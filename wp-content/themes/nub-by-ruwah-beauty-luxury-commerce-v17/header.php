@@ -1,13 +1,23 @@
-<?php defined('ABSPATH') || exit; $progress = ruwa_shipping_progress(); ?>
+<?php
+defined('ABSPATH') || exit;
+require_once get_stylesheet_directory() . '/inc/astra-design-system.php';
+ruwa_sync_astra_design_system();
+$progress = ruwa_shipping_progress();
+$override_css = get_stylesheet_directory() . '/assets/css/astra-woocommerce-overrides.css';
+?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
 <meta charset="<?php bloginfo('charset'); ?>">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <?php wp_head(); ?>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/css/ruwa-v31.css'); ?>?ver=<?php echo esc_attr(RUWA_THEME_VERSION); ?>">
+<link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/css/astra-woocommerce-overrides.css'); ?>?ver=<?php echo esc_attr(is_readable($override_css) ? (string) filemtime($override_css) : RUWA_THEME_VERSION); ?>">
 </head>
-<body <?php body_class(); ?>>
+<body <?php body_class(['ruwa-v30', 'ruwa-design-system-v31']); ?>>
 <?php wp_body_open(); ?>
 <a class="ruwa-skip" href="#main-content"><?php esc_html_e('Skip to content', 'nub-ruwah'); ?></a>
 <div class="ruwa-announcement"><span><?php esc_html_e('Small-batch skincare for real rituals', 'nub-ruwah'); ?></span><i></i><span><?php esc_html_e('Free delivery over PKR 5,000', 'nub-ruwah'); ?></span></div>

@@ -1,0 +1,307 @@
+/*
+ * RUWA BEAUTY — final Astra and WooCommerce cascade override.
+ * Loaded after Astra, WooCommerce and the child-theme styles.
+ */
+:root {
+  --color-bg-cream: #F7F0E6;
+  --color-bg-clay: #C97B5A;
+  --color-bg-clay-dark: #A85A3D;
+  --color-card: #FCF8F2;
+  --color-accent-forest: #1F3A30;
+  --color-accent-forest-hover: #16281F;
+  --color-gold: #B8935B;
+  --color-text-body: #3D342B;
+  --color-text-muted: #8C7F70;
+  --color-border-hairline: #E8DECF;
+  --color-error: #A8462E;
+  --ast-global-color-0: #1F3A30;
+  --ast-global-color-1: #16281F;
+  --ast-global-color-2: #3D342B;
+  --ast-global-color-3: #8C7F70;
+  --ast-global-color-4: #F7F0E6;
+  --ast-global-color-5: #FCF8F2;
+  --ast-global-color-6: #E8DECF;
+  --ast-global-color-7: #B8935B;
+  --ast-global-color-8: #A8462E;
+}
+
+html body.ruwa-design-system-v31,
+body.ruwa-design-system-v31 .site,
+body.ruwa-design-system-v31 #page,
+body.ruwa-design-system-v31 #content,
+body.ruwa-design-system-v31 .site-content,
+body.ruwa-design-system-v31 .ast-separate-container,
+body.ruwa-design-system-v31 .ast-container {
+  background-color: var(--color-bg-cream) !important;
+  color: var(--color-text-body) !important;
+  font-family: 'Inter', Arial, sans-serif !important;
+}
+
+body.ruwa-design-system-v31,
+body.ruwa-design-system-v31 p,
+body.ruwa-design-system-v31 li,
+body.ruwa-design-system-v31 label,
+body.ruwa-design-system-v31 input,
+body.ruwa-design-system-v31 select,
+body.ruwa-design-system-v31 textarea,
+body.ruwa-design-system-v31 button {
+  font-family: 'Inter', Arial, sans-serif !important;
+}
+
+body.ruwa-design-system-v31 h1,
+body.ruwa-design-system-v31 h2,
+body.ruwa-design-system-v31 h3,
+body.ruwa-design-system-v31 h4,
+body.ruwa-design-system-v31 h5,
+body.ruwa-design-system-v31 h6,
+body.ruwa-design-system-v31 .site-title,
+body.ruwa-design-system-v31 .entry-title,
+body.ruwa-design-system-v31 .page-title,
+body.ruwa-design-system-v31 .woocommerce-loop-product__title,
+body.ruwa-design-system-v31 .product_title,
+body.ruwa-design-system-v31 .wc-block-grid__product-title,
+body.ruwa-design-system-v31 .wp-block-post-title {
+  color: var(--color-accent-forest) !important;
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-weight: 600 !important;
+}
+
+body.ruwa-design-system-v31 a {
+  color: var(--color-accent-forest);
+}
+body.ruwa-design-system-v31 a:hover {
+  color: var(--color-accent-forest-hover);
+}
+
+/* Native WooCommerce, Astra shop cards and WooCommerce Blocks. */
+body.ruwa-design-system-v31.woocommerce ul.products li.product,
+body.ruwa-design-system-v31.woocommerce-page ul.products li.product,
+body.ruwa-design-system-v31 .woocommerce ul.products li.product,
+body.ruwa-design-system-v31 .woocommerce-page ul.products li.product,
+body.ruwa-design-system-v31 .wc-block-grid__product,
+body.ruwa-design-system-v31 .wc-block-product,
+body.ruwa-design-system-v31 .wp-block-woocommerce-product-template > li,
+body.ruwa-design-system-v31 .ruwa-product-card {
+  position: relative !important;
+  overflow: hidden !important;
+  background: var(--color-card) !important;
+  border: 2px solid var(--color-accent-forest) !important;
+  border-radius: 24px !important;
+  padding: 16px !important;
+  box-shadow: 0 2px 10px rgba(31, 58, 48, 0.06) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+body.ruwa-design-system-v31.woocommerce ul.products li.product:hover,
+body.ruwa-design-system-v31.woocommerce-page ul.products li.product:hover,
+body.ruwa-design-system-v31 .woocommerce ul.products li.product:hover,
+body.ruwa-design-system-v31 .woocommerce-page ul.products li.product:hover,
+body.ruwa-design-system-v31 .wc-block-grid__product:hover,
+body.ruwa-design-system-v31 .wc-block-product:hover,
+body.ruwa-design-system-v31 .wp-block-woocommerce-product-template > li:hover,
+body.ruwa-design-system-v31 .ruwa-product-card:hover {
+  transform: translateY(-6px) rotate(0deg) !important;
+  border-color: var(--color-accent-forest) !important;
+  box-shadow: 0 8px 32px rgba(31, 58, 48, 0.12) !important;
+}
+
+body.ruwa-design-system-v31 .woocommerce ul.products li.product .astra-shop-summary-wrap,
+body.ruwa-design-system-v31 .woocommerce ul.products li.product .ast-shop-product-out-of-stock,
+body.ruwa-design-system-v31 .wc-block-grid__product .wc-block-grid__product-link,
+body.ruwa-design-system-v31 .wc-block-product .wp-block-woocommerce-product-image {
+  background: transparent !important;
+}
+
+body.ruwa-design-system-v31 .woocommerce ul.products li.product img,
+body.ruwa-design-system-v31 .woocommerce-page ul.products li.product img,
+body.ruwa-design-system-v31 .wc-block-grid__product-image img,
+body.ruwa-design-system-v31 .wc-block-components-product-image img,
+body.ruwa-design-system-v31 .ruwa-product-media img {
+  border-radius: 16px !important;
+  background: #FFFFFF !important;
+}
+
+body.ruwa-design-system-v31 .woocommerce ul.products li.product .woocommerce-loop-product__title,
+body.ruwa-design-system-v31 .woocommerce-page ul.products li.product .woocommerce-loop-product__title,
+body.ruwa-design-system-v31 .wc-block-grid__product-title,
+body.ruwa-design-system-v31 .wc-block-components-product-name,
+body.ruwa-design-system-v31 .wc-block-components-product-name a {
+  color: var(--color-accent-forest) !important;
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+body.ruwa-design-system-v31 .woocommerce ul.products li.product .price,
+body.ruwa-design-system-v31 .woocommerce-page ul.products li.product .price,
+body.ruwa-design-system-v31 .wc-block-grid__product-price,
+body.ruwa-design-system-v31 .wc-block-components-product-price,
+body.ruwa-design-system-v31 .woocommerce div.product p.price,
+body.ruwa-design-system-v31 .woocommerce div.product span.price {
+  color: var(--color-accent-forest) !important;
+  font-family: 'Inter', Arial, sans-serif !important;
+  font-weight: 700 !important;
+}
+
+/* Sale badges: never allow Astra's default circle. */
+body.ruwa-design-system-v31 .woocommerce span.onsale,
+body.ruwa-design-system-v31 .woocommerce-page span.onsale,
+body.ruwa-design-system-v31 span.onsale,
+body.ruwa-design-system-v31 .ast-onsale-card,
+body.ruwa-design-system-v31 .wc-block-grid__product-onsale,
+body.ruwa-design-system-v31 .wc-block-components-product-sale-badge,
+body.ruwa-design-system-v31 .wc-block-components-product-badge {
+  top: 14px !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 14px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 7px 11px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: var(--color-error) !important;
+  color: #FFFFFF !important;
+  font-family: 'Inter', Arial, sans-serif !important;
+  font-size: 0.7rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  box-shadow: none !important;
+}
+
+/* Buttons: native WooCommerce, Astra, blocks, cart and checkout. */
+body.ruwa-design-system-v31 .button,
+body.ruwa-design-system-v31 button.button,
+body.ruwa-design-system-v31 input.button,
+body.ruwa-design-system-v31 a.button,
+body.ruwa-design-system-v31 .add_to_cart_button,
+body.ruwa-design-system-v31 .single_add_to_cart_button,
+body.ruwa-design-system-v31 .checkout-button,
+body.ruwa-design-system-v31 .woocommerce a.button,
+body.ruwa-design-system-v31 .woocommerce button.button,
+body.ruwa-design-system-v31 .woocommerce input.button,
+body.ruwa-design-system-v31 .woocommerce #respond input#submit,
+body.ruwa-design-system-v31 .wc-block-components-button,
+body.ruwa-design-system-v31 .wp-element-button,
+body.ruwa-design-system-v31 .ast-button,
+body.ruwa-design-system-v31 button[type='submit'],
+body.ruwa-design-system-v31 input[type='submit'] {
+  min-height: 46px !important;
+  padding: 12px 24px !important;
+  border: 1px solid var(--color-gold) !important;
+  border-radius: 999px !important;
+  background: var(--color-accent-forest) !important;
+  color: #FFFFFF !important;
+  font-family: 'Inter', Arial, sans-serif !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+body.ruwa-design-system-v31 .button:hover,
+body.ruwa-design-system-v31 button.button:hover,
+body.ruwa-design-system-v31 input.button:hover,
+body.ruwa-design-system-v31 a.button:hover,
+body.ruwa-design-system-v31 .add_to_cart_button:hover,
+body.ruwa-design-system-v31 .single_add_to_cart_button:hover,
+body.ruwa-design-system-v31 .checkout-button:hover,
+body.ruwa-design-system-v31 .woocommerce a.button:hover,
+body.ruwa-design-system-v31 .woocommerce button.button:hover,
+body.ruwa-design-system-v31 .woocommerce input.button:hover,
+body.ruwa-design-system-v31 .wc-block-components-button:hover,
+body.ruwa-design-system-v31 .wp-element-button:hover,
+body.ruwa-design-system-v31 .ast-button:hover,
+body.ruwa-design-system-v31 button[type='submit']:hover,
+body.ruwa-design-system-v31 input[type='submit']:hover {
+  border-color: var(--color-gold) !important;
+  background: var(--color-accent-forest-hover) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 24px rgba(31, 58, 48, 0.18) !important;
+}
+
+/* Product, cart, checkout and account surfaces. */
+body.ruwa-design-system-v31 .woocommerce div.product div.images,
+body.ruwa-design-system-v31 .woocommerce div.product div.summary,
+body.ruwa-design-system-v31 .woocommerce-cart-form,
+body.ruwa-design-system-v31 .cart_totals,
+body.ruwa-design-system-v31 .woocommerce-checkout-review-order,
+body.ruwa-design-system-v31 .woocommerce-billing-fields,
+body.ruwa-design-system-v31 .woocommerce-shipping-fields,
+body.ruwa-design-system-v31 .woocommerce-account .woocommerce-MyAccount-navigation,
+body.ruwa-design-system-v31 .woocommerce-account .woocommerce-MyAccount-content,
+body.ruwa-design-system-v31 .wc-block-cart,
+body.ruwa-design-system-v31 .wc-block-checkout,
+body.ruwa-design-system-v31 .wc-block-components-sidebar-layout .wc-block-components-main,
+body.ruwa-design-system-v31 .wc-block-components-sidebar {
+  border-color: var(--color-border-hairline) !important;
+  border-radius: 24px !important;
+  background: var(--color-card) !important;
+}
+
+body.ruwa-design-system-v31 input:not([type='checkbox']):not([type='radio']),
+body.ruwa-design-system-v31 select,
+body.ruwa-design-system-v31 textarea,
+body.ruwa-design-system-v31 .select2-container .select2-selection {
+  border: 1px solid var(--color-border-hairline) !important;
+  border-radius: 14px !important;
+  background: #FFFFFF !important;
+  color: var(--color-text-body) !important;
+}
+
+body.ruwa-design-system-v31 input:focus,
+body.ruwa-design-system-v31 select:focus,
+body.ruwa-design-system-v31 textarea:focus {
+  border-color: var(--color-gold) !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 4px rgba(184, 147, 91, 0.18) !important;
+}
+
+body.ruwa-design-system-v31 .site-footer,
+body.ruwa-design-system-v31 footer.site-footer,
+body.ruwa-design-system-v31 .ast-footer-overlay,
+body.ruwa-design-system-v31 .site-primary-footer-wrap,
+body.ruwa-design-system-v31 .site-below-footer-wrap,
+body.ruwa-design-system-v31 .ruwa-footer {
+  background: var(--color-accent-forest) !important;
+  color: var(--color-bg-cream) !important;
+}
+
+body.ruwa-design-system-v31 .site-footer h1,
+body.ruwa-design-system-v31 .site-footer h2,
+body.ruwa-design-system-v31 .site-footer h3,
+body.ruwa-design-system-v31 .site-footer h4,
+body.ruwa-design-system-v31 .site-footer a,
+body.ruwa-design-system-v31 .site-footer p,
+body.ruwa-design-system-v31 .ruwa-footer h1,
+body.ruwa-design-system-v31 .ruwa-footer h2,
+body.ruwa-design-system-v31 .ruwa-footer h3,
+body.ruwa-design-system-v31 .ruwa-footer h4,
+body.ruwa-design-system-v31 .ruwa-footer a,
+body.ruwa-design-system-v31 .ruwa-footer p {
+  color: var(--color-bg-cream) !important;
+}
+
+@media (max-width: 921px) {
+  body.ruwa-design-system-v31 .woocommerce ul.products,
+  body.ruwa-design-system-v31 .woocommerce-page ul.products,
+  body.ruwa-design-system-v31 .wp-block-woocommerce-product-template {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 544px) {
+  body.ruwa-design-system-v31 .woocommerce ul.products,
+  body.ruwa-design-system-v31 .woocommerce-page ul.products,
+  body.ruwa-design-system-v31 .wp-block-woocommerce-product-template {
+    grid-template-columns: 1fr !important;
+  }
+}
