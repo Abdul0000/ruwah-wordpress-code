@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" role="img" aria-labelledby="title desc">
   <title id="title">Ruwah Beauty monogram</title>
-  <desc id="desc">Transparent purple droplet monogram.</desc>
+  <desc id="desc">Transparent purple droplet monogram with a clear lowercase b.</desc>
   <g fill="none" stroke="#9638d5" stroke-width="30" stroke-linecap="round" stroke-linejoin="round">
     <path d="M120 278c-28-22-35-58-15-88 15-22 28-35 34-61 6 26 19 39 34 61 20 30 13 66-15 88-11 9-27 9-38 0Z"/>
     <path d="M139 190V112c0-44 32-76 76-76s76 32 76 76v132c0 46 32 78 76 78s76-32 76-78v-71"/>
     <path d="M443 173v71c0 46 32 78 76 78s76-32 76-78V82"/>
-    <circle cx="595" cy="226" r="80"/>
+    <circle cx="665" cy="226" r="70"/>
   </g>
   <g fill="none" stroke="#6f269f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".7">
     <path d="M120 278c-28-22-35-58-15-88 15-22 28-35 34-61 6 26 19 39 34 61 20 30 13 66-15 88-11 9-27 9-38 0Z"/>
     <path d="M139 190V112c0-44 32-76 76-76s76 32 76 76v132c0 46 32 78 76 78s76-32 76-78v-71"/>
     <path d="M443 173v71c0 46 32 78 76 78s76-32 76-78V82"/>
-    <circle cx="595" cy="226" r="80"/>
+    <circle cx="665" cy="226" r="70"/>
   </g>
 </svg>
