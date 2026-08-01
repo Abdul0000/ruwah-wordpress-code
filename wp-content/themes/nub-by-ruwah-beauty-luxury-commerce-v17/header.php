@@ -1,9 +1,11 @@
 <?php
 defined('ABSPATH') || exit;
 require_once get_stylesheet_directory() . '/inc/astra-design-system.php';
+require_once get_stylesheet_directory() . '/inc/warm-product-images.php';
 ruwa_sync_astra_design_system();
 $progress = ruwa_shipping_progress();
 $override_css = get_stylesheet_directory() . '/assets/css/astra-woocommerce-overrides.css';
+$interaction_css = get_stylesheet_directory() . '/assets/css/interaction-parity.css';
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -16,6 +18,7 @@ $override_css = get_stylesheet_directory() . '/assets/css/astra-woocommerce-over
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/css/ruwa-v31.css'); ?>?ver=<?php echo esc_attr(RUWA_THEME_VERSION); ?>">
 <link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/css/astra-woocommerce-overrides.css'); ?>?ver=<?php echo esc_attr(is_readable($override_css) ? (string) filemtime($override_css) : RUWA_THEME_VERSION); ?>">
+<link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/css/interaction-parity.css'); ?>?ver=<?php echo esc_attr(is_readable($interaction_css) ? (string) filemtime($interaction_css) : RUWA_THEME_VERSION); ?>">
 </head>
 <body <?php body_class(['ruwa-v30', 'ruwa-design-system-v31']); ?>>
 <?php wp_body_open(); ?>
@@ -44,11 +47,11 @@ $override_css = get_stylesheet_directory() . '/assets/css/astra-woocommerce-over
 </header>
 
 <div class="ruwa-overlay" data-overlay hidden></div>
-<section class="ruwa-search-overlay" data-search-dialog hidden aria-label="<?php esc_attr_e('Product search', 'nub-ruwah'); ?>">
+<section class="ruwa-search-overlay" data-search-dialog hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="ruwa-search-title">
   <div class="ruwa-search-card">
     <button type="button" class="ruwa-close" data-search-close aria-label="<?php esc_attr_e('Close search', 'nub-ruwah'); ?>">×</button>
     <span class="ruwa-eyebrow ruwa-eyebrow-light"><?php esc_html_e('FIND YOUR RITUAL', 'nub-ruwah'); ?></span>
-    <h2><?php esc_html_e('What are you looking for?', 'nub-ruwah'); ?></h2>
+    <h2 id="ruwa-search-title"><?php esc_html_e('What are you looking for?', 'nub-ruwah'); ?></h2>
     <form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
       <label class="screen-reader-text" for="ruwa-product-search"><?php esc_html_e('Search products', 'nub-ruwah'); ?></label>
       <input id="ruwa-product-search" type="search" name="s" placeholder="<?php esc_attr_e('Search products, ingredients, rituals…', 'nub-ruwah'); ?>">
