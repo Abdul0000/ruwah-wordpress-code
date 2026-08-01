@@ -5,6 +5,7 @@
 <meta charset="<?php bloginfo('charset'); ?>">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <?php wp_head(); ?>
+<link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/css/ruwa-v31.css'); ?>?ver=<?php echo esc_attr(RUWA_THEME_VERSION); ?>">
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
