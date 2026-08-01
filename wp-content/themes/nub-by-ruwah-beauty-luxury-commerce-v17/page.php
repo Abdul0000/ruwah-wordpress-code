@@ -1,1 +1,4 @@
-<?php defined('ABSPATH')||exit; get_header(); while(have_posts()):the_post(); $slug=get_post_field('post_name',get_the_ID()); ?><section class="rb-page-hero"><div class="rb-shell"><p class="rb-kicker">Ruwah Beauty</p><h1><?php the_title(); ?></h1></div></section><section class="rb-page"><div class="rb-shell rb-content-card"><?php if($slug==='faq'){echo '<div class="rb-faq">';} the_content(); if($slug==='faq'){echo '</div>';} ?></div></section><?php endwhile; get_footer(); ?>
+<?php defined('ABSPATH') || exit; get_header(); while(have_posts()): the_post(); $slug=get_post_field('post_name',get_the_ID()); ?>
+<section class="ruwa-page-hero"><div class="ruwa-grain"></div><div class="ruwa-shell"><span class="ruwa-eyebrow">RUWA BEAUTY</span><h1><?php the_title(); ?></h1></div></section>
+<section class="ruwa-page-section"><div class="ruwa-shell"><article class="ruwa-content-card<?php echo $slug==='faq'?' ruwa-faq':''; ?>"><?php the_content(); ?></article></div></section>
+<?php endwhile; get_footer(); ?>

@@ -1,12 +1,21 @@
 document.addEventListener('DOMContentLoaded',()=>{
-  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const menu=document.querySelector('.rb-menu');
-  const nav=document.querySelector('.rb-nav');
-  if(menu&&nav){const close=()=>{menu.setAttribute('aria-expanded','false');nav.classList.remove('open')};menu.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')==='true';menu.setAttribute('aria-expanded',String(!open));nav.classList.toggle('open',!open)});nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',close));document.addEventListener('keydown',e=>{if(e.key==='Escape')close()})}
-  const normalize=u=>{try{const x=new URL(u,location.origin);return x.pathname.replace(/\/$/,'')||'/'}catch(e){return u}};
-  const current=normalize(location.href);document.querySelectorAll('.rb-nav a').forEach(link=>{if(normalize(link.href)===current){link.classList.add('is-active');link.setAttribute('aria-current','page')}});
-  const header=document.querySelector('.rb-header');const updateHeader=()=>header&&header.classList.toggle('scrolled',window.scrollY>18);updateHeader();addEventListener('scroll',updateHeader,{passive:true});
-  document.querySelectorAll('.rb-faq h2,.rb-faq h3').forEach((heading,index)=>{const panel=heading.nextElementSibling;if(!panel)return;panel.classList.add('rb-accordion-panel');const id=`rb-faq-panel-${index}`;panel.id=id;heading.setAttribute('role','button');heading.setAttribute('tabindex','0');heading.setAttribute('aria-controls',id);heading.setAttribute('aria-expanded','false');const toggle=()=>{const open=heading.getAttribute('aria-expanded')==='true';heading.setAttribute('aria-expanded',String(!open));heading.classList.toggle('is-open',!open);panel.classList.toggle('is-open',!open);panel.style.maxHeight=!open?`${panel.scrollHeight+32}px`:'0px'};heading.addEventListener('click',toggle);heading.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}})});
-  if(!reduce&&'IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}}),{threshold:.12});document.querySelectorAll('.rb-reveal').forEach(el=>observer.observe(el))}else document.querySelectorAll('.rb-reveal').forEach(el=>el.classList.add('is-visible'));
-  const parallax=document.querySelector('.rb-parallax');if(parallax&&!reduce&&matchMedia('(min-width: 901px)').matches)addEventListener('scroll',()=>{parallax.style.transform=`translate3d(0,${Math.min(scrollY*.05,28)}px,0)`},{passive:true});
+ const header=document.querySelector('[data-header]');
+ const menuButton=document.querySelector('[data-menu-button]');
+ const menu=document.querySelector('[data-menu]');
+ const updateHeader=()=>header&&header.classList.toggle('is-scrolled',window.scrollY>16);
+ updateHeader(); window.addEventListener('scroll',updateHeader,{passive:true});
+ if(menuButton&&menu){menuButton.addEventListener('click',()=>{const open=menuButton.getAttribute('aria-expanded')==='true';menuButton.setAttribute('aria-expanded',String(!open));menu.classList.toggle('is-open',!open);});}
+ const tabs=[...document.querySelectorAll('[data-ritual-tab]')];
+ const panels=[...document.querySelectorAll('[data-ritual-panel]')];
+ const images=[...document.querySelectorAll('[data-ritual-image]')];
+ let active=0;
+ const selectRitual=index=>{active=(index+tabs.length)%tabs.length;tabs.forEach((tab,i)=>{const on=i===active;tab.classList.toggle('is-active',on);tab.setAttribute('aria-selected',String(on));});panels.forEach((panel,i)=>panel.classList.toggle('is-active',i===active));images.forEach((image,i)=>image.classList.toggle('is-active',i===active));};
+ tabs.forEach((tab,index)=>tab.addEventListener('click',()=>selectRitual(index)));
+ document.querySelector('[data-ritual-prev]')?.addEventListener('click',()=>selectRitual(active-1));
+ document.querySelector('[data-ritual-next]')?.addEventListener('click',()=>selectRitual(active+1));
+ const observer='IntersectionObserver'in window?new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target);}}),{threshold:.12}):null;
+ document.querySelectorAll('.ruwa-reveal').forEach((el,index)=>{el.style.setProperty('--delay',`${(index%4)*80}ms`);observer?observer.observe(el):el.classList.add('is-visible');});
+ document.querySelectorAll('.ruwa-faq h2,.ruwa-faq h3').forEach(title=>{title.tabIndex=0;title.setAttribute('role','button');title.setAttribute('aria-expanded','false');const toggle=()=>{const open=title.getAttribute('aria-expanded')==='true';title.setAttribute('aria-expanded',String(!open));title.parentElement?.classList.toggle('is-open',!open);};title.addEventListener('click',toggle);title.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle();}});});
+ document.querySelectorAll('.ruwa-bundle-options button').forEach(button=>button.addEventListener('click',()=>{button.parentElement.querySelectorAll('button').forEach(item=>item.classList.remove('is-active'));button.classList.add('is-active');}));
+ if(matchMedia('(min-width:1025px)').matches){const visual=document.querySelector('[data-ritual-visual]');window.addEventListener('scroll',()=>{if(visual)visual.style.transform=`translate3d(0,${Math.min(window.scrollY*.035,24)}px,0)`},{passive:true});}
 });
