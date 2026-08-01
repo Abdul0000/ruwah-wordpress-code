@@ -16,9 +16,32 @@ function ruwah_ritual_setup() {
 
 add_action( 'wp_enqueue_scripts', 'ruwah_ritual_assets', 30 );
 function ruwah_ritual_assets() {
-    $theme = wp_get_theme();
-    wp_enqueue_style( 'astra-parent', get_template_directory_uri() . '/style.css', array(), wp_get_theme( 'astra' )->get( 'Version' ) );
-    wp_enqueue_style( 'ruwah-ritual', get_stylesheet_uri(), array( 'astra-parent' ), $theme->get( 'Version' ) );
+    $theme       = wp_get_theme();
+    $style_path  = get_stylesheet_directory() . '/style.css';
+    $style_url   = get_stylesheet_directory_uri() . '/style.css';
+    $style_ver   = file_exists( $style_path ) ? (string) filemtime( $style_path ) : $theme->get( 'Version' );
+    $astra_theme = wp_get_theme( 'astra' );
+
+    wp_enqueue_style(
+        'astra-parent',
+        get_template_directory_uri() . '/style.css',
+        array(),
+        $astra_theme->exists() ? $astra_theme->get( 'Version' ) : null
+    );
+
+    wp_enqueue_style(
+        'ruwah-ritual',
+        $style_url,
+        array( 'astra-parent' ),
+        $style_ver
+    );
+
+    if ( file_exists( $style_path ) && is_readable( $style_path ) ) {
+        $inline_css = file_get_contents( $style_path );
+        if ( is_string( $inline_css ) && '' !== trim( $inline_css ) ) {
+            wp_add_inline_style( 'ruwah-ritual', $inline_css );
+        }
+    }
 
     wp_register_script( 'ruwah-ritual', '', array(), $theme->get( 'Version' ), true );
     wp_enqueue_script( 'ruwah-ritual' );
