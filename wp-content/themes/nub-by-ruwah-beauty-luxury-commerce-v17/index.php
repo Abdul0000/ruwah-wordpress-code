@@ -1,0 +1,6 @@
+<?php defined('ABSPATH') || exit; get_header(); ?>
+<section class="ruwa-page-hero ruwa-page-hero-quiet"><div class="ruwa-shell"><span class="ruwa-eyebrow">RUWA JOURNAL</span><h1><?php echo esc_html(is_search() ? sprintf(__('Search: %s', 'nub-ruwah'), get_search_query()) : (is_archive() ? get_the_archive_title() : __('Latest notes', 'nub-ruwah'))); ?></h1></div></section>
+<section class="ruwa-page-section"><div class="ruwa-shell"><div class="ruwa-post-grid">
+<?php if (have_posts()) : while (have_posts()) : the_post(); ?><article class="ruwa-post-card"><?php if (has_post_thumbnail()) : ?><a href="<?php the_permalink(); ?>"><?php the_post_thumbnail('large'); ?></a><?php endif; ?><small><?php echo esc_html(get_the_date()); ?></small><h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2><p><?php echo esc_html(wp_trim_words(get_the_excerpt(), 24)); ?></p><a class="ruwa-text-link" href="<?php the_permalink(); ?>"><?php esc_html_e('Read more', 'nub-ruwah'); ?></a></article><?php endwhile; else : ?><div class="ruwa-empty-state"><h2><?php esc_html_e('Nothing found yet.', 'nub-ruwah'); ?></h2><a class="ruwa-button ruwa-button-primary" href="<?php echo esc_url(ruwa_shop_url()); ?>"><?php esc_html_e('Explore the shop', 'nub-ruwah'); ?></a></div><?php endif; ?>
+</div><?php the_posts_pagination(); ?></div></section>
+<?php get_footer(); ?>
