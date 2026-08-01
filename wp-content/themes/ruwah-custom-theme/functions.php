@@ -1,6 +1,6 @@
 <?php
 defined('ABSPATH') || exit;
-define('RUWAH_THEME_VERSION','1.0.5');
+define('RUWAH_THEME_VERSION','1.0.6');
 
 add_action('after_setup_theme',function(){
     load_theme_textdomain('ruwah',get_template_directory().'/languages');
@@ -21,28 +21,28 @@ add_action('wp_enqueue_scripts',function(){
     wp_enqueue_script('ruwah-theme',get_template_directory_uri().'/theme.js',[],RUWAH_THEME_VERSION,true);
 
     $card_css=<<<CSS
-.rb-product-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:16px!important;align-items:stretch!important}
-.rb-product-card{display:flex!important;flex-direction:column!important;min-width:0!important;min-height:0!important;padding:8px!important;border:1px solid #eadfdf!important;border-radius:18px!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important}
-.rb-product-media{display:flex!important;align-items:center!important;justify-content:center!important;height:205px!important;padding:14px!important;border-radius:13px!important;overflow:hidden!important;background:#f8f6f6!important}
+.rb-product-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:14px!important;align-items:stretch!important}
+.rb-product-card{display:flex!important;flex-direction:column!important;min-width:0!important;min-height:0!important;padding:6px!important;border:1px solid #eadfdf!important;border-radius:15px!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important}
+.rb-product-media{display:flex!important;align-items:center!important;justify-content:center!important;height:170px!important;padding:9px!important;border-radius:11px!important;overflow:hidden!important;background:#f8f6f6!important}
 .rb-product-media img{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;object-fit:contain!important;object-position:center!important}
-.rb-product-copy{display:flex!important;flex:1!important;flex-direction:column!important;padding:10px 10px 4px!important}
+.rb-product-copy{display:flex!important;flex:1!important;flex-direction:column!important;padding:8px 8px 2px!important}
 .rb-product-copy small{display:none!important}
-.rb-product-copy h3{display:-webkit-box!important;min-height:39px!important;margin:0 0 7px!important;overflow:hidden!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;font-family:Inter,sans-serif!important;font-size:16px!important;font-weight:800!important;line-height:1.2!important;letter-spacing:-.015em!important}
+.rb-product-copy h3{display:-webkit-box!important;min-height:34px!important;margin:0 0 5px!important;overflow:hidden!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;font-family:Inter,sans-serif!important;font-size:14px!important;font-weight:800!important;line-height:1.18!important;letter-spacing:-.015em!important}
 .rb-product-copy h3 a{color:#171313!important;text-decoration:none!important}
-.rb-card-rating{display:flex!important;align-items:center!important;gap:5px!important;min-height:18px!important;margin:0 0 7px!important;color:#111!important;font-size:13px!important;line-height:1!important;white-space:nowrap!important}
-.rb-card-rating>span:first-child{font-size:15px!important;letter-spacing:-2px!important}
-.rb-card-rating .rb-rating-count{overflow:hidden!important;color:#111!important;font-size:10px!important;text-overflow:ellipsis!important;text-decoration:underline!important;text-underline-offset:2px!important}
-.rb-price{display:flex!important;align-items:baseline!important;flex-wrap:nowrap!important;gap:6px!important;min-height:22px!important;margin-top:auto!important;color:#171313!important;font-size:16px!important;font-weight:800!important;line-height:1.1!important;white-space:nowrap!important}
-.rb-price del{color:#887d7d!important;font-size:10px!important;font-weight:500!important;opacity:1!important}
-.rb-price ins{color:#171313!important;font-size:16px!important;font-weight:800!important;text-decoration:none!important}
-.rb-product-actions{display:block!important;margin-top:9px!important;padding:0 10px 7px!important}
+.rb-card-rating{display:flex!important;align-items:center!important;gap:4px!important;min-height:15px!important;margin:0 0 5px!important;color:#111!important;font-size:11px!important;line-height:1!important;white-space:nowrap!important}
+.rb-card-rating>span:first-child{font-size:13px!important;letter-spacing:-2px!important}
+.rb-card-rating .rb-rating-count{overflow:hidden!important;color:#111!important;font-size:9px!important;text-overflow:ellipsis!important;text-decoration:underline!important;text-underline-offset:2px!important}
+.rb-price{display:flex!important;align-items:baseline!important;flex-wrap:nowrap!important;gap:5px!important;min-height:19px!important;margin-top:auto!important;color:#171313!important;font-size:14px!important;font-weight:800!important;line-height:1.05!important;white-space:nowrap!important}
+.rb-price del{color:#887d7d!important;font-size:9px!important;font-weight:500!important;opacity:1!important}
+.rb-price ins{color:#171313!important;font-size:14px!important;font-weight:800!important;text-decoration:none!important}
+.rb-product-actions{display:block!important;margin-top:7px!important;padding:0 8px 5px!important}
 .rb-product-actions .rb-text-link{display:none!important}
-.rb-product-actions .button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:39px!important;margin:0!important;padding:9px 10px!important;border:0!important;border-radius:7px!important;background:#111!important;color:#fff!important;font-family:Inter,sans-serif!important;font-size:12px!important;font-weight:800!important;line-height:1!important;text-decoration:none!important;box-shadow:none!important}
+.rb-product-actions .button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:34px!important;margin:0!important;padding:7px 8px!important;border:0!important;border-radius:6px!important;background:#111!important;color:#fff!important;font-family:Inter,sans-serif!important;font-size:11px!important;font-weight:800!important;line-height:1!important;text-decoration:none!important;box-shadow:none!important}
 .rb-product-actions .button:hover{background:var(--rb-burgundy,#681426)!important;color:#fff!important}
-.rb-badge{top:16px!important;left:16px!important;padding:6px 9px!important;border-radius:999px!important;font-size:10px!important;line-height:1!important}
-@media(max-width:1500px){.rb-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.rb-product-media{height:215px!important}}
-@media(max-width:980px){.rb-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.rb-product-media{height:210px!important}}
-@media(max-width:560px){.rb-product-grid{gap:10px!important}.rb-product-card{padding:6px!important;border-radius:14px!important}.rb-product-media{height:145px!important;padding:8px!important;border-radius:10px!important}.rb-product-copy{padding:8px 6px 3px!important}.rb-product-copy h3{min-height:34px!important;margin-bottom:5px!important;font-size:13px!important}.rb-card-rating{gap:3px!important;margin-bottom:5px!important;font-size:10px!important}.rb-card-rating>span:first-child{font-size:12px!important}.rb-card-rating .rb-rating-count{font-size:8px!important}.rb-price{gap:3px!important;font-size:12px!important}.rb-price ins{font-size:12px!important}.rb-price del{font-size:8px!important}.rb-product-actions{margin-top:7px!important;padding:0 6px 5px!important}.rb-product-actions .button{min-height:34px!important;padding:8px 6px!important;font-size:10px!important}.rb-badge{top:11px!important;left:11px!important;padding:5px 7px!important;font-size:8px!important}}
+.rb-badge{top:12px!important;left:12px!important;padding:5px 8px!important;border-radius:999px!important;font-size:9px!important;line-height:1!important}
+@media(max-width:1500px){.rb-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.rb-product-media{height:175px!important}}
+@media(max-width:980px){.rb-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}.rb-product-media{height:165px!important}}
+@media(max-width:560px){.rb-product-grid{gap:8px!important}.rb-product-card{padding:5px!important;border-radius:12px!important}.rb-product-media{height:120px!important;padding:6px!important;border-radius:8px!important}.rb-product-copy{padding:6px 5px 2px!important}.rb-product-copy h3{min-height:29px!important;margin-bottom:4px!important;font-size:11.5px!important;line-height:1.15!important}.rb-card-rating{gap:2px!important;min-height:13px!important;margin-bottom:4px!important;font-size:9px!important}.rb-card-rating>span:first-child{font-size:10px!important}.rb-card-rating .rb-rating-count{font-size:7px!important}.rb-price{gap:3px!important;min-height:16px!important;font-size:11px!important}.rb-price ins{font-size:11px!important}.rb-price del{font-size:7px!important}.rb-product-actions{margin-top:5px!important;padding:0 5px 4px!important}.rb-product-actions .button{min-height:29px!important;padding:6px 5px!important;font-size:9px!important}.rb-badge{top:9px!important;left:9px!important;padding:4px 6px!important;font-size:7px!important}}
 .rb-category-card span{position:relative;background:#f6e8e8!important}.rb-category-card span img{display:block;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;transform:scale(1.01);transition:transform .35s ease}.rb-category-card:hover span img{transform:scale(1.08)}
 /* Keep the existing hero design, but prevent text/image overlap. */
 .home .rb-hero{min-height:620px!important;grid-template-columns:minmax(0,54%) minmax(0,46%)!important;background:linear-gradient(90deg,#f6e8e8 0 56%,#ead4d4 56%)!important}
