@@ -37,21 +37,21 @@ $logo_path = get_template_directory() . '/assets/ruwah-monogram.svg';
       .rb-kicker,.rb-text-link{color:#9638d5!important}
       .rb-section h2,.rb-page-title,.woocommerce h1,.woocommerce h2,.woocommerce h3,.rb-product-copy h3,.rb-concern-card strong,.rb-ingredient-card strong{color:#151218!important}
       .rb-section--blush,.rb-page-hero{background:#f6f1fb!important}
-      .home .rb-hero{background:linear-gradient(90deg,#f6f1fb 0 56%,#eee4f7 56%)!important}
-      .home .rb-hero h1{color:#151218!important}
-      .home .rb-hero p{color:#625c66!important}
-      .home .rb-hero-media:before{background:#fff!important}
-      .home .rb-hero-media img{filter:drop-shadow(0 26px 34px rgba(42,22,56,.20))!important}
+      body.home .rb-hero{background:linear-gradient(90deg,#f6f1fb 0 56%,#eee4f7 56%)!important}
+      body.home .rb-hero h1{color:#151218!important}
+      body.home .rb-hero p{color:#625c66!important}
+      body.home .rb-hero-media:before{background:#fff!important}
+      body.home .rb-hero-media img{filter:drop-shadow(0 26px 34px rgba(42,22,56,.20))!important}
       .rb-button,.woocommerce a.button,.woocommerce button.button,.woocommerce input.button,.woocommerce #respond input#submit,.wp-element-button,.wc-block-components-button{background:#9638d5!important;color:#fff!important;border:1px solid transparent!important;border-radius:999px!important;box-shadow:none!important}
       .rb-button:hover,.woocommerce a.button:hover,.woocommerce button.button:hover,.woocommerce input.button:hover,.wp-element-button:hover,.wc-block-components-button:hover{background:#7f2cc0!important;color:#fff!important;transform:translateY(-1px)!important}
       .rb-button--light{background:#fff!important;color:#2a1638!important;border-color:#e8e0ed!important}
       .rb-product-actions .button{background:#151218!important;color:#fff!important}
       .rb-product-actions .button:hover{background:#9638d5!important}
-      .home .rb-category-slider-section{background:#fff!important;border-color:#e8e0ed!important}
-      .home .rb-category-slider .rb-category-card span{background:linear-gradient(180deg,#fff 0 22%,#f6f1fb 22% 100%)!important;border-color:#e8e0ed!important;box-shadow:0 8px 22px rgba(42,22,56,.06)!important}
-      .home .rb-category-slider .rb-category-card b{color:#151218!important}
-      .home .rb-category-arrow{background:#fff!important;color:#9638d5!important;border-color:#e8e0ed!important}
-      .home .rb-category-arrow:hover{background:#9638d5!important;color:#fff!important;border-color:#9638d5!important}
+      body.home .rb-category-slider-section{background:#fff!important;border-color:#e8e0ed!important}
+      body.home .rb-category-slider .rb-category-card span{background:linear-gradient(180deg,#fff 0 22%,#f6f1fb 22% 100%)!important;border-color:#e8e0ed!important;box-shadow:0 8px 22px rgba(42,22,56,.06)!important}
+      body.home .rb-category-slider .rb-category-card b{color:#151218!important}
+      body.home .rb-category-arrow{background:#fff!important;color:#9638d5!important;border-color:#e8e0ed!important}
+      body.home .rb-category-arrow:hover{background:#9638d5!important;color:#fff!important;border-color:#9638d5!important}
       .rb-product-card,.woocommerce ul.products li.product,.rb-review,.rb-post-card,.rb-quality-card,.rb-empty,.woocommerce table.shop_table,.woocommerce-cart-form,.cart_totals,#customer_details,#order_review,.woocommerce-MyAccount-navigation,.woocommerce-MyAccount-content{background:#fff!important;border-color:#e8e0ed!important;box-shadow:0 6px 22px rgba(42,22,56,.05)!important}
       .rb-product-media,.woocommerce ul.products li.product img{background:#f6f1fb!important}
       .rb-card-rating,.woocommerce .star-rating,.comment-form-rating .stars a{color:#9638d5!important}
@@ -75,7 +75,7 @@ $logo_path = get_template_directory() . '/assets/ruwah-monogram.svg';
       .woocommerce div.product form.cart .single_add_to_cart_button{background:#9638d5!important}
       .woocommerce-cart .cart_totals,.woocommerce-checkout #order_review{background:#f6f1fb!important}
       .woocommerce-MyAccount-navigation .is-active a,.woocommerce-MyAccount-navigation a:hover{background:#f6f1fb!important;color:#6f2dbd!important}
-      @media(max-width:760px){.home .rb-hero{background:linear-gradient(#f6f1fb 0 59%,#eee4f7 59%)!important}}
+      @media(max-width:760px){body.home .rb-hero{background:linear-gradient(#f6f1fb 0 59%,#eee4f7 59%)!important}}
     </style>
 </head>
 <body <?php body_class(); ?>>
