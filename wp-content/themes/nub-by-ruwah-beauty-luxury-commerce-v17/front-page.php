@@ -1,191 +1,25 @@
 <?php
-/**
- * Premium front page for NUB by Ruwah Beauty.
- *
- * @package Nub_Ruwah
- */
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
+/** Clinical-premium homepage for NUB by Ruwah Beauty. */
+defined( 'ABSPATH' ) || exit;
 get_header();
-
-$shop_url      = function_exists( 'ruwah_shop_url' ) ? ruwah_shop_url() : home_url( '/shop/' );
-$products      = function_exists( 'ruwah_get_home_products' ) ? ruwah_get_home_products( 4 ) : array();
-$hero_product  = ! empty( $products ) ? $products[0] : null;
-$product_count = wp_count_posts( 'product' );
-$published     = isset( $product_count->publish ) ? absint( $product_count->publish ) : 0;
-$display_count = str_pad( (string) max( 1, $published ), 2, '0', STR_PAD_LEFT );
-$concerns      = array(
-	array(
-		'title' => __( 'Deep hydration', 'nub-ruwah' ),
-		'copy'  => __( 'Replenish moisture and support a soft, comfortable complexion.', 'nub-ruwah' ),
-		'query' => 'hydration',
-	),
-	array(
-		'title' => __( 'Visible radiance', 'nub-ruwah' ),
-		'copy'  => __( 'Bring clarity and luminosity back to tired-looking skin.', 'nub-ruwah' ),
-		'query' => 'brightening',
-	),
-	array(
-		'title' => __( 'Balanced skin', 'nub-ruwah' ),
-		'copy'  => __( 'Refine the look of congestion without compromising comfort.', 'nub-ruwah' ),
-		'query' => 'acne',
-	),
-	array(
-		'title' => __( 'Barrier support', 'nub-ruwah' ),
-		'copy'  => __( 'Strengthen the everyday ritual for resilient, calmer-looking skin.', 'nub-ruwah' ),
-		'query' => 'barrier',
-	),
-);
-$steps = array(
-	array(
-		'title' => __( 'Cleanse', 'nub-ruwah' ),
-		'copy'  => __( 'Begin with a gentle reset that removes the day while respecting your skin.', 'nub-ruwah' ),
-	),
-	array(
-		'title' => __( 'Treat', 'nub-ruwah' ),
-		'copy'  => __( 'Apply a focused serum to address the concern that matters most to you.', 'nub-ruwah' ),
-	),
-	array(
-		'title' => __( 'Hydrate', 'nub-ruwah' ),
-		'copy'  => __( 'Seal in comfort with balanced moisture and barrier-supporting care.', 'nub-ruwah' ),
-	),
-	array(
-		'title' => __( 'Protect', 'nub-ruwah' ),
-		'copy'  => __( 'Complete the morning ritual with daily sun protection.', 'nub-ruwah' ),
-	),
-);
+$shop_url    = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' );
+$account_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account/' );
+$cart_url    = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' );
+$cart_count  = function_exists( 'WC' ) && WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
+$products = function_exists( 'wc_get_products' ) ? wc_get_products( array( 'status' => 'publish', 'limit' => 4, 'orderby' => 'date', 'order' => 'DESC' ) ) : array();
+$hero_product = ! empty( $products ) ? $products[0] : null;
+$hero_image   = $hero_product ? wp_get_attachment_image_url( $hero_product->get_image_id(), 'full' ) : '';
 ?>
-
-<main id="primary" class="site-main ruwah-home">
-	<section class="ruwah-hero" aria-labelledby="ruwah-hero-title">
-		<div class="ruwah-shell">
-			<div class="ruwah-hero__grid">
-				<div class="ruwah-hero__content">
-					<p class="ruwah-kicker"><?php echo esc_html__( 'NUB by Ruwah Beauty', 'nub-ruwah' ); ?></p>
-					<h1 id="ruwah-hero-title" class="ruwah-title"><?php echo wp_kses_post( __( 'Skincare,<br><em>elevated.</em>', 'nub-ruwah' ) ); ?></h1>
-					<p class="ruwah-copy"><?php echo esc_html__( 'Thoughtful formulas for hydration, radiance and barrier support—designed to make effective skincare feel beautifully uncomplicated.', 'nub-ruwah' ); ?></p>
-					<div class="ruwah-actions">
-						<a class="ruwah-button" href="<?php echo esc_url( $shop_url ); ?>"><?php echo esc_html__( 'Shop the collection', 'nub-ruwah' ); ?></a>
-						<a class="ruwah-button ruwah-button--ghost" href="#ritual"><?php echo esc_html__( 'Build your ritual', 'nub-ruwah' ); ?></a>
-					</div>
-				</div>
-
-				<div class="ruwah-hero__visual" aria-label="Featured skincare product">
-					<div class="ruwah-hero__frame">
-						<?php if ( $hero_product instanceof WC_Product && $hero_product->get_image_id() ) : ?>
-							<a href="<?php echo esc_url( get_permalink( $hero_product->get_id() ) ); ?>">
-								<?php
-								echo wp_get_attachment_image(
-									$hero_product->get_image_id(),
-									'large',
-									false,
-									array(
-										'class'         => 'ruwah-hero__image',
-										'loading'       => 'eager',
-										'fetchpriority' => 'high',
-										'decoding'      => 'async',
-										'alt'           => $hero_product->get_name(),
-									)
-								);
-								?>
-							</a>
-						<?php else : ?>
-							<div class="ruwah-hero__fallback"><?php echo esc_html__( 'NUB', 'nub-ruwah' ); ?></div>
-						<?php endif; ?>
-					</div>
-					<div class="ruwah-hero__badge"><?php echo esc_html__( 'Made for an intentional daily ritual', 'nub-ruwah' ); ?></div>
-				</div>
-			</div>
-
-			<div class="ruwah-metrics" aria-label="Collection highlights">
-				<div class="ruwah-metric"><strong><?php echo esc_html( $display_count ); ?></strong><span><?php echo esc_html__( 'Focused products', 'nub-ruwah' ); ?></span></div>
-				<div class="ruwah-metric"><strong>04</strong><span><?php echo esc_html__( 'Essential steps', 'nub-ruwah' ); ?></span></div>
-				<div class="ruwah-metric"><strong>03</strong><span><?php echo esc_html__( 'Quality priorities', 'nub-ruwah' ); ?></span></div>
-			</div>
-		</div>
-	</section>
-
-	<section class="ruwah-section" aria-labelledby="ruwah-products-title">
-		<div class="ruwah-shell">
-			<div class="ruwah-section__head">
-				<div>
-					<p class="ruwah-kicker"><?php echo esc_html__( 'Selected essentials', 'nub-ruwah' ); ?></p>
-					<h2 id="ruwah-products-title" class="ruwah-title"><?php echo wp_kses_post( __( 'A focused edit for<br><em>everyday skin.</em>', 'nub-ruwah' ) ); ?></h2>
-				</div>
-				<a class="ruwah-text-link" href="<?php echo esc_url( $shop_url ); ?>"><?php echo esc_html__( 'View all products', 'nub-ruwah' ); ?></a>
-			</div>
-
-			<div class="ruwah-product-grid">
-				<?php if ( $products ) : ?>
-					<?php foreach ( $products as $product ) : ?>
-						<?php ruwah_render_product_card( $product ); ?>
-					<?php endforeach; ?>
-				<?php else : ?>
-					<div class="ruwah-empty">
-						<p><?php echo esc_html__( 'The collection is being prepared. Explore the shop for available skincare.', 'nub-ruwah' ); ?></p>
-						<a class="ruwah-button" href="<?php echo esc_url( $shop_url ); ?>"><?php echo esc_html__( 'Visit shop', 'nub-ruwah' ); ?></a>
-					</div>
-				<?php endif; ?>
-			</div>
-		</div>
-	</section>
-
-	<section class="ruwah-section ruwah-section--dark" aria-labelledby="ruwah-concerns-title">
-		<div class="ruwah-shell">
-			<div class="ruwah-section__head">
-				<div>
-					<p class="ruwah-kicker" style="color:#d6b38f"><?php echo esc_html__( 'Shop by need', 'nub-ruwah' ); ?></p>
-					<h2 id="ruwah-concerns-title" class="ruwah-title" style="color:#fff"><?php echo wp_kses_post( __( 'Start with what your<br><em style="color:#d6b38f">skin is asking for.</em>', 'nub-ruwah' ) ); ?></h2>
-				</div>
-			</div>
-
-			<div class="ruwah-concern-grid">
-				<?php foreach ( $concerns as $index => $concern ) : ?>
-					<a class="ruwah-concern" href="<?php echo esc_url( add_query_arg( array( 's' => $concern['query'], 'post_type' => 'product' ), home_url( '/' ) ) ); ?>">
-						<span class="ruwah-concern__number"><?php echo esc_html( str_pad( (string) ( $index + 1 ), 2, '0', STR_PAD_LEFT ) ); ?></span>
-						<h3><?php echo esc_html( $concern['title'] ); ?></h3>
-						<p><?php echo esc_html( $concern['copy'] ); ?></p>
-					</a>
-				<?php endforeach; ?>
-			</div>
-		</div>
-	</section>
-
-	<section id="ritual" class="ruwah-section ruwah-section--cream" aria-labelledby="ruwah-ritual-title">
-		<div class="ruwah-shell ruwah-ritual">
-			<div class="ruwah-ritual__intro">
-				<p class="ruwah-kicker"><?php echo esc_html__( 'The daily ritual', 'nub-ruwah' ); ?></p>
-				<h2 id="ruwah-ritual-title" class="ruwah-title"><?php echo wp_kses_post( __( 'Four steps.<br><em>One clear rhythm.</em>', 'nub-ruwah' ) ); ?></h2>
-				<p class="ruwah-copy"><?php echo esc_html__( 'A consistent routine does not need to be complicated. Begin with the essentials, then adapt them to your skin.', 'nub-ruwah' ); ?></p>
-				<div class="ruwah-actions"><a class="ruwah-button" href="<?php echo esc_url( $shop_url ); ?>"><?php echo esc_html__( 'Explore the ritual', 'nub-ruwah' ); ?></a></div>
-			</div>
-
-			<div class="ruwah-ritual__steps">
-				<?php foreach ( $steps as $index => $step ) : ?>
-					<article class="ruwah-step">
-						<div class="ruwah-step__number"><?php echo esc_html( str_pad( (string) ( $index + 1 ), 2, '0', STR_PAD_LEFT ) ); ?></div>
-						<div>
-							<h3><?php echo esc_html( $step['title'] ); ?></h3>
-							<p><?php echo esc_html( $step['copy'] ); ?></p>
-						</div>
-					</article>
-				<?php endforeach; ?>
-			</div>
-		</div>
-	</section>
-
-	<section class="ruwah-manifesto" aria-labelledby="ruwah-manifesto-title">
-		<div class="ruwah-shell">
-			<p class="ruwah-kicker"><?php echo esc_html__( 'Skincare with intention', 'nub-ruwah' ); ?></p>
-			<h2 id="ruwah-manifesto-title" class="ruwah-title"><?php echo wp_kses_post( __( 'Less noise.<br><em>More considered care.</em>', 'nub-ruwah' ) ); ?></h2>
-			<p class="ruwah-copy"><?php echo esc_html__( 'NUB by Ruwah Beauty brings together purposeful formulas, clear routines and an elevated everyday experience.', 'nub-ruwah' ); ?></p>
-			<div class="ruwah-actions"><a class="ruwah-button" href="<?php echo esc_url( home_url( '/our-story/' ) ); ?>"><?php echo esc_html__( 'Discover our story', 'nub-ruwah' ); ?></a></div>
-		</div>
-	</section>
+<div class="nub19-page">
+<div class="nub19-topbar"><div class="nub19-shell nub19-topbar__inner"><span>Complimentary delivery above PKR 5,000</span><div><a href="<?php echo esc_url( home_url( '/track-order/' ) ); ?>">Track order</a><i></i><a href="<?php echo esc_url( home_url( '/contact-us/' ) ); ?>">Customer care</a></div></div></div>
+<header class="nub19-header"><div class="nub19-shell nub19-header__inner"><a class="nub19-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="NUB by Ruwah Beauty home"><strong>NUB</strong><small>BY RUWAH BEAUTY</small></a><button class="nub19-menu-toggle" type="button" aria-expanded="false" aria-controls="nub19-navigation"><span></span><span></span><span></span><b class="screen-reader-text">Menu</b></button><nav id="nub19-navigation" class="nub19-nav" aria-label="Primary navigation"><a href="<?php echo esc_url( $shop_url ); ?>">Shop</a><a href="<?php echo esc_url( add_query_arg( 'orderby', 'date', $shop_url ) ); ?>">New arrivals</a><a href="<?php echo esc_url( add_query_arg( 'orderby', 'popularity', $shop_url ) ); ?>">Best sellers</a><a href="#daily-ritual">Rituals</a><a href="<?php echo esc_url( home_url( '/our-story/' ) ); ?>">Our story</a></nav><div class="nub19-tools"><button class="nub19-search-toggle" type="button" aria-label="Open search">⌕</button><a href="<?php echo esc_url( $account_url ); ?>" aria-label="My account">♙</a><a class="nub19-cart" href="<?php echo esc_url( $cart_url ); ?>" aria-label="Cart">▢<?php if ( $cart_count ) : ?><span><?php echo esc_html( $cart_count ); ?></span><?php endif; ?></a></div></div><form class="nub19-search" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>"><div class="nub19-shell"><label class="screen-reader-text" for="nub19-search-field">Search products</label><input id="nub19-search-field" type="search" name="s" placeholder="Search skincare" /><input type="hidden" name="post_type" value="product" /><button type="submit">Search</button></div></form></header>
+<main>
+<section class="nub19-hero"><div class="nub19-shell nub19-hero__grid"><div class="nub19-hero__copy"><p class="nub19-eyebrow">NUB BY RUWAH BEAUTY</p><h1>Skincare.<br><em>Elevated.</em></h1><p class="nub19-lead">Thoughtful formulas for hydration, radiance and barrier support—designed to make effective skincare feel beautifully uncomplicated.</p><div class="nub19-actions"><a class="nub19-btn" href="<?php echo esc_url( $shop_url ); ?>">Shop the collection</a><a class="nub19-btn nub19-btn--outline" href="#daily-ritual">Build your ritual</a></div><div class="nub19-trust"><div><span>⚗</span><b>Authentic products</b></div><div><span>◉</span><b>Dermatologically considered</b></div><div><span>◇</span><b>Secure checkout</b></div><div><span>▱</span><b>Complimentary delivery above PKR 5,000</b></div></div></div><div class="nub19-hero__visual"><div class="nub19-lab nub19-lab--one"></div><div class="nub19-lab nub19-lab--two"></div><div class="nub19-product-stage"><?php if ( $hero_image ) : ?><img src="<?php echo esc_url( $hero_image ); ?>" alt="<?php echo esc_attr( $hero_product->get_name() ); ?>" /><?php else : ?><div class="nub19-placeholder">NUB</div><?php endif; ?></div><div class="nub19-ritual-badge">Made for an<br>intentional<br>daily ritual<span>☼</span></div></div></div></section>
+<section class="nub19-metrics"><div class="nub19-shell nub19-metrics__grid"><div><strong>08</strong><span>Focused products</span></div><div><strong>04</strong><span>Essential steps</span></div><div><strong>03</strong><span>Quality priorities</span></div><div><strong>◒</strong><span>Skincare with intention</span></div></div></section>
+<section class="nub19-section nub19-products"><div class="nub19-shell"><div class="nub19-section-head"><div><p class="nub19-eyebrow">Selected essentials</p><h2>A focused edit for <em>everyday skin.</em></h2></div><a href="<?php echo esc_url( $shop_url ); ?>">View all products →</a></div><div class="nub19-product-grid"><?php if ( $products ) : foreach ( $products as $product ) : $image = wp_get_attachment_image_url( $product->get_image_id(), 'woocommerce_thumbnail' ); $rating_count = $product->get_rating_count(); ?><article class="nub19-card"><a class="nub19-card__media" href="<?php echo esc_url( $product->get_permalink() ); ?>"><span>New</span><?php if ( $image ) : ?><img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>" loading="lazy" /><?php endif; ?></a><div class="nub19-card__body"><h3><a href="<?php echo esc_url( $product->get_permalink() ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></h3><div class="nub19-card__meta"><div class="nub19-price"><?php echo wp_kses_post( $product->get_price_html() ); ?></div><?php if ( $rating_count ) : ?><div class="nub19-rating"><?php echo wp_kses_post( wc_get_rating_html( $product->get_average_rating(), $rating_count ) ); ?><small>(<?php echo esc_html( $rating_count ); ?>)</small></div><?php endif; ?></div><a class="nub19-card__button" href="<?php echo esc_url( $product->add_to_cart_url() ); ?>" data-quantity="1" data-product_id="<?php echo esc_attr( $product->get_id() ); ?>" rel="nofollow"><?php echo esc_html( $product->add_to_cart_text() ); ?> <span>▱</span></a></div></article><?php endforeach; else : ?><p class="nub19-empty">Products will appear here automatically.</p><?php endif; ?></div></div></section>
+<section class="nub19-promise"><div class="nub19-shell nub19-promise__grid"><div class="nub19-promise__intro"><p class="nub19-eyebrow">Our promise</p><h2>Skincare that works in harmony with <em>your skin.</em></h2></div><div class="nub19-benefit"><i>◯</i><b>01</b><h3>Deep hydration</h3><p>Replenish moisture and support a soft, comfortable complexion.</p></div><div class="nub19-benefit"><i>✦</i><b>02</b><h3>Visible radiance</h3><p>Bring clarity and luminosity back to tired-looking skin.</p></div><div class="nub19-benefit"><i>◒</i><b>03</b><h3>Balanced skin</h3><p>Refine the look of congestion without compromising comfort.</p></div><div class="nub19-benefit"><i>♢</i><b>04</b><h3>Barrier support</h3><p>Strengthen the everyday ritual for resilient, calmer-looking skin.</p></div></div></section>
+<section id="daily-ritual" class="nub19-ritual"><div class="nub19-shell nub19-ritual__grid"><div class="nub19-ritual__intro"><p class="nub19-eyebrow">The daily ritual</p><h2>Four steps.<br><em>One clear rhythm.</em></h2><p>A consistent routine does not need to be complicated. Begin with the essentials, then adapt them to your skin.</p><a class="nub19-btn" href="<?php echo esc_url( $shop_url ); ?>">Explore the ritual</a></div><div class="nub19-step"><i>⚗</i><b>01</b><h3>Cleanse</h3><p>Begin with a gentle reset that removes the day while respecting your skin.</p></div><div class="nub19-step"><i>♧</i><b>02</b><h3>Treat</h3><p>Apply a focused serum to address the concern that matters most to you.</p></div><div class="nub19-step"><i>▣</i><b>03</b><h3>Hydrate</h3><p>Seal in comfort with balanced moisture and barrier-supporting care.</p></div><div class="nub19-step"><i>☼</i><b>04</b><h3>Protect</h3><p>Complete the morning ritual with daily sun protection.</p></div></div></section>
+<section class="nub19-story"><div class="nub19-shell nub19-story__grid"><div><p class="nub19-eyebrow">Skincare with intention</p><h2>Less noise.<br><em>More considered care.</em></h2><p>NUB by Ruwah Beauty brings together purposeful formulas, clear routines and an elevated everyday experience.</p><a class="nub19-btn nub19-btn--light" href="<?php echo esc_url( home_url( '/our-story/' ) ); ?>">Discover our story</a></div><div class="nub19-story__values"><div><i>⚗</i><span>Purposeful<br>formulas</span></div><div><i>◒</i><span>Minimal &<br>effective</span></div><div><i>♡</i><span>Thoughtful<br>rituals</span></div><div><i>✦</i><span>Elevated<br>everyday</span></div></div></div></section>
 </main>
-
-<?php
-get_footer();
+<footer class="nub19-footer"><div class="nub19-shell nub19-footer__grid"><div class="nub19-footer__brand"><a class="nub19-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>"><strong>NUB</strong><small>BY RUWAH BEAUTY</small></a><p>Thoughtful formulas. Visible results. Skincare with intention.</p><div class="nub19-social"><a href="#" aria-label="Instagram">◎</a><a href="#" aria-label="Facebook">f</a><a href="#" aria-label="TikTok">♪</a><a href="#" aria-label="YouTube">▶</a></div></div><div><h3>Shop</h3><a href="<?php echo esc_url( $shop_url ); ?>">All products</a><a href="<?php echo esc_url( add_query_arg( 'orderby', 'date', $shop_url ) ); ?>">New arrivals</a><a href="<?php echo esc_url( add_query_arg( 'orderby', 'popularity', $shop_url ) ); ?>">Best sellers</a><a href="#daily-ritual">Build your ritual</a></div><div><h3>Rituals</h3><a href="#daily-ritual">The daily ritual</a><a href="<?php echo esc_url( $shop_url ); ?>">Hydration</a><a href="<?php echo esc_url( $shop_url ); ?>">Brightening</a><a href="<?php echo esc_url( $shop_url ); ?>">Barrier support</a></div><div><h3>About</h3><a href="<?php echo esc_url( home_url( '/our-story/' ) ); ?>">Our story</a><a href="<?php echo esc_url( home_url( '/ingredients/' ) ); ?>">Ingredients</a><a href="<?php echo esc_url( home_url( '/sustainability/' ) ); ?>">Sustainability</a><a href="<?php echo esc_url( home_url( '/contact-us/' ) ); ?>">Contact us</a></div><div><h3>Help</h3><a href="<?php echo esc_url( home_url( '/track-order/' ) ); ?>">Track order</a><a href="<?php echo esc_url( home_url( '/shipping-delivery/' ) ); ?>">Shipping & delivery</a><a href="<?php echo esc_url( home_url( '/returns-exchanges/' ) ); ?>">Returns & exchanges</a><a href="<?php echo esc_url( $account_url ); ?>">My account</a></div><div class="nub19-newsletter"><h3>Stay in the know</h3><p>Expert tips, new launches and exclusive offers.</p><form action="#" method="post"><label class="screen-reader-text" for="nub19-email">Email address</label><input id="nub19-email" type="email" name="email" placeholder="Enter your email" required><button type="submit">→</button></form></div></div><div class="nub19-servicebar"><div class="nub19-shell"><span>▱ Complimentary delivery</span><span>◇ Secure payments</span><span>✓ Authentic products</span><span>↻ Easy returns</span><b>VISA&nbsp;&nbsp;●&nbsp;&nbsp;Pay&nbsp;&nbsp;Easypaisa</b></div></div><div class="nub19-legal"><div class="nub19-shell"><span>© <?php echo esc_html( gmdate( 'Y' ) ); ?> NUB by Ruwah Beauty. All rights reserved.</span><div><a href="<?php echo esc_url( home_url( '/privacy-policy/' ) ); ?>">Privacy policy</a><a href="<?php echo esc_url( home_url( '/terms-conditions/' ) ); ?>">Terms & conditions</a><a href="<?php echo esc_url( home_url( '/refund-policy/' ) ); ?>">Refund policy</a></div><span>Pakistan (PKR ₨)</span></div></div></footer></div>
+<?php get_footer();
