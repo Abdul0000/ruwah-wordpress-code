@@ -23,7 +23,7 @@ function ruwah_theme_setup() {
 add_action( 'after_setup_theme', 'ruwah_theme_setup', 20 );
 
 /**
- * Enqueue the child stylesheet after Astra.
+ * Enqueue child-theme assets after Astra.
  */
 function ruwah_enqueue_assets() {
 	$theme = wp_get_theme();
@@ -33,8 +33,33 @@ function ruwah_enqueue_assets() {
 		array(),
 		$theme->get( 'Version' )
 	);
+
+	$fixes_path = get_stylesheet_directory() . '/assets/css/storefront-fixes.css';
+	if ( file_exists( $fixes_path ) ) {
+		wp_enqueue_style(
+			'ruwah-storefront-fixes',
+			get_stylesheet_directory_uri() . '/assets/css/storefront-fixes.css',
+			array( 'ruwah-luxury-child' ),
+			(string) filemtime( $fixes_path )
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'ruwah_enqueue_assets', 30 );
+
+/**
+ * Publish the storefront after the approved production launch.
+ * The updates are idempotent and become no-ops after the options are corrected.
+ */
+function ruwah_publish_storefront() {
+	if ( 'yes' === get_option( 'woocommerce_coming_soon', 'no' ) ) {
+		update_option( 'woocommerce_coming_soon', 'no' );
+	}
+
+	if ( 'yes' === get_option( 'woocommerce_store_pages_only', 'no' ) ) {
+		update_option( 'woocommerce_store_pages_only', 'no' );
+	}
+}
+add_action( 'init', 'ruwah_publish_storefront', 1 );
 
 /**
  * Return the WooCommerce shop URL with a safe fallback.
@@ -83,11 +108,77 @@ function ruwah_front_page_title( $parts ) {
 	if ( is_front_page() ) {
 		$parts['title'] = __( 'Premium Skincare in Pakistan', 'nub-ruwah' );
 		$parts['site']  = __( 'NUB by Ruwah Beauty', 'nub-ruwah' );
+		unset( $parts['tagline'] );
 	}
 
 	return $parts;
 }
 add_filter( 'document_title_parts', 'ruwah_front_page_title' );
+
+/**
+ * Replace inherited starter-menu labels without mutating the menu database.
+ *
+ * @param array<int,WP_Post> $items Menu items.
+ * @param stdClass           $args  Menu arguments.
+ * @return array<int,WP_Post>
+ */
+function ruwah_primary_menu_items( $items, $args ) {
+	if ( empty( $args->theme_location ) || 'primary' !== $args->theme_location ) {
+		return $items;
+	}
+
+	$map = array(
+		'Home'     => array( __( 'Home', 'nub-ruwah' ), home_url( '/' ) ),
+		'Services' => array( __( 'Shop', 'nub-ruwah' ), ruwah_shop_url() ),
+		'About'    => array( __( 'New Arrivals', 'nub-ruwah' ), home_url( '/new-arrivals/' ) ),
+		'Reviews'  => array( __( 'Best Sellers', 'nub-ruwah' ), home_url( '/best-sellers/' ) ),
+		'Why Us'   => array( __( 'Rituals', 'nub-ruwah' ), home_url( '/#ritual' ) ),
+		'Contact'  => array( __( 'Our Story', 'nub-ruwah' ), home_url( '/about-us/' ) ),
+	);
+
+	foreach ( $items as $item ) {
+		$title = wp_strip_all_tags( $item->title );
+		if ( isset( $map[ $title ] ) ) {
+			$item->title = $map[ $title ][0];
+			$item->url   = $map[ $title ][1];
+		}
+	}
+
+	return $items;
+}
+add_filter( 'wp_nav_menu_objects', 'ruwah_primary_menu_items', 20, 2 );
+
+/**
+ * Replace Astra's unassigned mobile fallback with a concise storefront menu.
+ *
+ * @param string $menu Existing fallback markup.
+ * @param array  $args Page-menu arguments.
+ * @return string
+ */
+function ruwah_mobile_fallback_menu( $menu, $args ) {
+	$links = array(
+		__( 'Home', 'nub-ruwah' )         => home_url( '/' ),
+		__( 'Shop', 'nub-ruwah' )         => ruwah_shop_url(),
+		__( 'New Arrivals', 'nub-ruwah' ) => home_url( '/new-arrivals/' ),
+		__( 'Best Sellers', 'nub-ruwah' ) => home_url( '/best-sellers/' ),
+		__( 'Rituals', 'nub-ruwah' )      => home_url( '/#ritual' ),
+		__( 'Our Story', 'nub-ruwah' )    => home_url( '/about-us/' ),
+		__( 'My Account', 'nub-ruwah' )   => home_url( '/my-account/' ),
+	);
+
+	$output = '<ul class="main-header-menu ast-nav-menu ast-flex submenu-with-border astra-menu-animation-fade stack-on-mobile">';
+	foreach ( $links as $label => $url ) {
+		$output .= sprintf(
+			'<li class="menu-item"><a class="menu-link" href="%1$s">%2$s</a></li>',
+			esc_url( $url ),
+			esc_html( $label )
+		);
+	}
+	$output .= '</ul>';
+
+	return $output;
+}
+add_filter( 'wp_page_menu', 'ruwah_mobile_fallback_menu', 20, 2 );
 
 /**
  * Output lightweight front-page metadata and schema when no SEO plugin is active.
@@ -208,7 +299,7 @@ function ruwah_render_product_card( $product ) {
 		return;
 	}
 
-	$product_id = $product->get_id();
+	$product_id  = $product->get_id();
 	$product_url = get_permalink( $product_id );
 	?>
 	<article class="ruwah-product-card">

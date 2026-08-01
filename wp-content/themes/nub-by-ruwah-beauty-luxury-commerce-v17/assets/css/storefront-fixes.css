@@ -1,0 +1,45 @@
+/* Storefront launch and inherited Astra header cleanup. */
+.ast-primary-header-bar,
+.ast-mobile-header-wrap .ast-primary-header-bar {
+  background: #fffdf9 !important;
+  border-bottom: 0.0625rem solid rgba(23, 18, 15, 0.12) !important;
+}
+
+.ast-builder-menu-1 .menu-item > .menu-link,
+.ast-builder-menu-1 .menu-item > .ast-menu-toggle {
+  color: #17120f !important;
+}
+
+.ast-builder-menu-1 .menu-link:hover,
+.ast-builder-menu-1 .menu-link:focus,
+.ast-builder-menu-1 .menu-item.current-menu-item > .menu-link,
+.ast-builder-menu-1 .current-menu-ancestor > .menu-link {
+  color: #4a253f !important;
+}
+
+[data-section="section-header-mobile-trigger"] .ast-button-wrap .ast-mobile-menu-trigger-minimal,
+[data-section="section-header-mobile-trigger"] .ast-button-wrap .mobile-menu-toggle-icon .ast-mobile-svg,
+[data-section="section-header-mobile-trigger"] .ast-button-wrap .mobile-menu-wrap .mobile-menu {
+  color: #17120f !important;
+  fill: #17120f !important;
+}
+
+.ast-header-social-wrap a[href="#"] {
+  display: none !important;
+}
+
+.home.ast-theme-transparent-header #masthead {
+  position: relative !important;
+}
+
+.site-logo-img img {
+  max-height: 3rem;
+  width: auto;
+}
+
+@media (max-width: 57.5rem) {
+  .ast-mobile-header-content {
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+  }
+}
