@@ -2,206 +2,69 @@
 .ruwa-search-overlay[hidden],
 .ruwa-overlay[hidden],
 [hidden].ruwa-search-overlay,
-[hidden].ruwa-overlay {
-  display: none !important;
-}
+[hidden].ruwa-overlay { display: none !important; }
+html { scrollbar-gutter: stable; }
+body.ruwa-layer-open,body.search-modal-open,body.cart-drawer-open { overflow: hidden !important; overscroll-behavior: none; }
+body.ruwa-design-system-v31 .ruwa-search-overlay {position:fixed!important;inset:0!important;z-index:9999!important;display:grid;place-items:center;width:100vw;height:100dvh;padding:clamp(18px,5vw,54px);overflow:auto;background:rgba(31,58,48,.5)!important;backdrop-filter:blur(5px);opacity:0;visibility:hidden;transition:opacity 180ms ease,visibility 180ms ease}
+body.ruwa-design-system-v31 .ruwa-search-overlay.is-open{opacity:1;visibility:visible}
+body.ruwa-design-system-v31 .ruwa-search-card{position:relative;width:min(760px,100%);max-height:calc(100dvh - 40px);padding:clamp(30px,5vw,52px);overflow:auto;border:2px solid var(--color-accent-forest)!important;border-radius:24px!important;background:var(--color-card)!important;box-shadow:0 24px 64px rgba(31,58,48,.2)!important;transform:translateY(12px) scale(.985);transition:transform 220ms ease}
+body.ruwa-design-system-v31 .ruwa-search-overlay.is-open .ruwa-search-card{transform:none}
+body.ruwa-design-system-v31 .ruwa-search-card .ruwa-eyebrow{display:block;margin:0 52px 12px 0;color:var(--color-gold)!important;font-family:Inter,Arial,sans-serif!important;font-size:11px!important;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+body.ruwa-design-system-v31 .ruwa-search-card h2{margin:0 44px 26px 0;color:var(--color-accent-forest)!important;font-family:Fraunces,Georgia,serif!important;font-size:clamp(2rem,5vw,3.25rem)!important;line-height:1.02}
+body.ruwa-design-system-v31 .ruwa-search-card form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px}
+body.ruwa-design-system-v31 .ruwa-search-card input[type=search]{min-height:56px;padding:14px 20px!important;border:1px solid var(--color-border-hairline)!important;border-radius:999px!important;background:#fff!important;color:var(--color-text-body)!important;box-shadow:none!important}
+body.ruwa-design-system-v31 .ruwa-search-card input[type=search]:focus{border-color:var(--color-gold)!important;outline:0!important;box-shadow:0 0 0 4px rgba(184,147,91,.2)!important}
+body.ruwa-design-system-v31 .ruwa-search-card button[type=submit]{min-height:56px!important;border-radius:999px!important}
+body.ruwa-design-system-v31 .ruwa-search-card>.ruwa-close{position:absolute;top:18px;right:18px;z-index:2;width:42px;height:42px;min-width:42px!important;min-height:42px!important;padding:0!important;border:1px solid var(--color-gold)!important;border-radius:50%!important;background:var(--color-card)!important;color:var(--color-accent-forest)!important;font-size:25px;line-height:1;box-shadow:none!important}
+body.ruwa-design-system-v31 .ruwa-search-card>.ruwa-close:hover{background:var(--color-accent-forest)!important;color:var(--color-card)!important;transform:rotate(4deg) scale(1.04)!important}
+body.ruwa-design-system-v31 .products .product,body.ruwa-design-system-v31 ul.products li.product,body.ruwa-design-system-v31 .ruwa-product-card,body.ruwa-design-system-v31 .wc-block-grid__product,body.ruwa-design-system-v31 .wp-block-woocommerce-product-template>li{background:var(--color-card)!important;border:2px solid var(--color-accent-forest)!important;border-radius:24px!important;box-shadow:0 2px 10px rgba(31,58,48,.06)!important;transition:transform 250ms ease,box-shadow 250ms ease,border-color 250ms ease!important}
+body.ruwa-design-system-v31 .products .product:hover,body.ruwa-design-system-v31 ul.products li.product:hover,body.ruwa-design-system-v31 .ruwa-product-card:hover,body.ruwa-design-system-v31 .wc-block-grid__product:hover,body.ruwa-design-system-v31 .wp-block-woocommerce-product-template>li:hover{transform:translateY(-6px)!important;border-color:var(--color-accent-forest)!important;box-shadow:0 8px 32px rgba(31,58,48,.12)!important}
+body.ruwa-design-system-v31 .products .product .category,body.ruwa-design-system-v31 .product-category-label,body.ruwa-design-system-v31 .ast-woo-product-category,body.ruwa-design-system-v31 .ruwa-product-copy>small,body.ruwa-design-system-v31 .ruwa-product-copy>small a,body.ruwa-design-system-v31 .woocommerce .posted_in,body.ruwa-design-system-v31 .woocommerce .posted_in a{color:var(--color-gold)!important;font-family:Inter,Arial,sans-serif!important;font-size:11px!important;font-weight:800!important;letter-spacing:.06em!important;line-height:1.35;text-transform:uppercase!important}
+body.ruwa-design-system-v31 .ruwa-product-media,body.ruwa-design-system-v31 .astra-shop-thumbnail-wrap,body.ruwa-design-system-v31 .woocommerce-product-gallery__image,body.ruwa-design-system-v31 .wc-block-components-product-image{overflow:hidden;border-radius:18px;background:var(--color-card)!important}
+body.ruwa-design-system-v31 .ruwa-product-media img,body.ruwa-design-system-v31 .astra-shop-thumbnail-wrap img,body.ruwa-design-system-v31 .woocommerce-product-gallery__image img,body.ruwa-design-system-v31 .wc-block-components-product-image img{background:var(--color-card)!important;object-fit:contain}
+body.ruwa-design-system-v31 .ruwa-mini-add,body.ruwa-design-system-v31 .ruwa-product-card .add_to_cart_button{border-color:#8f6d3e!important;background:var(--color-gold)!important;color:var(--color-accent-forest-hover)!important;box-shadow:none!important}
+body.ruwa-design-system-v31 .ruwa-mini-add:hover,body.ruwa-design-system-v31 .ruwa-product-card .add_to_cart_button:hover{border-color:var(--color-accent-forest-hover)!important;background:var(--color-gold)!important;color:var(--color-accent-forest-hover)!important;box-shadow:0 8px 20px rgba(31,58,48,.16)!important}
+body.ruwa-design-system-v31 .ruwa-product-card .ruwa-text-link,body.ruwa-design-system-v31 .ruwa-product-card .ruwa-text-link:visited{color:var(--color-gold)!important;text-decoration-color:var(--color-gold)!important;text-decoration-line:underline!important;text-decoration-thickness:1px;text-underline-offset:4px}
+body.ruwa-design-system-v31 .ruwa-product-card .ruwa-text-link:hover{color:var(--color-accent-forest)!important;text-decoration-color:var(--color-gold)!important}
+body.ruwa-design-system-v31 .woocommerce a:not(.button):not(.remove),body.ruwa-design-system-v31 .woocommerce-page a:not(.button):not(.remove),body.ruwa-design-system-v31 .wc-block-components-product-name,body.ruwa-design-system-v31 .wc-block-components-product-name a{color:var(--color-accent-forest)!important}
+body.ruwa-design-system-v31 .woocommerce a:not(.button):not(.remove):hover,body.ruwa-design-system-v31 .woocommerce-page a:not(.button):not(.remove):hover,body.ruwa-design-system-v31 .wc-block-components-product-name:hover,body.ruwa-design-system-v31 .wc-block-components-product-name a:hover{color:var(--color-gold)!important}
+body.ruwa-design-system-v31 .woocommerce div.product div.images,body.ruwa-design-system-v31 .woocommerce div.product div.summary,body.ruwa-design-system-v31 .woocommerce-cart-form,body.ruwa-design-system-v31 .cart_totals,body.ruwa-design-system-v31 .woocommerce-checkout-review-order,body.ruwa-design-system-v31 .woocommerce-billing-fields,body.ruwa-design-system-v31 .woocommerce-shipping-fields,body.ruwa-design-system-v31 .woocommerce-account .woocommerce-MyAccount-navigation,body.ruwa-design-system-v31 .woocommerce-account .woocommerce-MyAccount-content,body.ruwa-design-system-v31 .wc-block-cart,body.ruwa-design-system-v31 .wc-block-checkout,body.ruwa-design-system-v31 .wc-block-components-sidebar-layout .wc-block-components-main,body.ruwa-design-system-v31 .wc-block-components-sidebar{border:2px solid var(--color-accent-forest)!important;border-radius:24px!important;background:var(--color-card)!important;box-shadow:0 8px 28px rgba(31,58,48,.08)!important}
+body.ruwa-design-system-v31 .woocommerce div.product div.images,body.ruwa-design-system-v31 .woocommerce div.product div.summary,body.ruwa-design-system-v31 .woocommerce-cart-form,body.ruwa-design-system-v31 .cart_totals,body.ruwa-design-system-v31 .woocommerce-checkout-review-order,body.ruwa-design-system-v31 .woocommerce-billing-fields,body.ruwa-design-system-v31 .woocommerce-shipping-fields,body.ruwa-design-system-v31 .woocommerce-account .woocommerce-MyAccount-navigation,body.ruwa-design-system-v31 .woocommerce-account .woocommerce-MyAccount-content{padding:clamp(18px,3vw,30px)!important}
+body.ruwa-design-system-v31 .ruwa-ritual-panel{opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity 360ms ease,transform 420ms ease,visibility 360ms ease}
+body.ruwa-design-system-v31 .ruwa-ritual-panel.is-active{opacity:1;visibility:visible;transform:none}
+body.ruwa-design-system-v31 .ruwa-hero-product{opacity:0;visibility:hidden;transform:translate3d(0,calc(22px + var(--ruwa-parallax-y,0px)),0) rotate(calc(-3deg + var(--ruwa-parallax-rotate,0deg))) scale(.96);transition:opacity 380ms ease,transform 460ms cubic-bezier(.2,.75,.25,1),visibility 380ms ease;will-change:transform,opacity}
+body.ruwa-design-system-v31 .ruwa-hero-product.is-active{opacity:1;visibility:visible;transform:translate3d(0,var(--ruwa-parallax-y,0px),0) rotate(var(--ruwa-parallax-rotate,0deg)) scale(1)}
+body.ruwa-design-system-v31 .ruwa-hero-visual .botanical-one{translate:0 var(--ruwa-botanical-shift,0px)}
+body.ruwa-design-system-v31 .ruwa-hero-visual .botanical-two{translate:0 var(--ruwa-botanical-shift-two,0px)}
 
-html {
-  scrollbar-gutter: stable;
-}
-
-body.ruwa-layer-open,
-body.search-modal-open,
-body.cart-drawer-open {
-  overflow: hidden !important;
-  overscroll-behavior: none;
-}
-
-/* Search modal: viewport-centered, deterministic and independent of sticky header. */
-body.ruwa-design-system-v31 .ruwa-search-overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 9999 !important;
-  display: grid;
-  place-items: center;
-  width: 100vw;
-  height: 100dvh;
-  padding: clamp(18px, 5vw, 54px);
-  overflow: auto;
-  background: rgba(31, 58, 48, 0.5) !important;
-  backdrop-filter: blur(5px);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 180ms ease, visibility 180ms ease;
-}
-body.ruwa-design-system-v31 .ruwa-search-overlay.is-open { opacity: 1; visibility: visible; }
-body.ruwa-design-system-v31 .ruwa-search-card {
-  position: relative;
-  width: min(760px, 100%);
-  max-height: calc(100dvh - 40px);
-  padding: clamp(30px, 5vw, 52px);
-  overflow: auto;
-  border: 2px solid var(--color-accent-forest) !important;
-  border-radius: 24px !important;
-  background: var(--color-card) !important;
-  box-shadow: 0 24px 64px rgba(31, 58, 48, 0.2) !important;
-  transform: translateY(12px) scale(0.985);
-  transition: transform 220ms ease;
-}
-body.ruwa-design-system-v31 .ruwa-search-overlay.is-open .ruwa-search-card { transform: none; }
-body.ruwa-design-system-v31 .ruwa-search-card .ruwa-eyebrow {
-  display: block; margin: 0 52px 12px 0; color: var(--color-gold) !important;
-  font-family: 'Inter', Arial, sans-serif !important; font-size: 11px !important;
-  font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
-}
-body.ruwa-design-system-v31 .ruwa-search-card h2 {
-  margin: 0 44px 26px 0; color: var(--color-accent-forest) !important;
-  font-family: 'Fraunces', Georgia, serif !important; font-size: clamp(2rem, 5vw, 3.25rem) !important; line-height: 1.02;
-}
-body.ruwa-design-system-v31 .ruwa-search-card form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
-body.ruwa-design-system-v31 .ruwa-search-card input[type='search'] {
-  min-height: 56px; padding: 14px 20px !important; border: 1px solid var(--color-border-hairline) !important;
-  border-radius: 999px !important; background: #FFFFFF !important; color: var(--color-text-body) !important; box-shadow: none !important;
-}
-body.ruwa-design-system-v31 .ruwa-search-card input[type='search']:focus {
-  border-color: var(--color-gold) !important; outline: 0 !important; box-shadow: 0 0 0 4px rgba(184, 147, 91, 0.2) !important;
-}
-body.ruwa-design-system-v31 .ruwa-search-card button[type='submit'] { min-height: 56px !important; border-radius: 999px !important; }
-body.ruwa-design-system-v31 .ruwa-search-card > .ruwa-close {
-  position: absolute; top: 18px; right: 18px; z-index: 2; width: 42px; height: 42px;
-  min-width: 42px !important; min-height: 42px !important; padding: 0 !important;
-  border: 1px solid var(--color-gold) !important; border-radius: 50% !important;
-  background: var(--color-card) !important; color: var(--color-accent-forest) !important;
-  font-size: 25px; line-height: 1; box-shadow: none !important;
-}
-body.ruwa-design-system-v31 .ruwa-search-card > .ruwa-close:hover {
-  background: var(--color-accent-forest) !important; color: var(--color-card) !important; transform: rotate(4deg) scale(1.04) !important;
-}
-
-/* Product cards across native WooCommerce, blocks and the home ritual grid. */
-body.ruwa-design-system-v31 .products .product,
-body.ruwa-design-system-v31 ul.products li.product,
-body.ruwa-design-system-v31 .ruwa-product-card,
-body.ruwa-design-system-v31 .wc-block-grid__product,
-body.ruwa-design-system-v31 .wp-block-woocommerce-product-template > li {
-  background: var(--color-card) !important; border: 2px solid var(--color-accent-forest) !important;
-  border-radius: 24px !important; box-shadow: 0 2px 10px rgba(31, 58, 48, 0.06) !important;
-  transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease !important;
-}
-body.ruwa-design-system-v31 .products .product:hover,
-body.ruwa-design-system-v31 ul.products li.product:hover,
-body.ruwa-design-system-v31 .ruwa-product-card:hover,
-body.ruwa-design-system-v31 .wc-block-grid__product:hover,
-body.ruwa-design-system-v31 .wp-block-woocommerce-product-template > li:hover {
-  transform: translateY(-6px) !important; border-color: var(--color-accent-forest) !important;
-  box-shadow: 0 8px 32px rgba(31, 58, 48, 0.12) !important;
-}
-body.ruwa-design-system-v31 .products .product .category,
-body.ruwa-design-system-v31 .product-category-label,
-body.ruwa-design-system-v31 .ast-woo-product-category,
-body.ruwa-design-system-v31 .ruwa-product-copy > small,
-body.ruwa-design-system-v31 .ruwa-product-copy > small a,
-body.ruwa-design-system-v31 .woocommerce .posted_in,
-body.ruwa-design-system-v31 .woocommerce .posted_in a {
-  color: var(--color-gold) !important; font-family: 'Inter', Arial, sans-serif !important;
-  font-size: 11px !important; font-weight: 800 !important; letter-spacing: 0.06em !important;
-  line-height: 1.35; text-transform: uppercase !important;
-}
-body.ruwa-design-system-v31 .ruwa-product-media,
-body.ruwa-design-system-v31 .astra-shop-thumbnail-wrap,
-body.ruwa-design-system-v31 .woocommerce-product-gallery__image,
-body.ruwa-design-system-v31 .wc-block-components-product-image {
-  overflow: hidden; border-radius: 18px; background: var(--color-card) !important;
-}
-body.ruwa-design-system-v31 .ruwa-product-media img,
-body.ruwa-design-system-v31 .astra-shop-thumbnail-wrap img,
-body.ruwa-design-system-v31 .woocommerce-product-gallery__image img,
-body.ruwa-design-system-v31 .wc-block-components-product-image img { background: var(--color-card) !important; object-fit: contain; }
-
-/* #16281F on #B8935B has a 5.42:1 contrast ratio. */
-body.ruwa-design-system-v31 .ruwa-mini-add,
-body.ruwa-design-system-v31 .ruwa-product-card .add_to_cart_button {
-  border-color: #8F6D3E !important; background: var(--color-gold) !important;
-  color: var(--color-accent-forest-hover) !important; box-shadow: none !important;
-}
-body.ruwa-design-system-v31 .ruwa-mini-add:hover,
-body.ruwa-design-system-v31 .ruwa-product-card .add_to_cart_button:hover {
-  border-color: var(--color-accent-forest-hover) !important; background: var(--color-gold) !important;
-  color: var(--color-accent-forest-hover) !important; box-shadow: 0 8px 20px rgba(31, 58, 48, 0.16) !important;
-}
-body.ruwa-design-system-v31 .ruwa-product-card .ruwa-text-link,
-body.ruwa-design-system-v31 .ruwa-product-card .ruwa-text-link:visited {
-  color: var(--color-gold) !important; text-decoration-color: var(--color-gold) !important;
-  text-decoration-line: underline !important; text-decoration-thickness: 1px; text-underline-offset: 4px;
-}
-body.ruwa-design-system-v31 .ruwa-product-card .ruwa-text-link:hover { color: var(--color-accent-forest) !important; text-decoration-color: var(--color-gold) !important; }
-body.ruwa-design-system-v31 .woocommerce a:not(.button):not(.remove),
-body.ruwa-design-system-v31 .woocommerce-page a:not(.button):not(.remove),
-body.ruwa-design-system-v31 .wc-block-components-product-name,
-body.ruwa-design-system-v31 .wc-block-components-product-name a { color: var(--color-accent-forest) !important; }
-body.ruwa-design-system-v31 .woocommerce a:not(.button):not(.remove):hover,
-body.ruwa-design-system-v31 .woocommerce-page a:not(.button):not(.remove):hover,
-body.ruwa-design-system-v31 .wc-block-components-product-name:hover,
-body.ruwa-design-system-v31 .wc-block-components-product-name a:hover { color: var(--color-gold) !important; }
-
-/* One surface language for PDP, cart, checkout and account. */
-body.ruwa-design-system-v31 .woocommerce div.product div.images,
-body.ruwa-design-system-v31 .woocommerce div.product div.summary,
-body.ruwa-design-system-v31 .woocommerce-cart-form,
-body.ruwa-design-system-v31 .cart_totals,
-body.ruwa-design-system-v31 .woocommerce-checkout-review-order,
-body.ruwa-design-system-v31 .woocommerce-billing-fields,
-body.ruwa-design-system-v31 .woocommerce-shipping-fields,
-body.ruwa-design-system-v31 .woocommerce-account .woocommerce-MyAccount-navigation,
-body.ruwa-design-system-v31 .woocommerce-account .woocommerce-MyAccount-content,
-body.ruwa-design-system-v31 .wc-block-cart,
-body.ruwa-design-system-v31 .wc-block-checkout,
-body.ruwa-design-system-v31 .wc-block-components-sidebar-layout .wc-block-components-main,
-body.ruwa-design-system-v31 .wc-block-components-sidebar {
-  border: 2px solid var(--color-accent-forest) !important; border-radius: 24px !important;
-  background: var(--color-card) !important; box-shadow: 0 8px 28px rgba(31, 58, 48, 0.08) !important;
-}
-body.ruwa-design-system-v31 .woocommerce div.product div.images,
-body.ruwa-design-system-v31 .woocommerce div.product div.summary,
-body.ruwa-design-system-v31 .woocommerce-cart-form,
-body.ruwa-design-system-v31 .cart_totals,
-body.ruwa-design-system-v31 .woocommerce-checkout-review-order,
-body.ruwa-design-system-v31 .woocommerce-billing-fields,
-body.ruwa-design-system-v31 .woocommerce-shipping-fields,
-body.ruwa-design-system-v31 .woocommerce-account .woocommerce-MyAccount-navigation,
-body.ruwa-design-system-v31 .woocommerce-account .woocommerce-MyAccount-content { padding: clamp(18px, 3vw, 30px) !important; }
-
-/* Ritual crossfade and scroll-linked motion, using RUWA's own imagery. */
-body.ruwa-design-system-v31 .ruwa-ritual-panel {
-  opacity: 0; visibility: hidden; transform: translateY(12px);
-  transition: opacity 360ms ease, transform 420ms ease, visibility 360ms ease;
-}
-body.ruwa-design-system-v31 .ruwa-ritual-panel.is-active { opacity: 1; visibility: visible; transform: none; }
-body.ruwa-design-system-v31 .ruwa-hero-product {
-  opacity: 0; visibility: hidden;
-  transform: translate3d(0, calc(22px + var(--ruwa-parallax-y, 0px)), 0) rotate(calc(-3deg + var(--ruwa-parallax-rotate, 0deg))) scale(0.96);
-  transition: opacity 380ms ease, transform 460ms cubic-bezier(.2,.75,.25,1), visibility 380ms ease;
-  will-change: transform, opacity;
-}
-body.ruwa-design-system-v31 .ruwa-hero-product.is-active {
-  opacity: 1; visibility: visible;
-  transform: translate3d(0, var(--ruwa-parallax-y, 0px), 0) rotate(var(--ruwa-parallax-rotate, 0deg)) scale(1);
-}
-body.ruwa-design-system-v31 .ruwa-hero-visual .botanical-one { translate: 0 var(--ruwa-botanical-shift, 0px); }
-body.ruwa-design-system-v31 .ruwa-hero-visual .botanical-two { translate: 0 var(--ruwa-botanical-shift-two, 0px); }
-
-@media (max-width: 680px) {
-  body.ruwa-design-system-v31 .ruwa-search-card form { grid-template-columns: 1fr; }
-  body.ruwa-design-system-v31 .ruwa-search-card button[type='submit'] { width: 100%; }
-  body.ruwa-design-system-v31 .woocommerce div.product div.images,
-  body.ruwa-design-system-v31 .woocommerce div.product div.summary { padding: 16px !important; }
-}
-@media (prefers-reduced-motion: reduce) {
-  body.ruwa-design-system-v31 .ruwa-search-overlay,
-  body.ruwa-design-system-v31 .ruwa-search-card,
-  body.ruwa-design-system-v31 .products .product,
-  body.ruwa-design-system-v31 ul.products li.product,
-  body.ruwa-design-system-v31 .ruwa-product-card,
-  body.ruwa-design-system-v31 .ruwa-ritual-panel,
-  body.ruwa-design-system-v31 .ruwa-hero-product { transition: none !important; transform: none !important; }
-}
+/* RUWA editorial product stage — adapted from the supplied visual reference. */
+body.home.ruwa-design-system-v31 .ruwa-editorial-hero{min-height:calc(100svh - 116px);background:#0d0b08!important;color:#f7e8ca!important;border-bottom:1px solid rgba(247,232,202,.2)}
+body.home.ruwa-design-system-v31 .ruwa-editorial-stage{position:relative;isolation:isolate;min-height:calc(100svh - 116px);display:grid;grid-template-columns:minmax(90px,1fr) minmax(440px,720px) minmax(90px,1fr);grid-template-rows:90px 1fr 84px;align-items:center;padding:14px clamp(16px,3vw,58px) 22px;overflow:hidden}
+body.home.ruwa-design-system-v31 .ruwa-editorial-guides{position:absolute;inset:0;pointer-events:none;z-index:0}
+body.home.ruwa-design-system-v31 .ruwa-editorial-guides i{position:absolute;left:clamp(16px,3vw,58px);right:clamp(16px,3vw,58px);height:1px;background:repeating-linear-gradient(90deg,rgba(247,232,202,.26) 0 4px,transparent 4px 8px)}
+body.home.ruwa-design-system-v31 .ruwa-editorial-guides i:nth-child(1){top:18%}body.home.ruwa-design-system-v31 .ruwa-editorial-guides i:nth-child(2){top:54%}body.home.ruwa-design-system-v31 .ruwa-editorial-guides i:nth-child(3){bottom:10%}
+body.home.ruwa-design-system-v31 .ruwa-editorial-meta{position:relative;z-index:4;align-self:end;padding-bottom:12px;color:#f7e8ca;font-size:clamp(11px,1.1vw,16px);font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+body.home.ruwa-design-system-v31 .ruwa-editorial-meta-left{grid-column:1/2;grid-row:1;text-align:left}.ruwa-editorial-meta-right{grid-column:3/4;grid-row:1;text-align:right}
+body.home.ruwa-design-system-v31 .ruwa-editorial-meta .ruwa-ritual-panel{display:none}body.home.ruwa-design-system-v31 .ruwa-editorial-meta .ruwa-ritual-panel.is-active{display:inline-block}
+body.home.ruwa-design-system-v31 .ruwa-editorial-center{position:relative;z-index:2;grid-column:2;grid-row:1/4;align-self:stretch;display:grid;place-items:center;min-height:620px}
+body.home.ruwa-design-system-v31 .ruwa-editorial-disc{position:absolute;width:min(58vw,610px);aspect-ratio:1;border-radius:50%;background:#c99a45;box-shadow:0 0 0 1px rgba(247,232,202,.08),0 30px 80px rgba(0,0,0,.35)}
+body.home.ruwa-design-system-v31 .ruwa-editorial-orbit{position:absolute;border:1px solid rgba(247,232,202,.42);border-radius:50%;pointer-events:none}.ruwa-editorial-orbit.orbit-one{width:min(67vw,720px);aspect-ratio:1;transform:rotate(-10deg)}.ruwa-editorial-orbit.orbit-two{width:min(49vw,520px);aspect-ratio:1;transform:rotate(18deg)}
+body.home.ruwa-design-system-v31 .ruwa-editorial-center .ruwa-hero-product{position:absolute;inset:70px 11% 138px;display:grid;place-items:center;z-index:3}
+body.home.ruwa-design-system-v31 .ruwa-editorial-center .ruwa-hero-product a{display:grid;place-items:center;width:100%;height:100%}
+body.home.ruwa-design-system-v31 .ruwa-editorial-center .ruwa-hero-product img{max-width:min(74%,430px);max-height:min(58vh,520px);width:auto;height:auto;object-fit:contain;background:transparent!important;filter:drop-shadow(0 34px 24px rgba(0,0,0,.42))}
+body.home.ruwa-design-system-v31 .ruwa-editorial-copy{position:absolute;z-index:4;left:50%;bottom:122px;width:min(680px,92vw);transform:translateX(-50%);text-align:center;pointer-events:none}
+body.home.ruwa-design-system-v31 .ruwa-editorial-copy .ruwa-ritual-panel{display:none}body.home.ruwa-design-system-v31 .ruwa-editorial-copy .ruwa-ritual-panel.is-active{display:block}
+body.home.ruwa-design-system-v31 .ruwa-editorial-copy .ruwa-eyebrow{margin:0 0 4px;color:#f7e8ca!important;font-size:10px!important}
+body.home.ruwa-design-system-v31 .ruwa-editorial-copy h1{margin:0;color:#f7e8ca!important;font-family:Impact,'Arial Narrow',Inter,sans-serif!important;font-size:clamp(30px,4.4vw,62px)!important;font-weight:900!important;line-height:.92!important;letter-spacing:-.02em;text-transform:uppercase;text-shadow:0 3px 20px rgba(0,0,0,.48)}
+body.home.ruwa-design-system-v31 .ruwa-editorial-copy p{max-width:530px;margin:8px auto 0;color:rgba(247,232,202,.84);font-size:13px;line-height:1.45}
+body.home.ruwa-design-system-v31 .ruwa-editorial-cta{position:absolute;z-index:6;left:50%;bottom:16px;min-width:min(330px,75vw);min-height:78px;display:grid;place-items:center;transform:translateX(-50%);border:2px solid #0d0b08;border-radius:16px;background:#f7e8ca;color:#0d0b08!important;font-family:Impact,'Arial Narrow',Inter,sans-serif;font-size:clamp(24px,2.2vw,34px);font-weight:900;letter-spacing:.01em;text-decoration:none!important;text-transform:uppercase;box-shadow:0 10px 0 rgba(0,0,0,.22);transition:transform .2s ease,background .2s ease}
+body.home.ruwa-design-system-v31 .ruwa-editorial-cta:hover{background:#c99a45;transform:translateX(-50%) translateY(-4px)}
+body.home.ruwa-design-system-v31 .ruwa-editorial-arrow{position:relative;z-index:7;grid-row:2;width:clamp(78px,8vw,126px);aspect-ratio:1;border:2px solid #0d0b08;border-radius:50%;background:#f7e8ca;color:#0d0b08;font-size:clamp(30px,3vw,48px);cursor:pointer;box-shadow:0 0 0 1px rgba(247,232,202,.2);transition:transform .2s ease,background .2s ease}
+body.home.ruwa-design-system-v31 .ruwa-editorial-arrow:hover{background:#c99a45;transform:scale(1.05)}body.home.ruwa-design-system-v31 .ruwa-editorial-prev{grid-column:1;justify-self:center}body.home.ruwa-design-system-v31 .ruwa-editorial-next{grid-column:3;justify-self:center}
+body.home.ruwa-design-system-v31 .ruwa-editorial-tabs{position:absolute;z-index:8;top:18px;left:50%;transform:translateX(-50%);margin:0;justify-content:center}
+body.home.ruwa-design-system-v31 .ruwa-editorial-tabs button{border-color:rgba(247,232,202,.35);color:#f7e8ca;background:rgba(13,11,8,.65);backdrop-filter:blur(8px)}body.home.ruwa-design-system-v31 .ruwa-editorial-tabs button[aria-selected=true]{background:#f7e8ca;color:#0d0b08;border-color:#f7e8ca}
+body.home.ruwa-design-system-v31 .ruwa-editorial-tabs small{margin-right:6px;opacity:.65}
+@media(max-width:900px){body.home.ruwa-design-system-v31 .ruwa-editorial-stage{grid-template-columns:86px 1fr 86px;grid-template-rows:72px 1fr 88px;padding-inline:14px}body.home.ruwa-design-system-v31 .ruwa-editorial-meta{font-size:10px}.ruwa-editorial-meta-right{max-width:120px;justify-self:end}.ruwa-editorial-center{min-height:600px}.ruwa-editorial-disc{width:min(78vw,560px)}body.home.ruwa-design-system-v31 .ruwa-editorial-center .ruwa-hero-product{inset:74px 4% 150px}.ruwa-editorial-arrow{width:72px}.ruwa-editorial-copy{bottom:126px}}
+@media(max-width:640px){body.home.ruwa-design-system-v31 .ruwa-editorial-hero,body.home.ruwa-design-system-v31 .ruwa-editorial-stage{min-height:760px}body.home.ruwa-design-system-v31 .ruwa-editorial-stage{grid-template-columns:58px 1fr 58px;grid-template-rows:92px 1fr 92px;padding:8px 8px 18px}.ruwa-editorial-meta{align-self:center;padding:0;font-size:8px!important}.ruwa-editorial-meta-right{max-width:82px}.ruwa-editorial-tabs{top:10px;width:calc(100% - 18px);flex-wrap:nowrap;overflow:auto;justify-content:flex-start;padding-bottom:5px}.ruwa-editorial-tabs button{flex:0 0 auto;padding:8px 11px;font-size:11px}.ruwa-editorial-center{min-height:650px}.ruwa-editorial-disc{width:min(92vw,440px)}.ruwa-editorial-orbit.orbit-one{width:min(105vw,500px)}.ruwa-editorial-orbit.orbit-two{width:min(80vw,390px)}body.home.ruwa-design-system-v31 .ruwa-editorial-center .ruwa-hero-product{inset:96px -10% 184px}body.home.ruwa-design-system-v31 .ruwa-editorial-center .ruwa-hero-product img{max-width:82%;max-height:390px}.ruwa-editorial-copy{bottom:132px;width:92vw}.ruwa-editorial-copy p{display:none}.ruwa-editorial-cta{bottom:14px;min-height:66px;min-width:min(260px,72vw);font-size:24px}.ruwa-editorial-arrow{width:54px;font-size:25px}.ruwa-editorial-prev{justify-self:start}.ruwa-editorial-next{justify-self:end}}
+@media(max-width:680px){body.ruwa-design-system-v31 .ruwa-search-card form{grid-template-columns:1fr}body.ruwa-design-system-v31 .ruwa-search-card button[type=submit]{width:100%}body.ruwa-design-system-v31 .woocommerce div.product div.images,body.ruwa-design-system-v31 .woocommerce div.product div.summary{padding:16px!important}}
+@media(prefers-reduced-motion:reduce){body.ruwa-design-system-v31 .ruwa-search-overlay,body.ruwa-design-system-v31 .ruwa-search-card,body.ruwa-design-system-v31 .products .product,body.ruwa-design-system-v31 ul.products li.product,body.ruwa-design-system-v31 .ruwa-product-card,body.ruwa-design-system-v31 .ruwa-ritual-panel,body.ruwa-design-system-v31 .ruwa-hero-product,body.home.ruwa-design-system-v31 .ruwa-editorial-cta,body.home.ruwa-design-system-v31 .ruwa-editorial-arrow{transition:none!important;transform:none!important}}

@@ -3,37 +3,56 @@ defined('ABSPATH') || exit;
 get_header();
 $products = ruwa_products(12);
 $rituals = [
-    ['morning', 'n01', 'DAILY GLOW RITUAL', 'Wake up your glow.', 'Fresh hydration, brightening support and daily protection for skin that feels ready for the day.', 0],
-    ['night', 'n02', 'RESET & RECHARGE RITUAL', 'Reset while you rest.', 'Comforting textures and barrier-first care designed to replenish skin overnight.', 1],
-    ['weekly', 'n03', 'CLEAR & BALANCE RITUAL', 'Make space for balance.', 'A focused reset for smoother texture, clearer-looking pores and renewed softness.', 2],
+    ['morning', '01', 'DAILY GLOW RITUAL', 'Wake up your glow.', 'Fresh hydration, brightening support and daily protection for skin that feels ready for the day.', 0],
+    ['night', '02', 'RESET & RECHARGE RITUAL', 'Reset while you rest.', 'Comforting textures and barrier-first care designed to replenish skin overnight.', 1],
+    ['weekly', '03', 'CLEAR & BALANCE RITUAL', 'Make space for balance.', 'A focused reset for smoother texture, clearer-looking pores and renewed softness.', 2],
 ];
 ?>
-<section class="ruwa-hero" data-ritual-switcher>
-  <div class="ruwa-grain"></div>
-  <div class="ruwa-shell ruwa-hero-grid">
-    <div class="ruwa-hero-copy ruwa-reveal">
-      <span class="ruwa-eyebrow">SMALL-BATCH SKINCARE</span>
-      <div class="ruwa-ritual-tabs" role="tablist" aria-label="<?php esc_attr_e('Choose a ritual', 'nub-ruwah'); ?>">
-        <?php foreach ($rituals as $index => $ritual) : ?>
-          <button type="button" role="tab" aria-selected="<?php echo $index === 0 ? 'true' : 'false'; ?>" data-ritual-tab="<?php echo esc_attr($ritual[0]); ?>"><small><?php echo esc_html($ritual[1]); ?></small><?php echo esc_html(ucfirst($ritual[0])); ?></button>
-        <?php endforeach; ?>
-      </div>
+<section class="ruwa-hero ruwa-editorial-hero" data-ritual-switcher data-active-ritual="morning">
+  <div class="ruwa-grain" aria-hidden="true"></div>
+  <div class="ruwa-editorial-guides" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="ruwa-editorial-stage">
+    <div class="ruwa-editorial-meta ruwa-editorial-meta-left" aria-live="polite">
       <?php foreach ($rituals as $index => $ritual) : ?>
-        <article class="ruwa-ritual-panel<?php echo $index === 0 ? ' is-active' : ''; ?>" data-ritual-panel="<?php echo esc_attr($ritual[0]); ?>">
-          <span><?php echo esc_html($ritual[2]); ?></span><h1><?php echo esc_html($ritual[3]); ?></h1><p><?php echo esc_html($ritual[4]); ?></p>
-          <a class="ruwa-button ruwa-button-primary" href="<?php echo esc_url(ruwa_shop_url()); ?>"><?php esc_html_e('Shop now', 'nub-ruwah'); ?></a>
+        <span class="ruwa-ritual-panel<?php echo $index === 0 ? ' is-active' : ''; ?>" data-ritual-panel="<?php echo esc_attr($ritual[0]); ?>">PRODUCT NO.<?php echo esc_html($ritual[1]); ?></span>
+      <?php endforeach; ?>
+    </div>
+    <div class="ruwa-editorial-meta ruwa-editorial-meta-right" aria-live="polite">
+      <?php foreach ($rituals as $index => $ritual) : ?>
+        <span class="ruwa-ritual-panel<?php echo $index === 0 ? ' is-active' : ''; ?>" data-ritual-panel="<?php echo esc_attr($ritual[0]); ?>"><?php echo esc_html($ritual[2]); ?></span>
+      <?php endforeach; ?>
+    </div>
+
+    <button class="ruwa-editorial-arrow ruwa-editorial-prev" type="button" data-ritual-prev aria-label="<?php esc_attr_e('Previous ritual', 'nub-ruwah'); ?>">←</button>
+
+    <div class="ruwa-editorial-center">
+      <div class="ruwa-editorial-disc" aria-hidden="true"></div>
+      <div class="ruwa-editorial-orbit orbit-one" aria-hidden="true"></div>
+      <div class="ruwa-editorial-orbit orbit-two" aria-hidden="true"></div>
+      <?php foreach ($rituals as $index => $ritual) : $product = $products[$ritual[5]] ?? null; ?>
+        <article class="ruwa-hero-product<?php echo $index === 0 ? ' is-active' : ''; ?>" data-ritual-image="<?php echo esc_attr($ritual[0]); ?>">
+          <a href="<?php echo esc_url($product ? $product->get_permalink() : ruwa_shop_url()); ?>" aria-label="<?php echo esc_attr($product ? sprintf(__('View %s', 'nub-ruwah'), $product->get_name()) : __('Explore Ruwa Beauty products', 'nub-ruwah')); ?>">
+            <?php echo $product ? wp_kses_post($product->get_image('woocommerce_single', ['loading' => $index === 0 ? 'eager' : 'lazy'])) : '<div class="ruwa-placeholder-bottle">RUWA</div>'; ?>
+          </a>
         </article>
       <?php endforeach; ?>
-      <div class="ruwa-switch-controls"><button type="button" data-ritual-prev aria-label="<?php esc_attr_e('Previous ritual', 'nub-ruwah'); ?>">←</button><button type="button" data-ritual-next aria-label="<?php esc_attr_e('Next ritual', 'nub-ruwah'); ?>">→</button></div>
+      <div class="ruwa-editorial-copy">
+        <?php foreach ($rituals as $index => $ritual) : ?>
+          <article class="ruwa-ritual-panel<?php echo $index === 0 ? ' is-active' : ''; ?>" data-ritual-panel="<?php echo esc_attr($ritual[0]); ?>">
+            <span class="ruwa-eyebrow"><?php echo esc_html($ritual[2]); ?></span>
+            <h1><?php echo esc_html($ritual[3]); ?></h1>
+            <p><?php echo esc_html($ritual[4]); ?></p>
+          </article>
+        <?php endforeach; ?>
+      </div>
+      <a class="ruwa-editorial-cta" href="<?php echo esc_url(ruwa_shop_url()); ?>"><?php esc_html_e('Shop now', 'nub-ruwah'); ?></a>
     </div>
-    <div class="ruwa-hero-visual ruwa-reveal" data-ritual-visual>
-      <div class="ruwa-glow"></div><div class="ruwa-pedestal"></div>
-      <svg class="ruwa-botanical botanical-one" viewBox="0 0 120 90" aria-hidden="true"><path d="M12 75C44 52 51 20 103 12M38 58C27 43 24 31 28 18M63 39C78 35 91 38 104 48"/></svg>
-      <svg class="ruwa-botanical botanical-two" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="36"/><path d="M50 14v72M14 50h72M25 25l50 50M75 25L25 75"/></svg>
-      <?php foreach ($rituals as $index => $ritual) : $product = $products[$ritual[5]] ?? null; ?>
-        <div class="ruwa-hero-product<?php echo $index === 0 ? ' is-active' : ''; ?>" data-ritual-image="<?php echo esc_attr($ritual[0]); ?>">
-          <?php echo $product ? wp_kses_post($product->get_image('woocommerce_single', ['loading' => $index === 0 ? 'eager' : 'lazy'])) : '<div class="ruwa-placeholder-bottle">RUWA</div>'; ?>
-        </div>
+
+    <button class="ruwa-editorial-arrow ruwa-editorial-next" type="button" data-ritual-next aria-label="<?php esc_attr_e('Next ritual', 'nub-ruwah'); ?>">→</button>
+
+    <div class="ruwa-ritual-tabs ruwa-editorial-tabs" role="tablist" aria-label="<?php esc_attr_e('Choose a ritual', 'nub-ruwah'); ?>">
+      <?php foreach ($rituals as $index => $ritual) : ?>
+        <button type="button" role="tab" aria-selected="<?php echo $index === 0 ? 'true' : 'false'; ?>" data-ritual-tab="<?php echo esc_attr($ritual[0]); ?>"><small><?php echo esc_html($ritual[1]); ?></small><?php echo esc_html(ucfirst($ritual[0])); ?></button>
       <?php endforeach; ?>
     </div>
   </div>
