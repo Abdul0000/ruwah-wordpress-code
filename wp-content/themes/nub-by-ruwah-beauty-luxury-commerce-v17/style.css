@@ -1,0 +1,721 @@
+/*
+Theme Name: NUB by Ruwah Beauty — Luxury Commerce
+Theme URI: https://ruwahbeauty.com/
+Description: Premium Astra child theme for NUB by Ruwah Beauty.
+Author: Ruwah Beauty
+Version: 18.0.0
+Template: astra
+Text Domain: nub-ruwah
+*/
+
+:root {
+  --ruwah-ink: #17120f;
+  --ruwah-muted: #6d625c;
+  --ruwah-cream: #f7f2ec;
+  --ruwah-paper: #fffdf9;
+  --ruwah-sand: #e7d8c9;
+  --ruwah-cocoa: #4d3027;
+  --ruwah-plum: #4a253f;
+  --ruwah-gold: #a97745;
+  --ruwah-line: rgba(23, 18, 15, 0.12);
+  --ruwah-shadow: 0 1.5rem 4rem rgba(45, 29, 22, 0.12);
+  --ruwah-radius: 1.5rem;
+  --ruwah-shell: min(92vw, 78rem);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--ruwah-ink);
+  background: var(--ruwah-paper);
+}
+
+body.home {
+  overflow-x: hidden;
+}
+
+body.home .site-content > .ast-container {
+  display: block;
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+body.home .site-content {
+  background: var(--ruwah-paper);
+}
+
+body.home .site-header {
+  border-bottom: 0.0625rem solid var(--ruwah-line);
+  background: rgba(255, 253, 249, 0.96);
+  backdrop-filter: blur(1rem);
+}
+
+.ruwah-announcement {
+  position: relative;
+  z-index: 99;
+  background: var(--ruwah-ink);
+  color: #fff;
+  font-size: 0.72rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.ruwah-announcement__inner {
+  width: var(--ruwah-shell);
+  min-height: 2.25rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ruwah-announcement p {
+  margin: 0;
+}
+
+.ruwah-announcement__links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.ruwah-announcement a {
+  color: #fff;
+  text-decoration: none;
+  opacity: 0.82;
+}
+
+.ruwah-announcement a:hover,
+.ruwah-announcement a:focus {
+  color: #fff;
+  opacity: 1;
+}
+
+.ruwah-home {
+  width: 100%;
+  overflow: hidden;
+  background: var(--ruwah-paper);
+}
+
+.ruwah-shell {
+  width: var(--ruwah-shell);
+  margin-inline: auto;
+}
+
+.ruwah-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 1rem;
+  color: var(--ruwah-cocoa);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.ruwah-kicker::before {
+  content: "";
+  width: 2.2rem;
+  height: 0.0625rem;
+  background: currentColor;
+}
+
+.ruwah-title {
+  margin: 0;
+  color: var(--ruwah-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.4rem, 5vw, 5.75rem);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+}
+
+.ruwah-title em {
+  color: var(--ruwah-plum);
+  font-weight: 400;
+}
+
+.ruwah-copy {
+  max-width: 38rem;
+  margin: 1.4rem 0 0;
+  color: var(--ruwah-muted);
+  font-size: clamp(1rem, 1.5vw, 1.16rem);
+  line-height: 1.75;
+}
+
+.ruwah-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 2rem;
+}
+
+.ruwah-button,
+.ruwah-product-card__button {
+  min-height: 3.1rem;
+  padding: 0.85rem 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 0.0625rem solid var(--ruwah-ink);
+  border-radius: 999rem;
+  background: var(--ruwah-ink);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.ruwah-button:hover,
+.ruwah-button:focus,
+.ruwah-product-card__button:hover,
+.ruwah-product-card__button:focus {
+  transform: translateY(-0.12rem);
+  background: var(--ruwah-plum);
+  border-color: var(--ruwah-plum);
+  color: #fff;
+  box-shadow: 0 0.9rem 2rem rgba(74, 37, 63, 0.18);
+}
+
+.ruwah-button--ghost {
+  background: transparent;
+  color: var(--ruwah-ink);
+}
+
+.ruwah-button--ghost:hover,
+.ruwah-button--ghost:focus {
+  color: #fff;
+}
+
+.ruwah-hero {
+  position: relative;
+  padding: clamp(4.5rem, 8vw, 8rem) 0 clamp(3.5rem, 7vw, 6.5rem);
+  background:
+    radial-gradient(circle at 10% 10%, rgba(169, 119, 69, 0.16), transparent 29%),
+    radial-gradient(circle at 88% 18%, rgba(74, 37, 63, 0.13), transparent 27%),
+    linear-gradient(135deg, #fffdf9 0%, #f3eae1 100%);
+}
+
+.ruwah-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto -8rem -10rem auto;
+  width: 26rem;
+  aspect-ratio: 1;
+  border: 0.0625rem solid rgba(74, 37, 63, 0.18);
+  border-radius: 50%;
+}
+
+.ruwah-hero__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(18rem, 0.96fr);
+  align-items: center;
+  gap: clamp(2.5rem, 7vw, 6.5rem);
+}
+
+.ruwah-hero__visual {
+  position: relative;
+  min-height: min(43rem, 67vw);
+  display: grid;
+  place-items: center;
+}
+
+.ruwah-hero__frame {
+  position: relative;
+  width: min(100%, 32rem);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 45% 45% 1.75rem 1.75rem;
+  background: linear-gradient(160deg, #ead8c8, #cdb3a0);
+  box-shadow: var(--ruwah-shadow);
+}
+
+.ruwah-hero__frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ruwah-hero__fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.86);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.2rem, 5vw, 4.5rem);
+  text-align: center;
+}
+
+.ruwah-hero__badge {
+  position: absolute;
+  right: -1.2rem;
+  bottom: 8%;
+  width: 8.5rem;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  border-radius: 50%;
+  background: var(--ruwah-plum);
+  color: #fff;
+  box-shadow: 0 1rem 3rem rgba(74, 37, 63, 0.26);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.45;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.ruwah-metrics {
+  position: relative;
+  z-index: 2;
+  margin-top: clamp(3rem, 6vw, 5.5rem);
+  padding-top: 1.4rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  border-top: 0.0625rem solid var(--ruwah-line);
+}
+
+.ruwah-metric strong {
+  display: block;
+  color: var(--ruwah-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  font-weight: 400;
+}
+
+.ruwah-metric span {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--ruwah-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ruwah-section {
+  padding: clamp(4.5rem, 8vw, 8rem) 0;
+}
+
+.ruwah-section--cream {
+  background: var(--ruwah-cream);
+}
+
+.ruwah-section--dark {
+  background: var(--ruwah-ink);
+  color: #fff;
+}
+
+.ruwah-section__head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.ruwah-section__head .ruwah-title {
+  max-width: 49rem;
+  font-size: clamp(2.25rem, 4vw, 4.4rem);
+}
+
+.ruwah-text-link {
+  flex: 0 0 auto;
+  color: var(--ruwah-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.ruwah-text-link::after {
+  content: " →";
+}
+
+.ruwah-product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.6rem);
+}
+
+.ruwah-product-card {
+  position: relative;
+  min-width: 0;
+}
+
+.ruwah-product-card__media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--ruwah-radius);
+  background: #efe7df;
+}
+
+.ruwah-product-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 420ms ease;
+}
+
+.ruwah-product-card:hover .ruwah-product-card__media img {
+  transform: scale(1.035);
+}
+
+.ruwah-product-card__tag {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999rem;
+  background: rgba(255, 253, 249, 0.9);
+  color: var(--ruwah-ink);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(0.8rem);
+}
+
+.ruwah-product-card__body {
+  padding: 1.05rem 0.15rem 0;
+}
+
+.ruwah-product-card__title {
+  margin: 0;
+  color: var(--ruwah-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.ruwah-product-card__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ruwah-product-card__price {
+  min-height: 1.6rem;
+  margin-top: 0.55rem;
+  color: var(--ruwah-cocoa);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.ruwah-product-card__price del {
+  opacity: 0.55;
+}
+
+.ruwah-product-card__price ins {
+  text-decoration: none;
+}
+
+.ruwah-product-card__button {
+  width: 100%;
+  min-height: 2.8rem;
+  margin-top: 0.9rem;
+  padding-inline: 0.9rem;
+  font-size: 0.68rem;
+}
+
+.ruwah-empty {
+  grid-column: 1 / -1;
+  padding: 2.5rem;
+  border: 0.0625rem dashed var(--ruwah-line);
+  border-radius: var(--ruwah-radius);
+  color: var(--ruwah-muted);
+  text-align: center;
+}
+
+.ruwah-concern-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.ruwah-concern {
+  position: relative;
+  min-height: 15rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--ruwah-radius);
+  background:
+    linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02)),
+    radial-gradient(circle at 80% 10%, rgba(169,119,69,0.45), transparent 34%);
+  color: #fff;
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.ruwah-concern:nth-child(2) {
+  background:
+    linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02)),
+    radial-gradient(circle at 80% 10%, rgba(106,70,96,0.8), transparent 38%);
+}
+
+.ruwah-concern:nth-child(3) {
+  background:
+    linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02)),
+    radial-gradient(circle at 80% 10%, rgba(135,91,69,0.7), transparent 38%);
+}
+
+.ruwah-concern:nth-child(4) {
+  background:
+    linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02)),
+    radial-gradient(circle at 80% 10%, rgba(184,144,104,0.58), transparent 38%);
+}
+
+.ruwah-concern:hover,
+.ruwah-concern:focus {
+  transform: translateY(-0.2rem);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+.ruwah-concern__number {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  color: rgba(255,255,255,0.58);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+}
+
+.ruwah-concern h3 {
+  margin: 0;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.7rem;
+  font-weight: 400;
+}
+
+.ruwah-concern p {
+  margin: 0.6rem 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.ruwah-ritual {
+  display: grid;
+  grid-template-columns: 0.78fr 1.22fr;
+  gap: clamp(3rem, 8vw, 7rem);
+  align-items: start;
+}
+
+.ruwah-ritual__intro {
+  position: sticky;
+  top: 7rem;
+}
+
+.ruwah-ritual__steps {
+  border-top: 0.0625rem solid var(--ruwah-line);
+}
+
+.ruwah-step {
+  padding: 1.65rem 0;
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: 1rem;
+  border-bottom: 0.0625rem solid var(--ruwah-line);
+}
+
+.ruwah-step__number {
+  color: var(--ruwah-gold);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+
+.ruwah-step h3 {
+  margin: 0;
+  color: var(--ruwah-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+  font-weight: 400;
+}
+
+.ruwah-step p {
+  margin: 0.45rem 0 0;
+  color: var(--ruwah-muted);
+  line-height: 1.65;
+}
+
+.ruwah-manifesto {
+  position: relative;
+  padding: clamp(5rem, 10vw, 9rem) 0;
+  overflow: hidden;
+  background: var(--ruwah-plum);
+  color: #fff;
+  text-align: center;
+}
+
+.ruwah-manifesto::before,
+.ruwah-manifesto::after {
+  content: "";
+  position: absolute;
+  width: 22rem;
+  aspect-ratio: 1;
+  border: 0.0625rem solid rgba(255,255,255,0.14);
+  border-radius: 50%;
+}
+
+.ruwah-manifesto::before {
+  top: -10rem;
+  left: -7rem;
+}
+
+.ruwah-manifesto::after {
+  right: -7rem;
+  bottom: -12rem;
+}
+
+.ruwah-manifesto .ruwah-kicker,
+.ruwah-manifesto .ruwah-title,
+.ruwah-manifesto .ruwah-copy {
+  color: #fff;
+}
+
+.ruwah-manifesto .ruwah-copy {
+  margin-inline: auto;
+  color: rgba(255,255,255,0.76);
+}
+
+.ruwah-manifesto .ruwah-actions {
+  justify-content: center;
+}
+
+.ruwah-manifesto .ruwah-button {
+  border-color: #fff;
+  background: #fff;
+  color: var(--ruwah-plum);
+}
+
+.ruwah-manifesto .ruwah-button:hover,
+.ruwah-manifesto .ruwah-button:focus {
+  background: var(--ruwah-ink);
+  border-color: var(--ruwah-ink);
+  color: #fff;
+}
+
+@media (max-width: 64rem) {
+  .ruwah-hero__grid,
+  .ruwah-ritual {
+    grid-template-columns: 1fr;
+  }
+
+  .ruwah-hero__visual {
+    min-height: 36rem;
+  }
+
+  .ruwah-product-grid,
+  .ruwah-concern-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ruwah-ritual__intro {
+    position: static;
+  }
+}
+
+@media (max-width: 48rem) {
+  .ruwah-announcement__inner {
+    min-height: 2.65rem;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .ruwah-announcement__links {
+    display: none;
+  }
+
+  .ruwah-hero {
+    padding-top: 3.5rem;
+  }
+
+  .ruwah-hero__grid {
+    gap: 2.4rem;
+  }
+
+  .ruwah-hero__visual {
+    min-height: auto;
+  }
+
+  .ruwah-hero__frame {
+    width: min(88vw, 30rem);
+  }
+
+  .ruwah-hero__badge {
+    right: 0;
+    width: 7.4rem;
+  }
+
+  .ruwah-section__head {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .ruwah-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .ruwah-metric {
+    padding: 0.85rem 0;
+    border-bottom: 0.0625rem solid var(--ruwah-line);
+  }
+}
+
+@media (max-width: 38rem) {
+  .ruwah-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ruwah-button {
+    width: 100%;
+  }
+
+  .ruwah-product-grid,
+  .ruwah-concern-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ruwah-step {
+    grid-template-columns: 2.8rem minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
