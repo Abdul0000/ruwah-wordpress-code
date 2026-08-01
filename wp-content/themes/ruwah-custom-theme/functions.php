@@ -1,6 +1,6 @@
 <?php
 defined('ABSPATH') || exit;
-define('RUWAH_THEME_VERSION','1.0.4');
+define('RUWAH_THEME_VERSION','1.0.5');
 
 add_action('after_setup_theme',function(){
     load_theme_textdomain('ruwah',get_template_directory().'/languages');
@@ -44,6 +44,18 @@ add_action('wp_enqueue_scripts',function(){
 @media(max-width:980px){.rb-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.rb-product-media{height:210px!important}}
 @media(max-width:560px){.rb-product-grid{gap:10px!important}.rb-product-card{padding:6px!important;border-radius:14px!important}.rb-product-media{height:145px!important;padding:8px!important;border-radius:10px!important}.rb-product-copy{padding:8px 6px 3px!important}.rb-product-copy h3{min-height:34px!important;margin-bottom:5px!important;font-size:13px!important}.rb-card-rating{gap:3px!important;margin-bottom:5px!important;font-size:10px!important}.rb-card-rating>span:first-child{font-size:12px!important}.rb-card-rating .rb-rating-count{font-size:8px!important}.rb-price{gap:3px!important;font-size:12px!important}.rb-price ins{font-size:12px!important}.rb-price del{font-size:8px!important}.rb-product-actions{margin-top:7px!important;padding:0 6px 5px!important}.rb-product-actions .button{min-height:34px!important;padding:8px 6px!important;font-size:10px!important}.rb-badge{top:11px!important;left:11px!important;padding:5px 7px!important;font-size:8px!important}}
 .rb-category-card span{position:relative;background:#f6e8e8!important}.rb-category-card span img{display:block;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;transform:scale(1.01);transition:transform .35s ease}.rb-category-card:hover span img{transform:scale(1.08)}
+/* Keep the existing hero design, but prevent text/image overlap. */
+.home .rb-hero{min-height:620px!important;grid-template-columns:minmax(0,54%) minmax(0,46%)!important;background:linear-gradient(90deg,#f6e8e8 0 56%,#ead4d4 56%)!important}
+.home .rb-hero-copy{width:calc(100% - 40px)!important;max-width:1240px!important;padding:58px 0!important}
+.home .rb-hero-copy>*{max-width:570px!important}
+.home .rb-hero h1{max-width:570px!important;margin:0 0 20px!important;font-size:clamp(52px,5.35vw,76px)!important;line-height:.98!important;overflow-wrap:normal!important;word-break:normal!important}
+.home .rb-hero p{max-width:520px!important;font-size:17px!important}
+.home .rb-hero-media{inset:0 0 0 56%!important;padding:42px 4vw 34px 2vw!important}
+.home .rb-hero-media:before{width:min(38vw,500px)!important;height:min(38vw,500px)!important}
+.home .rb-hero-media img{width:88%!important;height:88%!important;max-width:650px!important;object-fit:contain!important}
+@media(max-width:1180px){.home .rb-hero h1{max-width:510px!important;font-size:clamp(48px,5.5vw,66px)!important}.home .rb-hero-copy>*{max-width:510px!important}.home .rb-hero-media{inset:0 0 0 57%!important;padding-left:1vw!important}}
+@media(max-width:900px){.home .rb-hero{min-height:700px!important}.home .rb-hero h1{max-width:440px!important;font-size:54px!important}.home .rb-hero-copy>*{max-width:440px!important}.home .rb-hero-media{inset:0 0 0 55%!important}.home .rb-hero-media img{width:94%!important;height:84%!important}}
+@media(max-width:760px){.home .rb-hero{min-height:780px!important;display:block!important;background:linear-gradient(#f6e8e8 0 59%,#ead4d4 59%)!important}.home .rb-hero-copy{padding:42px 0 34px!important}.home .rb-hero-copy>*{max-width:100%!important}.home .rb-hero h1{max-width:100%!important;font-size:clamp(43px,13vw,56px)!important;line-height:1!important}.home .rb-hero p{max-width:100%!important;font-size:16px!important}.home .rb-hero-media{inset:auto 0 0!important;height:41%!important;padding:10px 24px 20px!important}.home .rb-hero-media:before{width:300px!important;height:300px!important}.home .rb-hero-media img{width:92%!important;height:92%!important}}
 CSS;
     wp_add_inline_style('ruwah-style',$card_css);
 
