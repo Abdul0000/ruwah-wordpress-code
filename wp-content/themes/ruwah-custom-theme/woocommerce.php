@@ -1,0 +1,1 @@
+<?php defined('ABSPATH')||exit;get_header(); ?><section class="rb-content"><div class="rb-shell"><?php woocommerce_content(); ?></div></section><?php get_footer(); ?>

@@ -1,0 +1,1 @@
+<?php defined('ABSPATH')||exit;get_header();while(have_posts()):the_post(); ?><section class="rb-page-hero"><div class="rb-shell"><span class="rb-kicker">RUWAH BEAUTY</span><h1 class="rb-page-title"><?php the_title(); ?></h1></div></section><section class="rb-content"><div class="rb-shell"><article><?php the_content(); ?></article></div></section><?php endwhile;get_footer(); ?>
