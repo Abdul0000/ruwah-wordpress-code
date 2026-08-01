@@ -19,6 +19,11 @@ $interaction_css = get_stylesheet_directory() . '/assets/css/interaction-parity.
 <link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/css/ruwa-v31.css'); ?>?ver=<?php echo esc_attr(RUWA_THEME_VERSION); ?>">
 <link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/css/astra-woocommerce-overrides.css'); ?>?ver=<?php echo esc_attr(is_readable($override_css) ? (string) filemtime($override_css) : RUWA_THEME_VERSION); ?>">
 <link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/css/interaction-parity.css'); ?>?ver=<?php echo esc_attr(is_readable($interaction_css) ? (string) filemtime($interaction_css) : RUWA_THEME_VERSION); ?>">
+<style id="ruwa-search-critical-state">
+body:not(.search-modal-open) .ruwa-search-overlay{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+body.search-modal-open .ruwa-search-overlay{display:grid!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+body.search-modal-open{overflow:hidden!important;overscroll-behavior:none!important}
+</style>
 </head>
 <body <?php body_class(['ruwa-v30', 'ruwa-design-system-v31']); ?>>
 <?php wp_body_open(); ?>
@@ -60,6 +65,43 @@ $interaction_css = get_stylesheet_directory() . '/assets/css/interaction-parity.
     </form>
   </div>
 </section>
+<script id="ruwa-search-critical-controller">
+(function(){
+  var body=document.body;
+  var dialog=document.querySelector('[data-search-dialog]');
+  if(!body||!dialog){return;}
+  var returnFocus=null;
+  function isOpen(){return body.classList.contains('search-modal-open');}
+  function closeSearch(restore){
+    body.classList.remove('search-modal-open','ruwa-layer-open');
+    dialog.classList.remove('is-open');
+    dialog.hidden=true;
+    dialog.setAttribute('aria-hidden','true');
+    if(restore!==false&&returnFocus&&typeof returnFocus.focus==='function'){returnFocus.focus({preventScroll:true});}
+    returnFocus=null;
+  }
+  function openSearch(trigger){
+    returnFocus=trigger||document.activeElement;
+    dialog.hidden=false;
+    dialog.setAttribute('aria-hidden','false');
+    body.classList.add('search-modal-open','ruwa-layer-open');
+    dialog.classList.add('is-open');
+    window.requestAnimationFrame(function(){var field=dialog.querySelector('input[type="search"]');if(field){field.focus({preventScroll:true});}});
+  }
+  closeSearch(false);
+  document.addEventListener('click',function(event){
+    var opener=event.target.closest('[data-search-open]');
+    if(opener){event.preventDefault();event.stopImmediatePropagation();openSearch(opener);return;}
+    var closer=event.target.closest('[data-search-close]');
+    if(closer){event.preventDefault();event.stopImmediatePropagation();closeSearch(true);return;}
+    if(event.target===dialog){event.preventDefault();closeSearch(true);}
+  },true);
+  document.addEventListener('keydown',function(event){
+    if(event.key==='Escape'&&isOpen()){event.preventDefault();event.stopImmediatePropagation();closeSearch(true);}
+  },true);
+  window.addEventListener('pageshow',function(){if(!isOpen()){closeSearch(false);}});
+})();
+</script>
 
 <aside class="ruwa-cart-drawer" data-cart-drawer aria-hidden="true">
   <header><h2><?php esc_html_e('Your Ritual Bag', 'nub-ruwah'); ?></h2><button type="button" class="ruwa-close" data-cart-close aria-label="<?php esc_attr_e('Close cart', 'nub-ruwah'); ?>">×</button></header>
