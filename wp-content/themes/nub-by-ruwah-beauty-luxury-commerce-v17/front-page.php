@@ -41,18 +41,12 @@ $rituals = [
 
 <section class="ruwa-story-strip"><div class="ruwa-shell ruwa-reveal"><span class="ruwa-eyebrow ruwa-eyebrow-light">OUR PHILOSOPHY</span><blockquote>Small-batch. Real ingredients. <em>Rituals made to last.</em></blockquote><p>We create uncomplicated skincare that turns everyday care into something tactile, expressive and easy to return to.</p></div></section>
 
-<section class="ruwa-claims"><div class="ruwa-shell ruwa-claims-grid">
-<?php
-$claims = [
-    ['◇','No Sulfates','Gentle cleansing without the harsh finish.'],
-    ['✦','No Parabens','Thoughtful formulas, nothing unnecessary.'],
-    ['♡','Cruelty-Free','Beauty made with care and respect.'],
-    ['◎','Dermatologist Tested','Designed with skin comfort in mind.'],
-];
-foreach ($claims as $claim) : ?>
-<article><i><?php echo esc_html($claim[0]); ?></i><strong><?php echo esc_html($claim[1]); ?></strong><span><?php echo esc_html($claim[2]); ?></span></article>
-<?php endforeach; ?>
-</div></section>
+<section class="ritual-claims-stack" id="ritual-claims" aria-label="<?php esc_attr_e('Our formulation standards', 'nub-ruwah'); ?>">
+  <article class="claim-card" data-index="0"><span class="claim-icon" aria-hidden="true">◇</span><h3><?php esc_html_e('No Sulfates', 'nub-ruwah'); ?></h3><p><?php esc_html_e('Gentle cleansing without harsh stripping agents.', 'nub-ruwah'); ?></p></article>
+  <article class="claim-card" data-index="1"><span class="claim-icon" aria-hidden="true">✦</span><h3><?php esc_html_e('No Parabens', 'nub-ruwah'); ?></h3><p><?php esc_html_e('Preserved naturally, without synthetic preservatives.', 'nub-ruwah'); ?></p></article>
+  <article class="claim-card" data-index="2"><span class="claim-icon" aria-hidden="true">♡</span><h3><?php esc_html_e('Cruelty-Free', 'nub-ruwah'); ?></h3><p><?php esc_html_e('Never tested on animals, ever.', 'nub-ruwah'); ?></p></article>
+  <article class="claim-card" data-index="3"><span class="claim-icon" aria-hidden="true">◎</span><h3><?php esc_html_e('Dermatologist Tested', 'nub-ruwah'); ?></h3><p><?php esc_html_e('Verified safe and gentle for everyday use.', 'nub-ruwah'); ?></p></article>
+</section>
 
 <section class="ruwa-section ruwa-ritual-shop"><div class="ruwa-shell"><header class="ruwa-section-heading ruwa-reveal"><span class="ruwa-eyebrow ruwa-eyebrow-light">CHOOSE YOUR RITUAL</span><h2>Three ways to meet your skin.</h2><p>Start with the feeling you want, then build the routine around it.</p></header><div class="ruwa-product-grid"><?php $badges = ['Daily glow','Night reset','Weekly balance']; foreach (array_slice($products, 0, 3) as $i => $product) ruwa_product_card($product, $badges[$i] ?? ''); ?></div></div></section>
 

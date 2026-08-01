@@ -41,6 +41,44 @@ add_action('wp_enqueue_scripts', function () {
     );
 }, 40);
 
+// RUWA Beauty — GSAP stacked scroll reveal for the Home page claims.
+add_action('wp_enqueue_scripts', function () {
+    if (!is_front_page()) {
+        return;
+    }
+
+    $stack_script = get_stylesheet_directory() . '/js/ruwa-scroll-stack.js';
+    $stack_style = get_stylesheet_directory() . '/assets/css/ruwa-scroll-stack.css';
+
+    wp_enqueue_script(
+        'gsap',
+        'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js',
+        [],
+        '3.12.5',
+        true
+    );
+    wp_enqueue_script(
+        'gsap-scrolltrigger',
+        'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js',
+        ['gsap'],
+        '3.12.5',
+        true
+    );
+    wp_enqueue_script(
+        'ruwa-scroll-stack',
+        get_stylesheet_directory_uri() . '/js/ruwa-scroll-stack.js',
+        ['gsap', 'gsap-scrolltrigger'],
+        is_readable($stack_script) ? (string) filemtime($stack_script) : RUWA_THEME_VERSION,
+        true
+    );
+    wp_enqueue_style(
+        'ruwa-scroll-stack',
+        get_stylesheet_directory_uri() . '/assets/css/ruwa-scroll-stack.css',
+        ['ruwa-rituals'],
+        is_readable($stack_style) ? (string) filemtime($stack_style) : RUWA_THEME_VERSION
+    );
+}, 45);
+
 add_filter('body_class', function ($classes) {
     $classes[] = 'ruwa-ritual-theme';
     return $classes;

@@ -1,0 +1,9 @@
+/* RUWA Beauty — stacked scroll reveal. */
+.ritual-claims-stack{position:relative;width:100%;padding:clamp(48px,7vw,88px) 0 clamp(72px,10vw,128px);overflow:clip;background:var(--color-bg-cream,#F7F0E6)}
+.ritual-claims-stack .claim-card{position:sticky;top:clamp(88px,15vh,150px);width:min(600px,calc(100% - 32px));margin:0 auto 24px;padding:clamp(24px,4vw,32px);border:2px solid var(--color-accent-forest,#1F3A30);border-radius:24px;background:var(--color-card,#FCF8F2);box-shadow:0 8px 32px rgba(31,58,48,.10);text-align:center;transform-origin:50% 100%;will-change:transform,opacity}
+.ritual-claims-stack .claim-card+.claim-card{margin-top:min(20vh,160px)}
+.ritual-claims-stack .claim-card h3{margin:12px 0 8px;color:var(--color-accent-forest,#1F3A30);font-family:'Fraunces',Georgia,serif;font-size:clamp(20px,2.4vw,26px);line-height:1.2}
+.ritual-claims-stack .claim-card p{max-width:440px;margin:0 auto;color:var(--color-text-muted,#8C7F70);font-size:14px;line-height:1.65}
+.ritual-claims-stack .claim-icon{display:inline-grid;place-items:center;width:48px;height:48px;border:1px solid rgba(184,147,91,.55);border-radius:50%;color:var(--color-gold,#B8935B);font-size:24px;line-height:1}
+@media(max-width:680px){.ritual-claims-stack{padding-top:40px;padding-bottom:88px}.ritual-claims-stack .claim-card{top:96px;width:min(92%,600px)}.ritual-claims-stack .claim-card+.claim-card{margin-top:96px}}
+@media(prefers-reduced-motion:reduce){.ritual-claims-stack .claim-card{position:relative;top:auto;margin-top:0;opacity:1!important;transform:none!important;will-change:auto}}
