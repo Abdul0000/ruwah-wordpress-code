@@ -26,6 +26,7 @@ $logo_path = get_template_directory() . '/assets/ruwah-monogram.svg';
         @media(max-width:1050px){.rb-header-main{min-height:76px;grid-template-columns:auto 1fr auto;padding:0 16px}.rb-menu-btn{display:inline-flex!important;justify-self:start}.rb-header-search{display:none}.rb-header-brand{justify-self:center;width:165px;height:70px}.rb-header-brand svg{width:150px;max-height:58px}.rb-header-tools{gap:14px}.rb-track-order{display:none!important}.rb-header-nav{display:none;position:absolute;left:0;right:0;top:76px;min-height:0;padding:14px 20px;border-top:1px solid #eee;box-shadow:0 14px 30px rgba(0,0,0,.08)}.rb-header-nav.is-open{display:block}.rb-header-nav ul{display:flex;flex-direction:column;align-items:stretch;gap:0}.rb-header-nav a{padding:12px 4px}}
         @media(max-width:760px){body.admin-bar .rb-header{top:0}.rb-header-tools .rb-account-link{display:none}.rb-header-main{min-height:70px}.rb-header-nav{top:70px}.rb-header-brand{width:138px;height:64px}.rb-header-brand svg{width:126px;max-height:50px}}
     </style>
+    <link id="ruwah-global-design-system" rel="stylesheet" href="<?php echo esc_url(get_template_directory_uri() . '/design-system.css?ver=20260802-2'); ?>" media="all">
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
