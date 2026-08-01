@@ -1,47 +1,112 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-
-function rw_products( $count = 8, $offset = 0 ) {
-    if ( ! function_exists( 'wc_get_products' ) ) return array();
-    return wc_get_products( array('status'=>'publish','limit'=>$count,'offset'=>$offset,'orderby'=>'date','order'=>'DESC','return'=>'objects') );
-}
-function rw_shop_url() { return function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' ); }
-function rw_page_url( $slug ) { $page = get_page_by_path( $slug ); return $page ? get_permalink( $page ) : home_url( '/' . trim( $slug, '/' ) . '/' ); }
-function rw_product_card( $product ) {
-    if ( ! $product instanceof WC_Product ) return;
-    $simple = $product->is_type( 'simple' ) && $product->is_purchasable() && $product->is_in_stock();
-    $url = $simple ? $product->add_to_cart_url() : $product->get_permalink();
-    $classes = $simple ? 'rw-add add_to_cart_button ajax_add_to_cart product_type_simple' : 'rw-add';
-    echo '<article class="rw-card"><a class="rw-card-media" href="' . esc_url( $product->get_permalink() ) . '">';
-    echo '<span class="rw-badge">' . esc_html( $product->is_on_sale() ? 'Sale' : 'Daily essential' ) . '</span>';
-    echo wp_kses_post( $product->get_image( 'woocommerce_thumbnail', array('loading'=>'lazy','alt'=>$product->get_name()) ) );
-    echo '</a><div class="rw-card-body"><h3><a href="' . esc_url( $product->get_permalink() ) . '">' . esc_html( $product->get_name() ) . '</a></h3>';
-    echo '<div class="rw-card-meta"><strong>' . wp_kses_post( $product->get_price_html() ) . '</strong><span>★ ' . esc_html( $product->get_average_rating() ?: 'New' ) . '</span></div>';
-    echo '<a class="' . esc_attr( $classes ) . '" href="' . esc_url( $url ) . '" data-product_id="' . esc_attr( $product->get_id() ) . '" data-quantity="1" rel="nofollow">' . esc_html( $simple ? 'Quick Add' : 'View Product' ) . '</a></div></article>';
-}
-
 get_header();
-$shop = rw_shop_url();
-$products = rw_products( 8 );
-$hero_products = array_slice( $products, 0, 3 );
-$cart = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : rw_page_url( 'cart' );
-$account = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : rw_page_url( 'my-account' );
-$count = function_exists( 'WC' ) && WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
+
+$shop      = ruwah_shop_url();
+$rituals   = ruwah_page_url( 'build-your-ritual' );
+$story     = ruwah_page_url( 'our-story' );
+$account   = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : ruwah_page_url( 'my-account' );
+$cart      = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : ruwah_page_url( 'cart' );
+$products  = ruwah_products( 10 );
+$hero      = $products[0] ?? null;
+$hero_two  = $products[1] ?? null;
+$hero_three= $products[2] ?? null;
+$cart_count= function_exists( 'WC' ) && WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
 ?>
-<div class="rw-page">
-<div class="rw-marquee"><div class="rw-marquee-track"><span>✦ Free delivery on qualifying orders</span><span>✦ New glow essentials have arrived</span><span>✦ Thoughtful formulas for real skin</span><span>✦ Build your complete skincare ritual</span><span>✦ Free delivery on qualifying orders</span><span>✦ New glow essentials have arrived</span><span>✦ Thoughtful formulas for real skin</span><span>✦ Build your complete skincare ritual</span></div></div>
-<header class="rw-header"><div class="rw-shell rw-nav"><a class="rw-logo" href="<?php echo esc_url( home_url('/') ); ?>"><strong>RUWAH</strong><small>BEAUTY</small></a><nav class="rw-links" aria-label="Primary"><a href="<?php echo esc_url($shop); ?>">Shop</a><a href="<?php echo esc_url(rw_page_url('skin-concerns')); ?>">Skin Concerns</a><a href="<?php echo esc_url(rw_page_url('build-your-ritual')); ?>">Rituals</a><a href="<?php echo esc_url(rw_page_url('ingredients')); ?>">Ingredients</a><a href="<?php echo esc_url(rw_page_url('our-story')); ?>">Our Story</a></nav><div class="rw-tools"><a href="<?php echo esc_url($account); ?>" aria-label="Account">♙</a><a href="<?php echo esc_url($cart); ?>" aria-label="Cart">♧<span class="rw-cart-count"><?php echo esc_html($count); ?></span></a><button class="rw-menu" type="button" aria-expanded="false" aria-label="Open menu"><span></span><span></span><span></span></button></div></div></header>
-<main>
-<section class="rw-hero"><div class="rw-shell rw-hero-grid"><div class="rw-hero-copy"><p class="rw-kicker">Purposeful skincare · visible everyday results</p><h1>Skincare made for the skin <em>you live in.</em></h1><p class="rw-lead">Purposeful formulas, skin-loving ingredients, and simple rituals designed for visible everyday results.</p><div class="rw-actions"><a class="rw-btn" href="<?php echo esc_url($shop); ?>">Shop Best Sellers</a><a class="rw-btn rw-btn-outline" href="<?php echo esc_url(rw_page_url('build-your-ritual')); ?>">Find Your Ritual</a></div><div class="rw-trust"><span>✿ Thoughtful ingredients</span><span>♡ Cruelty-conscious</span><span>☀ Made for real routines</span></div></div><div class="rw-products-hero" aria-label="Featured products"><?php foreach($hero_products as $product){ echo '<a href="'.esc_url($product->get_permalink()).'">'.wp_kses_post($product->get_image('large',array('alt'=>$product->get_name()))).'</a>'; } ?></div></div></section>
-<section class="rw-section"><div class="rw-shell"><div class="rw-section-head"><div><p class="rw-kicker">Shop by skin concern</p><h2 class="rw-title">Find your skin’s next favourite.</h2></div><a class="rw-text-link" href="<?php echo esc_url(rw_page_url('skin-concerns')); ?>">View all concerns →</a></div><div class="rw-concerns"><?php $concerns=array(array('Hydration','Quench dryness and support a softer skin barrier.','◌'),array('Uneven Tone','Support brighter, more even-looking skin.','◐'),array('Dullness','Bring visible radiance back to tired skin.','✦'),array('Sensitive Skin','Soothe, calm and strengthen delicate skin.','❀'),array('Breakouts','Clarify without overwhelming your routine.','◎'),array('Fine Lines','Smooth and support a more supple look.','≈'),array('Barrier Support','Reinforce and protect everyday comfort.','⬡'),array('Daily Protection','Finish your ritual with daily defence.','☀')); foreach($concerns as $c){ echo '<a class="rw-concern" href="'.esc_url(rw_page_url('skin-concerns')).'"><i>'.esc_html($c[2]).'</i><h3>'.esc_html($c[0]).'</h3><p>'.esc_html($c[1]).'</p></a>'; } ?></div></div></section>
-<section class="rw-section" style="background:#fff"><div class="rw-shell"><div class="rw-section-head"><div><p class="rw-kicker">Current collection</p><h2 class="rw-title">Your glow lineup</h2></div><a class="rw-text-link" href="<?php echo esc_url($shop); ?>">Shop all products →</a></div><div class="rw-product-grid"><?php if($products){foreach($products as $p)rw_product_card($p);}else{echo '<p>No published products found.</p>';} ?></div></div></section>
-<section class="rw-section rw-proof"><div class="rw-shell"><p class="rw-kicker" style="color:#fff">What makes Ruwah different</p><h2 class="rw-title">Good skin days begin with intention.</h2><div class="rw-proof-grid"><article class="rw-proof-card"><b>01</b><h3>Purposeful formulas</h3><p>Every ingredient should have a reason to be there.</p></article><article class="rw-proof-card"><b>02</b><h3>Skin-first routines</h3><p>Simple steps that fit into real daily life.</p></article><article class="rw-proof-card"><b>03</b><h3>Thoughtful ingredients</h3><p>Botanicals, nourishing oils, and effective actives.</p></article><article class="rw-proof-card"><b>04</b><h3>Confidence through consistency</h3><p>Progress rather than perfection, one ritual at a time.</p></article></div></div></section>
-<section class="rw-section rw-ritual"><div class="rw-shell"><p class="rw-kicker">Build your ritual</p><h2 class="rw-title">Four simple steps. One confident routine.</h2><div class="rw-steps"><article class="rw-step"><b>01</b><h3>Cleanse</h3><p>Start with a fresh, comfortable base.</p></article><article class="rw-step"><b>02</b><h3>Treat</h3><p>Target your specific skin concern.</p></article><article class="rw-step"><b>03</b><h3>Moisturise</h3><p>Support hydration and barrier comfort.</p></article><article class="rw-step"><b>04</b><h3>Protect</h3><p>Finish with daily protection where applicable.</p></article></div><a class="rw-btn" href="<?php echo esc_url(rw_page_url('build-your-ritual')); ?>">Build My Ritual</a></div></section>
-<section class="rw-section rw-ingredient"><div class="rw-shell rw-ingredient-grid"><div><p class="rw-kicker" style="color:#fff">Ingredient spotlight</p><h2 class="rw-title">Niacinamide, the versatile all-rounder.</h2><p class="rw-lead" style="color:rgba(255,255,255,.82)">An ingredient commonly used to support more even-looking skin, manage excess shine, and strengthen the appearance of the skin barrier.</p><a class="rw-btn" href="<?php echo esc_url(rw_page_url('ingredients')); ?>">Explore Ingredients</a></div><div class="rw-ingredient-art" aria-hidden="true"></div></div></section>
-<section class="rw-section rw-story"><div class="rw-shell rw-story-grid"><div><p class="rw-kicker">Our story</p><h2 class="rw-title">Rooted in care. Made for real skin.</h2><p class="rw-lead">Ruwah means “soul” in Arabic. Our approach is grounded in thoughtful ingredients, simple rituals, and products designed to support the skin you already have.</p><a class="rw-btn" href="<?php echo esc_url(rw_page_url('our-story')); ?>">Read Our Story</a></div><div class="rw-quote">“Your skin does not need more noise. It needs the right ritual.”</div></div></section>
-<section class="rw-section"><div class="rw-shell rw-faq"><div><p class="rw-kicker">Need to know</p><h2 class="rw-title">Simple answers for better rituals.</h2></div><div><details open><summary>Which product should I start with?</summary><p>Begin with your main skin concern and build a simple cleanse, treat, moisturise and protect routine.</p></details><details><summary>Can I use multiple Ruwah products together?</summary><p>Product compatibility depends on the formulas and your skin. Introduce new products gradually and follow the instructions supplied with each product.</p></details><details><summary>How long does delivery take?</summary><p>Delivery timing is shown during checkout and depends on your destination and selected shipping method.</p></details><details><summary>How do returns work?</summary><p>Review the current returns policy for eligibility, timing and product-condition requirements.</p></details></div></div></section>
-<section class="rw-section rw-newsletter"><div class="rw-shell rw-newsletter-grid"><div><p class="rw-kicker" style="color:#fff">Join the glow list</p><h2 class="rw-title">Good skin news, delivered.</h2><p>New products, skincare education, exclusive offers and routine inspiration.</p></div><form action="#" method="post"><label class="screen-reader-text" for="rw-email">Email address</label><input id="rw-email" type="email" name="email" placeholder="Email address" required><button type="submit">Subscribe</button></form></div></section>
-</main>
-<footer class="rw-footer"><div class="rw-shell"><div class="rw-footer-grid"><div><a class="rw-logo" href="<?php echo esc_url(home_url('/')); ?>"><strong>RUWAH</strong><small>BEAUTY</small></a><p>Purposeful formulas and simple rituals for real skin.</p></div><div><h3>Shop</h3><a href="<?php echo esc_url($shop); ?>">All Products</a><a href="<?php echo esc_url(rw_page_url('skin-concerns')); ?>">Skin Concerns</a><a href="<?php echo esc_url(rw_page_url('ingredients')); ?>">Ingredients</a></div><div><h3>Discover</h3><a href="<?php echo esc_url(rw_page_url('build-your-ritual')); ?>">Build Your Ritual</a><a href="<?php echo esc_url(rw_page_url('our-story')); ?>">Our Story</a><a href="<?php echo esc_url(rw_page_url('journal')); ?>">Journal</a></div><div><h3>Help</h3><a href="<?php echo esc_url(rw_page_url('faq')); ?>">FAQ</a><a href="<?php echo esc_url(rw_page_url('contact')); ?>">Contact</a><a href="<?php echo esc_url($account); ?>">My Account</a></div></div><div class="rw-footer-bottom">© <?php echo esc_html(date('Y')); ?> Ruwah Beauty. All rights reserved.</div></div></footer>
+<div class="rr-page">
+    <div class="rr-announcement"><div class="rr-shell"><span>Free delivery on qualifying orders</span><span>Two samples with every order</span><span>Thoughtful formulas for real skin</span><span>Easy returns</span></div></div>
+    <header class="rr-header">
+        <div class="rr-shell rr-header-row">
+            <button class="rr-menu" type="button" aria-expanded="false" aria-label="Open menu"><i></i><i></i><i></i></button>
+            <a class="rr-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>"><strong>RUWAH</strong><small>BEAUTY</small></a>
+            <nav class="rr-nav" aria-label="Primary navigation">
+                <a href="<?php echo esc_url( $shop ); ?>">Shop</a>
+                <a href="#concerns">Skin Concerns</a>
+                <a href="<?php echo esc_url( $rituals ); ?>">Rituals</a>
+                <a href="#ingredients">Ingredients</a>
+                <a href="<?php echo esc_url( $story ); ?>">Our Story</a>
+            </nav>
+            <div class="rr-tools">
+                <a href="<?php echo esc_url( home_url( '/?s=&post_type=product' ) ); ?>" aria-label="Search">⌕</a>
+                <a href="<?php echo esc_url( $account ); ?>" aria-label="Account">♙</a>
+                <a href="<?php echo esc_url( $cart ); ?>" aria-label="Cart">♧<b><?php echo esc_html( (string) $cart_count ); ?></b></a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="rr-hero">
+            <div class="rr-shell rr-hero-grid">
+                <div class="rr-hero-copy">
+                    <p class="rr-kicker">Simple steps. Powerful results.</p>
+                    <h1>Build your<br>skincare ritual</h1>
+                    <p>A thoughtful routine built around your real skin, your pace, and the products already available in the Ruwah collection.</p>
+                    <div class="rr-actions"><a class="rr-button" href="<?php echo esc_url( $rituals ); ?>">Find your ritual</a><a class="rr-button rr-button-light" href="<?php echo esc_url( $shop ); ?>">Shop all products</a></div>
+                    <div class="rr-hero-points"><span>Thoughtful ingredients</span><span>Clean & effective</span><span>Cruelty-conscious</span></div>
+                </div>
+                <div class="rr-hero-stage">
+                    <div class="rr-blob"></div>
+                    <div class="rr-products-stage">
+                        <?php foreach ( array_filter( array( $hero, $hero_two, $hero_three ) ) as $product ) : ?>
+                            <a href="<?php echo esc_url( $product->get_permalink() ); ?>"><?php echo wp_kses_post( $product->get_image( 'woocommerce_single', array( 'alt' => $product->get_name() ) ) ); ?></a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="rr-tabs-wrap">
+            <div class="rr-shell rr-tabs" role="tablist" aria-label="Ritual filters">
+                <button class="is-active" type="button" data-ritual-tab="all">All rituals</button>
+                <button type="button" data-ritual-tab="morning">Morning</button>
+                <button type="button" data-ritual-tab="night">Night</button>
+                <button type="button" data-ritual-tab="weekly">Weekly</button>
+            </div>
+        </section>
+
+        <section class="rr-section rr-rituals">
+            <div class="rr-shell">
+                <div class="rr-section-head"><div><p class="rr-kicker">Made for real routines</p><h2>Choose your ritual</h2></div><a href="<?php echo esc_url( $rituals ); ?>">View all rituals →</a></div>
+                <div class="rr-ritual-grid">
+                    <article class="rr-ritual-card" data-ritual-card="morning"><div><span>04 minutes</span><h3>The Daily Glow Ritual</h3><p>Cleanse, treat, moisturise and protect for a calm, balanced start.</p><ul><li>Cleanse</li><li>Treat</li><li>Moisturise</li><li>Protect</li></ul><a class="rr-small-button" href="<?php echo esc_url( $rituals ); ?>">View ritual</a></div><div class="rr-ritual-image"><?php if ( $hero ) echo wp_kses_post( $hero->get_image( 'woocommerce_single' ) ); ?></div></article>
+                    <article class="rr-ritual-card" data-ritual-card="night"><div><span>06 minutes</span><h3>Reset & Recharge</h3><p>A nourishing evening routine that supports comfort and hydration.</p><ul><li>Cleanse</li><li>Restore</li><li>Treat</li><li>Moisturise</li></ul><a class="rr-small-button" href="<?php echo esc_url( $rituals ); ?>">View ritual</a></div><div class="rr-ritual-image"><?php if ( $hero_two ) echo wp_kses_post( $hero_two->get_image( 'woocommerce_single' ) ); ?></div></article>
+                    <article class="rr-ritual-card" data-ritual-card="weekly"><div><span>08 minutes</span><h3>Clear & Balance</h3><p>A focused weekly ritual to refresh, rebalance and simplify your routine.</p><ul><li>Cleanse</li><li>Exfoliate</li><li>Treat</li><li>Moisturise</li></ul><a class="rr-small-button" href="<?php echo esc_url( $rituals ); ?>">View ritual</a></div><div class="rr-ritual-image"><?php if ( $hero_three ) echo wp_kses_post( $hero_three->get_image( 'woocommerce_single' ) ); ?></div></article>
+                </div>
+            </div>
+        </section>
+
+        <section id="concerns" class="rr-section rr-concerns">
+            <div class="rr-shell"><div class="rr-section-head"><div><p class="rr-kicker">Start with what your skin needs</p><h2>Shop by concern</h2></div><a href="<?php echo esc_url( $shop ); ?>">Shop all →</a></div>
+                <div class="rr-concern-grid">
+                    <?php
+                    $concerns = array(
+                        array( 'Hydration', 'Support a softer, more comfortable skin barrier.', 'blue' ),
+                        array( 'Uneven Tone', 'Reveal a brighter and more even-looking finish.', 'cream' ),
+                        array( 'Dullness', 'Bring radiance back to tired-looking skin.', 'peach' ),
+                        array( 'Sensitive Skin', 'Soothe, simplify and strengthen your routine.', 'sage' ),
+                        array( 'Breakouts', 'Clarify without overwhelming the skin.', 'olive' ),
+                        array( 'Fine Lines', 'Support smoothness and lasting hydration.', 'lilac' ),
+                    );
+                    foreach ( $concerns as $concern ) : ?>
+                        <a class="rr-concern rr-<?php echo esc_attr( $concern[2] ); ?>" href="<?php echo esc_url( add_query_arg( 's', $concern[0], $shop ) ); ?>"><i></i><h3><?php echo esc_html( $concern[0] ); ?></h3><p><?php echo esc_html( $concern[1] ); ?></p><span>→</span></a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </section>
+
+        <section class="rr-section rr-products">
+            <div class="rr-shell"><div class="rr-section-head"><div><p class="rr-kicker">Current collection</p><h2>Your glow lineup</h2></div><a href="<?php echo esc_url( $shop ); ?>">Shop all products →</a></div>
+                <div class="rr-product-grid"><?php foreach ( array_slice( $products, 0, 8 ) as $product ) { ruwah_product_card( $product ); } ?></div>
+            </div>
+        </section>
+
+        <section id="ingredients" class="rr-values">
+            <div class="rr-shell rr-values-grid"><div><b>01</b><h3>Thoughtful ingredients</h3><p>Every formula should have a reason to be in your ritual.</p></div><div><b>02</b><h3>Clean & effective</h3><p>Simple, focused products designed for daily consistency.</p></div><div><b>03</b><h3>Cruelty-conscious</h3><p>Care that reflects both skin and values.</p></div><div><b>04</b><h3>Made for real life</h3><p>Routines that fit your morning, evening and budget.</p></div></div>
+        </section>
+
+        <section class="rr-newsletter"><div class="rr-shell rr-newsletter-grid"><div><p class="rr-kicker">Inside the Ruwah ritual</p><h2>Join the glow list</h2><p>New launches, skincare education and routine inspiration.</p></div><form method="post" action="#"><label class="screen-reader-text" for="rr-email">Email address</label><input id="rr-email" type="email" name="email" placeholder="Enter your email" required><button type="submit">Join now</button></form></div></section>
+    </main>
+
+    <footer class="rr-footer"><div class="rr-shell rr-footer-grid"><div><a class="rr-logo rr-logo-footer" href="<?php echo esc_url( home_url( '/' ) ); ?>"><strong>RUWAH</strong><small>BEAUTY</small></a><p>Skincare made for the skin you live in.</p></div><div><h3>Shop</h3><a href="<?php echo esc_url( $shop ); ?>">All products</a><a href="#concerns">Skin concerns</a><a href="<?php echo esc_url( $rituals ); ?>">Rituals</a></div><div><h3>About</h3><a href="<?php echo esc_url( $story ); ?>">Our story</a><a href="<?php echo esc_url( ruwah_page_url( 'faq' ) ); ?>">FAQ</a><a href="<?php echo esc_url( ruwah_page_url( 'contact' ) ); ?>">Contact</a></div><div><h3>Account</h3><a href="<?php echo esc_url( $account ); ?>">My account</a><a href="<?php echo esc_url( $cart ); ?>">Cart</a><a href="<?php echo esc_url( ruwah_page_url( 'checkout' ) ); ?>">Checkout</a></div></div><div class="rr-shell rr-legal"><span>© <?php echo esc_html( gmdate( 'Y' ) ); ?> Ruwah Beauty</span><span>Privacy · Terms · Accessibility</span></div></footer>
 </div>
 <?php get_footer(); ?>
