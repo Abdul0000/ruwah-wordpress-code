@@ -12,6 +12,8 @@
 .rb-footer a{color:#F1E8F8!important}
 .rb-footer a:hover,.rb-footer a:focus-visible{color:#fff!important}
 .rb-footer-bottom{border-color:rgba(248,244,255,.28)!important;color:#F8F4FF!important}
+.rb-product-actions .button,.rb-product-actions .add_to_cart_button{background:#7B2BAF!important;color:#fff!important;border-color:#7B2BAF!important}
+.rb-product-actions .button:hover,.rb-product-actions .button:focus-visible,.rb-product-actions .add_to_cart_button:hover,.rb-product-actions .add_to_cart_button:focus-visible{background:#65218F!important;color:#fff!important;border-color:#65218F!important;box-shadow:0 8px 20px rgba(123,43,175,.24)!important}
 </style>
 <style id="ruwah-transparent-hero-product">
 .home .rb-hero-media{position:absolute!important;isolation:isolate!important;overflow:hidden!important;background:radial-gradient(circle at 53% 42%,rgba(255,255,255,.92) 0 13%,rgba(255,255,255,.54) 30%,rgba(255,255,255,0) 57%),linear-gradient(145deg,#f9f6fd 0%,#eee3f8 46%,#d9c2ee 100%)!important}
