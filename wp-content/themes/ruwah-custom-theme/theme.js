@@ -17,6 +17,21 @@
   const menu=q('[data-menu]');
 
   if(body.classList.contains('home')){
+    const heroImage=q('.rb-hero-media>img');
+    if(heroImage){
+      const originalSource=heroImage.currentSrc||heroImage.src;
+      const pngSource=new URL('assets/hero-product.php?v=png-20260802-1',currentScript?.src||window.location.href).href;
+      heroImage.addEventListener('error',()=>{
+        if(heroImage.src!==originalSource){heroImage.src=originalSource;}
+      },{once:true});
+      heroImage.src=pngSource;
+      heroImage.removeAttribute('srcset');
+      heroImage.removeAttribute('sizes');
+      heroImage.alt='Mineral Shield Sunscreen SPF 50+';
+      heroImage.loading='eager';
+      heroImage.decoding='async';
+    }
+
     const heroStyle=document.createElement('style');
     heroStyle.id='ruwah-hero-type-refinement';
     heroStyle.textContent=`
