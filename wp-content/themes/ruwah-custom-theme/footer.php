@@ -7,12 +7,13 @@
 .home .rb-newsletter input[type="email"]::placeholder,.rb-newsletter input[type="email"]::placeholder{color:#76657f!important;opacity:1!important}
 .home .rb-newsletter .rb-button,.rb-newsletter .rb-button{background:#fff!important;color:#7B2BAF!important;border-color:#fff!important}
 .home .rb-newsletter .rb-button:hover,.rb-newsletter .rb-button:hover{background:#F1E8F8!important;color:#65218f!important;border-color:#F1E8F8!important}
-body .rb-footer{background:#7B2BAF!important;background-image:linear-gradient(135deg,#7B2BAF 0%,#7B2BAF 68%,#65218F 100%)!important;color:#F8F4FF!important;border-top:1px solid rgba(255,255,255,.18)!important}
+body .rb-footer{padding:48px 0 18px!important;background:#7B2BAF!important;background-image:linear-gradient(135deg,#7B2BAF 0%,#7B2BAF 72%,#65218F 100%)!important;color:#F8F4FF!important;border-top:1px solid rgba(255,255,255,.18)!important}
 body .rb-footer .rb-shell,body .rb-footer .rb-footer-grid,body .rb-footer .rb-footer-bottom,body .rb-footer section{background:transparent!important;background-image:none!important}
+body .rb-footer .rb-footer-grid{gap:34px!important}
 body .rb-footer .rb-brand,body .rb-footer .rb-brand strong,body .rb-footer h3,body .rb-footer p,body .rb-footer span{color:#F8F4FF!important}
-body .rb-footer a{color:#F1E8F8!important}
+body .rb-footer a{color:#F1E8F8!important;margin:6px 0!important}
 body .rb-footer a:hover,body .rb-footer a:focus-visible{color:#fff!important}
-body .rb-footer-bottom{border-color:rgba(248,244,255,.30)!important;color:#F8F4FF!important}
+body .rb-footer-bottom{margin-top:28px!important;padding-top:16px!important;border-color:rgba(248,244,255,.30)!important;color:#F8F4FF!important}
 .rb-product-actions .button,.rb-product-actions .add_to_cart_button{background:#7B2BAF!important;color:#fff!important;border-color:#7B2BAF!important}
 .rb-product-actions .button:hover,.rb-product-actions .button:focus-visible,.rb-product-actions .add_to_cart_button:hover,.rb-product-actions .add_to_cart_button:focus-visible{background:#65218F!important;color:#fff!important;border-color:#65218F!important;box-shadow:0 8px 20px rgba(123,43,175,.24)!important}
 </style>
