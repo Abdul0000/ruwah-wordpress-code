@@ -1,5 +1,5 @@
 <style id="ruwah-newsletter-footer-palette">
-:root{--rb-community-purple:#7B2BAF;--rb-community-white:#F8F4FF;--rb-community-soft:#F1E8F8}
+:root{--rb-community-purple:#7B2BAF;--rb-community-purple-dark:#65218F;--rb-community-white:#F8F4FF;--rb-community-soft:#F1E8F8}
 .home .rb-newsletter,.rb-newsletter{background:#7B2BAF!important;background-image:none!important;color:#F8F4FF!important}
 .home .rb-newsletter .rb-kicker,.rb-newsletter .rb-kicker{color:#F1E8F8!important}
 .home .rb-newsletter h2,.rb-newsletter h2,.home .rb-newsletter p,.rb-newsletter p{color:#F8F4FF!important}
@@ -7,11 +7,12 @@
 .home .rb-newsletter input[type="email"]::placeholder,.rb-newsletter input[type="email"]::placeholder{color:#76657f!important;opacity:1!important}
 .home .rb-newsletter .rb-button,.rb-newsletter .rb-button{background:#fff!important;color:#7B2BAF!important;border-color:#fff!important}
 .home .rb-newsletter .rb-button:hover,.rb-newsletter .rb-button:hover{background:#F1E8F8!important;color:#65218f!important;border-color:#F1E8F8!important}
-.rb-footer{background:#7B2BAF!important;background-image:none!important;color:#F8F4FF!important}
-.rb-footer .rb-brand,.rb-footer .rb-brand strong,.rb-footer h3,.rb-footer p,.rb-footer span{color:#F8F4FF!important}
-.rb-footer a{color:#F1E8F8!important}
-.rb-footer a:hover,.rb-footer a:focus-visible{color:#fff!important}
-.rb-footer-bottom{border-color:rgba(248,244,255,.28)!important;color:#F8F4FF!important}
+body .rb-footer{background:#7B2BAF!important;background-image:linear-gradient(135deg,#7B2BAF 0%,#7B2BAF 68%,#65218F 100%)!important;color:#F8F4FF!important;border-top:1px solid rgba(255,255,255,.18)!important}
+body .rb-footer .rb-shell,body .rb-footer .rb-footer-grid,body .rb-footer .rb-footer-bottom,body .rb-footer section{background:transparent!important;background-image:none!important}
+body .rb-footer .rb-brand,body .rb-footer .rb-brand strong,body .rb-footer h3,body .rb-footer p,body .rb-footer span{color:#F8F4FF!important}
+body .rb-footer a{color:#F1E8F8!important}
+body .rb-footer a:hover,body .rb-footer a:focus-visible{color:#fff!important}
+body .rb-footer-bottom{border-color:rgba(248,244,255,.30)!important;color:#F8F4FF!important}
 .rb-product-actions .button,.rb-product-actions .add_to_cart_button{background:#7B2BAF!important;color:#fff!important;border-color:#7B2BAF!important}
 .rb-product-actions .button:hover,.rb-product-actions .button:focus-visible,.rb-product-actions .add_to_cart_button:hover,.rb-product-actions .add_to_cart_button:focus-visible{background:#65218F!important;color:#fff!important;border-color:#65218F!important;box-shadow:0 8px 20px rgba(123,43,175,.24)!important}
 </style>
