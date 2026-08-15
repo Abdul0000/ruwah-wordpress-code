@@ -77,6 +77,7 @@ $logo_path = get_template_directory() . '/assets/ruwah-monogram.svg';
       .woocommerce-MyAccount-navigation .is-active a,.woocommerce-MyAccount-navigation a:hover{background:#f6f1fb!important;color:#6f2dbd!important}
       @media(max-width:760px){body.home .rb-hero{background:linear-gradient(#f6f1fb 0 59%,#eee4f7 59%)!important}}
     </style>
+    <link rel="stylesheet" id="ruwah-purple-luxe-v2-css" href="<?php echo esc_url(get_template_directory_uri() . '/assets/ruwah-purple-luxe-v2.css?v=2.0.0'); ?>" media="all">
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
