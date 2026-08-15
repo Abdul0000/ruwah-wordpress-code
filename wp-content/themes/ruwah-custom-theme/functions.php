@@ -1,7 +1,7 @@
 <?php
 defined('ABSPATH') || exit;
 
-define('RUWAH_THEME_VERSION', '2.0.0');
+define('RUWAH_THEME_VERSION', '2.0.1');
 
 add_action('after_setup_theme', function () {
     load_theme_textdomain('ruwah', get_template_directory() . '/languages');
@@ -22,7 +22,6 @@ add_action('after_setup_theme', function () {
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('ruwah-fonts', 'https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap', [], null);
     wp_enqueue_style('ruwah-style', get_stylesheet_uri(), ['ruwah-fonts'], RUWAH_THEME_VERSION);
-    wp_enqueue_style('ruwah-purple-atelier', get_template_directory_uri() . '/assets/purple-atelier.css', ['ruwah-style'], RUWAH_THEME_VERSION);
     wp_enqueue_script('ruwah-theme', get_template_directory_uri() . '/theme.js', [], RUWAH_THEME_VERSION, true);
 });
 
