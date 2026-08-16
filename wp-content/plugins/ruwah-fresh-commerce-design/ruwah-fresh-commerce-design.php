@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial homepage experience for Ruwah Beauty using live WooCommerce products, pricing, stock and reviews.
- * Version: 5.0.0
+ * Version: 5.0.1
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,12 +10,13 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '5.0.0';
+    private const VERSION = '5.0.1';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
         add_action('wp_enqueue_scripts', [self::class, 'assets'], 999);
         add_filter('body_class', [self::class, 'body_class']);
+        add_filter('wc_price_args', [self::class, 'price_args'], 20);
     }
 
     public static function front_page_template(string $template): string {
@@ -41,6 +42,13 @@ final class Ruwah_Fresh_Commerce_Design {
             $classes[] = 'rwb-reference-home-v5';
         }
         return $classes;
+    }
+
+    public static function price_args(array $args): array {
+        if (is_front_page()) {
+            $args['decimals'] = 0;
+        }
+        return $args;
     }
 }
 
