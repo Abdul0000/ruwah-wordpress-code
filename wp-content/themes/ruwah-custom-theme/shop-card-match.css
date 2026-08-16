@@ -1,0 +1,21 @@
+/* Final card consistency layer: shop matches homepage Bestsellers */
+.rwb-commerce ul.products{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:18px 10px!important;margin:0!important;padding:0!important}
+.rwb-commerce ul.products::before,.rwb-commerce ul.products::after{display:none!important;content:none!important}
+.rwb-commerce ul.products li.product.rwb-shop-card{float:none!important;width:auto!important;min-width:0!important;display:flex!important;flex-direction:column!important;margin:0!important;padding:0!important;background:transparent!important}
+.rwb-commerce .rwb-shop-card .rwb-card-media{aspect-ratio:1/1.02!important;display:grid!important;place-items:center!important;overflow:hidden!important;background:linear-gradient(#8fcfdd,#d5e9eb 72%,#f1efe6)!important}
+.rwb-commerce ul.products li.product.rwb-shop-card .rwb-card-media img{width:78%!important;height:78%!important;max-width:none!important;margin:0!important;padding:0!important;object-fit:contain!important;background:transparent!important}
+.rwb-commerce .rwb-shop-card .rwb-badge{left:8px!important;top:8px!important;min-width:34px!important;min-height:34px!important;padding:4px 6px!important;font-size:8px!important;line-height:1!important}
+.rwb-commerce .rwb-shop-card .rwb-card-copy{height:100%!important;display:flex!important;flex-direction:column!important;padding:10px 1px 0!important}
+.rwb-commerce .rwb-shop-card .rwb-card-head{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important;align-items:start!important}
+.rwb-commerce .rwb-shop-card .rwb-shop-title{margin:0!important;padding:0!important;font-family:var(--sans)!important;font-size:10px!important;font-weight:700!important;line-height:1.22!important;letter-spacing:-.01em!important}
+.rwb-commerce .rwb-shop-card .rwb-shop-price{display:flex!important;gap:4px!important;align-items:baseline!important;justify-content:flex-end!important;margin:0!important;color:#111!important;font-size:8px!important;font-weight:700!important;line-height:1.2!important;white-space:nowrap!important}
+.rwb-commerce .rwb-shop-card .rwb-shop-price del{opacity:.55!important;font-weight:500!important}
+.rwb-commerce .rwb-shop-card .rwb-shop-price ins{text-decoration:none!important}
+.rwb-commerce .rwb-shop-card .rwb-shop-tagline{min-height:23px!important;margin:5px 0 0!important;color:var(--muted)!important;font-size:8px!important;line-height:1.35!important}
+.rwb-commerce .rwb-shop-card .rwb-benefits{margin:7px 0 0!important;padding:7px 0 0!important;border-top:1px solid rgba(17,17,17,.42)!important;font-size:9px!important;line-height:1.3!important}
+.rwb-commerce .rwb-shop-card .rwb-card-action{margin-top:auto!important;padding-top:9px!important}
+.rwb-commerce .rwb-shop-card .rwb-add{min-height:34px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;width:100%!important;margin:0!important;padding:0 10px!important;border:1px solid #111!important;border-radius:0!important;background:#111!important;color:#fff!important;font-size:9px!important;font-weight:650!important;line-height:1!important}
+.rwb-commerce .rwb-shop-card .rwb-add b{font-size:12px!important;font-weight:500!important}
+@media(max-width:1240px){.rwb-commerce ul.products{grid-template-columns:repeat(3,minmax(0,1fr))!important}.rwb-commerce .rwb-shop-card .rwb-card-head{grid-template-columns:1fr!important}.rwb-commerce .rwb-shop-card .rwb-shop-price{justify-content:flex-start!important}}
+@media(max-width:900px){.rwb-commerce ul.products{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px 9px!important}.rwb-commerce .rwb-shop-card .rwb-shop-title{font-size:11px!important}.rwb-commerce .rwb-shop-card .rwb-shop-price{font-size:9px!important}}
+@media(max-width:560px){.rwb-commerce ul.products{grid-template-columns:1fr!important;gap:22px!important}.rwb-commerce ul.products li.product.rwb-shop-card .rwb-card-media img{width:76%!important;height:76%!important}.rwb-commerce .rwb-shop-card .rwb-shop-title{font-size:14px!important}.rwb-commerce .rwb-shop-card .rwb-shop-price{font-size:11px!important}.rwb-commerce .rwb-shop-card .rwb-shop-tagline,.rwb-commerce .rwb-shop-card .rwb-benefits{font-size:11px!important}.rwb-commerce .rwb-shop-card .rwb-add{min-height:46px!important;font-size:12px!important}}
