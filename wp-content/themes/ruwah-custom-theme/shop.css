@@ -1,57 +1,56 @@
-/* Ruwah Beauty — WooCommerce catalogue refinement */
-.rwb-commerce{padding:46px 0 68px}
+/* Ruwah Beauty — shop cards matched to homepage reference */
+.rwb-commerce{padding:44px 0 62px}
 .rwb-commerce>.rwb-shell{width:calc(100% - 48px);max-width:1760px}
-.rwb-commerce .woocommerce-products-header{margin:0 0 8px}
-.rwb-commerce h1.page-title{margin:0!important;font-family:var(--serif)!important;font-size:clamp(48px,4.6vw,76px)!important;font-weight:400!important;line-height:.95!important;letter-spacing:-.035em!important}
-.rwb-commerce .woocommerce-result-count{float:none!important;margin:7px 0 30px!important;color:var(--muted)!important;font-size:11px!important;line-height:1.4!important}
-.rwb-commerce .woocommerce-ordering{float:right!important;margin:-55px 0 24px!important}
-.rwb-commerce .woocommerce-ordering select{width:220px;min-height:42px;padding:0 38px 0 13px!important;border:1px solid rgba(17,17,17,.3)!important;border-radius:0!important;background-color:var(--milk)!important;color:var(--ink)!important;font-size:11px!important}
+.rwb-commerce .page-title{margin:0!important;font-family:var(--serif)!important;font-size:clamp(48px,4.4vw,72px)!important;font-weight:400!important;line-height:.94!important;letter-spacing:-.035em!important}
+.rwb-commerce .woocommerce-result-count{float:none!important;margin:6px 0 28px!important;color:var(--muted)!important;font-size:10px!important;line-height:1.35!important}
+.rwb-commerce .woocommerce-ordering{float:right!important;margin:-54px 0 24px!important}
+.rwb-commerce .woocommerce-ordering select{width:210px;min-height:40px;padding:0 34px 0 12px!important;border:1px solid rgba(17,17,17,.26)!important;border-radius:0!important;background:var(--milk)!important;color:var(--ink)!important;font-size:10px!important}
 .rwb-commerce .woocommerce-notices-wrapper{clear:both}
-.rwb-commerce ul.products{clear:both!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:20px 12px!important;margin:0!important;padding:0!important}
+.rwb-commerce ul.products{clear:both!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important;margin:0!important;padding:0!important}
 .rwb-commerce ul.products::before,.rwb-commerce ul.products::after{display:none!important;content:none!important}
 .rwb-commerce ul.products li.product.rwb-shop-card{float:none!important;width:auto!important;min-width:0!important;display:flex!important;flex-direction:column!important;margin:0!important;padding:0!important;background:transparent!important}
-.rwb-commerce .rwb-shop-card .rwb-card-media{position:relative;aspect-ratio:1/1.02;display:grid;place-items:center;overflow:hidden;background:linear-gradient(#91d0de,#d4e8ea 72%,#f1efe6)}
-.rwb-commerce ul.products li.product.rwb-shop-card .rwb-card-media img{position:relative;z-index:2;width:82%!important;height:82%!important;max-width:none!important;margin:0!important;padding:0!important;object-fit:contain!important;background:transparent!important;transition:transform .22s var(--ease)}
-.rwb-commerce .rwb-shop-card:hover .rwb-card-media img{transform:translateY(-4px) scale(1.018)}
-.rwb-commerce .rwb-shop-card .rwb-badge{left:11px;top:10px;min-width:48px;min-height:48px;display:grid;place-items:center;padding:5px 7px;border-radius:50%;background:var(--coral);color:#111;font-family:var(--serif);font-size:10px;line-height:1;text-align:center;transform:rotate(-7deg)}
-.rwb-commerce .rwb-shop-card .rwb-card-copy{height:100%;display:flex;flex-direction:column;padding:14px 1px 0!important}
-.rwb-commerce .rwb-shop-card .rwb-card-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
-.rwb-commerce .rwb-shop-card .rwb-shop-title{min-width:0;margin:0!important;padding:0!important;font-family:var(--sans)!important;font-size:14px!important;font-weight:700!important;line-height:1.25!important;letter-spacing:-.012em!important}
+.rwb-commerce .rwb-shop-card .rwb-card-media{position:relative;aspect-ratio:1/1.02;display:grid;place-items:center;overflow:hidden;background:linear-gradient(#8fcfdd,#d5e9eb 72%,#f1efe6)}
+.rwb-commerce ul.products li.product.rwb-shop-card .rwb-card-media img{position:relative;z-index:2;width:78%!important;height:78%!important;max-width:none!important;margin:0!important;padding:0!important;object-fit:contain!important;background:transparent!important;transition:transform .22s var(--ease)}
+.rwb-commerce .rwb-shop-card:hover .rwb-card-media img{transform:translateY(-4px) scale(1.02)}
+.rwb-commerce .rwb-shop-card .rwb-badge{left:9px;top:8px;min-width:auto;min-height:auto;padding:7px 10px;border-radius:50%;background:var(--coral);color:#111;font-family:var(--serif);font-size:9px;line-height:1;text-align:center;transform:rotate(-7deg)}
+.rwb-commerce .rwb-shop-card .rwb-card-copy{height:100%;display:flex;flex-direction:column;padding:12px 1px 0!important}
+.rwb-commerce .rwb-shop-card .rwb-card-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:start}
+.rwb-commerce .rwb-shop-card .rwb-shop-title{min-width:0;margin:0!important;padding:0!important;font-family:var(--sans)!important;font-size:10px!important;font-weight:700!important;line-height:1.25!important;letter-spacing:0!important}
 .rwb-commerce .rwb-shop-card .rwb-shop-title a{display:block}
-.rwb-commerce .rwb-shop-card .rwb-shop-price{display:flex;gap:5px;align-items:baseline;justify-content:flex-end;margin:0!important;color:#111!important;font-size:12px!important;font-weight:700!important;line-height:1.25!important;white-space:nowrap}
-.rwb-commerce .rwb-shop-card .rwb-shop-price del{opacity:.55;font-weight:500}
+.rwb-commerce .rwb-shop-card .rwb-shop-price{display:flex;gap:4px;align-items:baseline;justify-content:flex-end;margin:0!important;color:#111!important;font-size:9px!important;font-weight:700!important;line-height:1.25!important;white-space:nowrap}
+.rwb-commerce .rwb-shop-card .rwb-shop-price del{opacity:.6;font-weight:500}
 .rwb-commerce .rwb-shop-card .rwb-shop-price ins{text-decoration:none}
-.rwb-commerce .rwb-shop-card .rwb-shop-price .woocommerce-Price-currencySymbol{font-size:.9em}
-.rwb-commerce .rwb-shop-card .rwb-shop-tagline{min-height:34px;margin:8px 0 0!important;color:var(--muted)!important;font-size:11px!important;line-height:1.45!important}
-.rwb-commerce .rwb-shop-card .rwb-benefits{margin:10px 0 0!important;padding:10px 0 0!important;border-top:1px solid rgba(17,17,17,.38);font-size:11px!important;line-height:1.35!important}
-.rwb-commerce .rwb-shop-card .rwb-rating{margin-top:7px}
-.rwb-commerce .rwb-shop-card .rwb-card-action{margin-top:auto;padding-top:14px}
-.rwb-commerce .rwb-shop-card .rwb-add{min-height:48px;display:flex!important;align-items:center;justify-content:space-between;width:100%;margin:0!important;padding:0 15px!important;border:1px solid #111!important;border-radius:0!important;background:#111!important;color:#fff!important;font-size:12px!important;font-weight:650!important;line-height:1!important;transition:background .18s ease,color .18s ease}
-.rwb-commerce .rwb-shop-card .rwb-add b{font-size:15px;font-weight:500}
-.rwb-commerce .rwb-shop-card .rwb-add:hover{background:var(--paper)!important;color:#111!important}
-.rwb-commerce nav.woocommerce-pagination{margin-top:42px}
+.rwb-commerce .rwb-shop-card .rwb-shop-price .woocommerce-Price-currencySymbol{font-size:.92em}
+.rwb-commerce .rwb-shop-card .rwb-shop-tagline{min-height:0;margin:5px 0 0!important;color:var(--muted)!important;font-size:8px!important;line-height:1.35!important}
+.rwb-commerce .rwb-shop-card .rwb-benefits{margin:9px 0 0!important;padding:8px 0 0!important;border-top:1px solid rgba(17,17,17,.5);font-size:9px!important;line-height:1.35!important}
+.rwb-commerce .rwb-shop-card .rwb-rating{display:flex;gap:6px;margin-top:6px;font-size:8px!important}
+.rwb-commerce .rwb-shop-card .rwb-card-action{margin-top:auto;padding-top:10px}
+.rwb-commerce .rwb-shop-card .rwb-add{min-height:34px;display:flex!important;align-items:center;justify-content:space-between;width:100%;margin:0!important;padding:0 10px!important;border:1px solid #111!important;border-radius:0!important;background:#111!important;color:#fff!important;font-size:9px!important;font-weight:600!important;line-height:1!important;transition:background .18s ease,color .18s ease}
+.rwb-commerce .rwb-shop-card .rwb-add b{font-size:13px;font-weight:500}
+.rwb-commerce .rwb-shop-card .rwb-add:hover{background:transparent!important;color:#111!important}
+.rwb-commerce nav.woocommerce-pagination{margin-top:38px}
 
 @media(max-width:1240px){
   .rwb-commerce>.rwb-shell{width:calc(100% - 36px)}
   .rwb-commerce ul.products{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:900px){
+  .rwb-commerce{padding-top:32px}
+  .rwb-commerce ul.products{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .rwb-commerce .woocommerce-ordering{float:none!important;margin:0 0 20px!important}
+  .rwb-commerce .woocommerce-ordering select{width:100%}
+  .rwb-commerce .woocommerce-result-count{margin-bottom:12px!important}
   .rwb-commerce .rwb-shop-card .rwb-card-head{grid-template-columns:1fr}
   .rwb-commerce .rwb-shop-card .rwb-shop-price{justify-content:flex-start}
 }
-@media(max-width:900px){
-  .rwb-commerce{padding-top:34px}
-  .rwb-commerce ul.products{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px 10px!important}
-  .rwb-commerce .woocommerce-ordering{float:none!important;margin:0 0 24px!important}
-  .rwb-commerce .woocommerce-ordering select{width:100%}
-  .rwb-commerce .woocommerce-result-count{margin-bottom:14px!important}
-  .rwb-commerce .rwb-shop-card .rwb-card-head{grid-template-columns:1fr}
-}
 @media(max-width:560px){
   .rwb-commerce>.rwb-shell{width:calc(100% - 24px)}
-  .rwb-commerce h1.page-title{font-size:48px!important}
-  .rwb-commerce ul.products{grid-template-columns:1fr!important;gap:24px!important}
+  .rwb-commerce .page-title{font-size:46px!important}
+  .rwb-commerce ul.products{grid-template-columns:1fr!important;gap:22px!important}
   .rwb-commerce .rwb-shop-card .rwb-card-media{aspect-ratio:1/1}
   .rwb-commerce ul.products li.product.rwb-shop-card .rwb-card-media img{width:80%!important;height:80%!important}
-  .rwb-commerce .rwb-shop-card .rwb-shop-title{font-size:15px!important}
-  .rwb-commerce .rwb-shop-card .rwb-shop-tagline,.rwb-commerce .rwb-shop-card .rwb-benefits{font-size:12px!important}
-  .rwb-commerce .rwb-shop-card .rwb-add{min-height:50px;font-size:13px!important}
+  .rwb-commerce .rwb-shop-card .rwb-shop-title{font-size:13px!important}
+  .rwb-commerce .rwb-shop-card .rwb-shop-price{font-size:11px!important}
+  .rwb-commerce .rwb-shop-card .rwb-shop-tagline,.rwb-commerce .rwb-shop-card .rwb-benefits{font-size:10px!important}
+  .rwb-commerce .rwb-shop-card .rwb-add{min-height:44px;font-size:11px!important}
 }
