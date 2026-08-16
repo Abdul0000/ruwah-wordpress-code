@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial homepage experience for Ruwah Beauty using live WooCommerce products, pricing, stock and reviews.
- * Version: 5.0.1
+ * Version: 5.0.2
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '5.0.1';
+    private const VERSION = '5.0.2';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
@@ -31,10 +31,32 @@ final class Ruwah_Fresh_Commerce_Design {
         if (! is_front_page()) {
             return;
         }
-        wp_enqueue_style('ruwah-reference-home', plugins_url('assets/home.css', __FILE__), ['rwb-theme'], self::VERSION);
+
+        /*
+         * Some production hosts block direct requests to newly deployed custom
+         * plugin asset files. Keep the files as the maintainable source of truth,
+         * but inject their contents inline so the homepage cannot render unstyled
+         * when those static URLs are denied by the web server.
+         */
+        $css_path = __DIR__ . '/assets/home.css';
+        if (is_readable($css_path)) {
+            $css = file_get_contents($css_path);
+            if (false !== $css && '' !== trim($css)) {
+                wp_register_style('ruwah-reference-home', false, ['rwb-theme'], self::VERSION);
+                wp_enqueue_style('ruwah-reference-home');
+                wp_add_inline_style('ruwah-reference-home', $css);
+            }
+        }
+
         wp_enqueue_script('wc-add-to-cart');
-        wp_enqueue_script('ruwah-reference-home', plugins_url('assets/home.js', __FILE__), [], self::VERSION, true);
-        wp_script_add_data('ruwah-reference-home', 'strategy', 'defer');
+
+        $js_path = __DIR__ . '/assets/home.js';
+        if (is_readable($js_path)) {
+            $js = file_get_contents($js_path);
+            if (false !== $js && '' !== trim($js)) {
+                wp_add_inline_script('wc-add-to-cart', $js, 'after');
+            }
+        }
     }
 
     public static function body_class(array $classes): array {
