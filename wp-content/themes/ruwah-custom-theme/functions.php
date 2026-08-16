@@ -1,7 +1,7 @@
 <?php
 defined('ABSPATH') || exit;
 
-define('RUWAH_THEME_VERSION', '2.1.0');
+define('RUWAH_THEME_VERSION', '2.2.0');
 
 add_action('after_setup_theme', function () {
     load_theme_textdomain('ruwah', get_template_directory() . '/languages');
@@ -22,16 +22,37 @@ add_action('after_setup_theme', function () {
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('ruwah-fonts', 'https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap', [], null);
     wp_enqueue_style('ruwah-style', get_stylesheet_uri(), ['ruwah-fonts'], RUWAH_THEME_VERSION);
-    wp_add_inline_style('ruwah-style', '.rb-search[hidden],.rb-overlay[hidden]{display:none!important}');
+
+    // Keep critical visual states and route-specific premium fixes on the
+    // canonical theme stylesheet handle so LiteSpeed cannot drop a secondary
+    // CSS request and leave the route partially styled.
+    $inline_css = '.rb-search[hidden],.rb-overlay[hidden]{display:none!important}';
+
+    if (is_front_page()) {
+        $home_css = get_template_directory() . '/assets/home-atelier.css';
+        if (is_readable($home_css)) {
+            $inline_css .= "\n" . file_get_contents($home_css);
+        }
+        $inline_css .= "\n.home .rb-category-media>i{width:72px;height:72px;display:grid;place-items:center;border:1px solid rgba(122,63,160,.18);border-radius:50%;background:rgba(255,255,255,.72);color:var(--rb-orchid);font-family:var(--rb-serif);font-size:30px;font-style:normal;box-shadow:var(--rb-shadow-sm)}";
+    }
+
+    if (function_exists('is_woocommerce') && (is_woocommerce() || is_cart() || is_checkout())) {
+        $commerce_css = get_template_directory() . '/assets/commerce-plan.css';
+        if (is_readable($commerce_css)) {
+            $inline_css .= "\n" . file_get_contents($commerce_css);
+        }
+    }
+
+    wp_add_inline_style('ruwah-style', $inline_css);
+
     wp_enqueue_script('ruwah-theme', get_template_directory_uri() . '/theme.js', [], RUWAH_THEME_VERSION, true);
     wp_script_add_data('ruwah-theme', 'strategy', 'defer');
 
-    // The homepage renders custom WooCommerce product cards outside a native
-    // WooCommerce archive. Explicitly load the official handlers so AJAX
-    // add-to-cart and cart fragments work there exactly as they do in Shop.
+    // The homepage uses custom WooCommerce cards outside the native archive.
+    // wc-add-to-cart is sufficient for the AJAX request and response fragments;
+    // do not force wc-cart-fragments, which adds an unnecessary initial request.
     if (function_exists('WC') && is_front_page()) {
         wp_enqueue_script('wc-add-to-cart');
-        wp_enqueue_script('wc-cart-fragments');
     }
 }, 30);
 

@@ -1,0 +1,77 @@
+/* Ruwah Beauty — premium commerce corrections to the locked plan */
+
+/* ----- Shop/archive: preserve a true four-column grid without Woo clearfix nodes. ----- */
+.woocommerce .woocommerce-products-header{display:none!important}
+.woocommerce ul.products::before,.woocommerce ul.products::after{display:none!important;content:none!important}
+.woocommerce ul.products{clear:none!important;grid-auto-flow:row!important;align-items:stretch!important}
+.woocommerce ul.products li.product{overflow:hidden!important}
+.woocommerce ul.products li.product>a.woocommerce-LoopProduct-link,.woocommerce ul.products li.product>a.woocommerce-loop-product__link{display:block!important;height:auto!important;padding:0!important;overflow:visible!important;background:transparent!important}
+.woocommerce ul.products li.product>a.woocommerce-LoopProduct-link img,.woocommerce ul.products li.product>a.woocommerce-loop-product__link img{display:block!important;width:100%!important;height:270px!important;margin:0!important;padding:20px!important;object-fit:contain!important;background:var(--rb-mist)!important;border-bottom:1px solid var(--rb-border)!important}
+.woocommerce ul.products li.product .woocommerce-loop-product__title{min-height:0!important;margin:0!important;padding:16px 18px 6px!important;color:var(--rb-aubergine)!important;font-family:var(--rb-sans)!important;font-size:14px!important;font-weight:800!important;line-height:1.35!important;text-align:left!important}
+.woocommerce ul.products li.product .price{display:block!important;margin:0!important;padding:0 18px 14px!important;color:var(--rb-aubergine)!important;font-size:14px!important;font-weight:800!important;text-align:left!important}
+.woocommerce ul.products li.product .price del{opacity:.52!important;font-size:12px!important}
+.woocommerce ul.products li.product .price ins{text-decoration:none!important}
+.woocommerce ul.products li.product .button{width:calc(100% - 36px)!important;min-height:44px!important;margin:auto 18px 18px!important;padding:11px 14px!important;border-radius:11px!important;background:var(--rb-aubergine)!important;color:#fff!important;font-size:11px!important}
+.woocommerce ul.products li.product span.onsale{top:14px!important;left:14px!important;right:auto!important;bottom:auto!important;width:auto!important;min-width:0!important;height:auto!important;min-height:0!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:7px 10px!important;border-radius:999px!important;background:var(--rb-aubergine)!important;color:#fff!important;font-size:8px!important;font-weight:800!important;line-height:1!important;letter-spacing:.1em!important;text-transform:uppercase!important}
+.woocommerce .woocommerce-result-count{margin:10px 0 28px!important;color:var(--rb-muted)!important;font-size:13px!important}
+.woocommerce .woocommerce-ordering{margin:0 0 28px!important}
+.woocommerce .woocommerce-ordering select{min-width:190px!important;padding:0 42px 0 14px!important;border-color:var(--rb-border)!important;background-color:#fff!important}
+
+/* ----- Cart: remove generic article squeeze and create the premium two-column funnel. ----- */
+.woocommerce-cart .rb-content{padding-top:62px!important;padding-bottom:88px!important}
+.woocommerce-cart .rb-content article,.woocommerce-checkout .rb-content article{max-width:none!important;margin:0!important}
+.woocommerce-cart .rb-content article>.woocommerce{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(320px,390px)!important;gap:28px!important;align-items:start!important}
+.woocommerce-cart .woocommerce-notices-wrapper{grid-column:1/-1!important}
+.woocommerce-cart .woocommerce-cart-form{grid-column:1!important;margin:0!important;padding:28px!important;border:1px solid var(--rb-border)!important;border-radius:22px!important;background:#fff!important;box-shadow:var(--rb-shadow-sm)!important}
+.woocommerce-cart .woocommerce-cart-form table.shop_table{width:100%!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;border-collapse:separate!important;border-spacing:0!important}
+.woocommerce-cart table.shop_table thead th{padding:0 14px 15px!important;border-bottom:1px solid var(--rb-border)!important;color:var(--rb-muted)!important;font-size:10px!important;font-weight:800!important;letter-spacing:.08em!important;text-transform:uppercase!important}
+.woocommerce-cart table.shop_table td{padding:16px 14px!important;border-top:0!important;border-bottom:1px solid var(--rb-border)!important;vertical-align:middle!important}
+.woocommerce-cart table.shop_table tr:last-child td{border-bottom:0!important}
+.woocommerce-cart td.product-remove{width:34px!important;padding-left:0!important;padding-right:4px!important}
+.woocommerce-cart td.product-remove a.remove{width:30px!important;height:30px!important;display:grid!important;place-items:center!important;border-radius:50%!important;background:transparent!important;color:var(--rb-error)!important;font-size:21px!important;line-height:1!important}
+.woocommerce-cart td.product-remove a.remove:hover{background:#faeef1!important;color:var(--rb-error)!important}
+.woocommerce-cart td.product-thumbnail{width:82px!important}
+.woocommerce-cart td.product-thumbnail img{width:66px!important;height:66px!important;padding:5px!important;border:1px solid var(--rb-border)!important;border-radius:12px!important;background:var(--rb-mist)!important;object-fit:contain!important}
+.woocommerce-cart td.product-name a{color:var(--rb-aubergine)!important;font-size:14px!important;font-weight:800!important}
+.woocommerce-cart td.product-price,.woocommerce-cart td.product-subtotal{color:var(--rb-aubergine)!important;font-size:14px!important;font-weight:800!important}
+.woocommerce-cart .quantity .qty{width:72px!important;min-height:46px!important;padding:0 8px!important;text-align:center!important}
+.woocommerce-cart td.actions{padding:22px 0 0!important;border-bottom:0!important}
+.woocommerce-cart td.actions .coupon{display:flex!important;align-items:center!important;gap:10px!important;float:left!important}
+.woocommerce-cart td.actions .coupon #coupon_code{width:160px!important;min-height:46px!important;margin:0!important;padding:0 13px!important}
+.woocommerce-cart td.actions .coupon .button,.woocommerce-cart td.actions>button[name="update_cart"]{min-height:46px!important;padding:11px 18px!important;border-radius:999px!important}
+.woocommerce-cart td.actions>button[name="update_cart"]{float:right!important}
+.woocommerce-cart td.actions>button[name="update_cart"]:disabled{opacity:.45!important;cursor:not-allowed!important;transform:none!important}
+.woocommerce-cart .cart-collaterals{grid-column:2!important;width:100%!important;margin:0!important}
+.woocommerce-cart .cart-collaterals .cart_totals{float:none!important;width:100%!important;margin:0!important;padding:28px!important;border:1px solid var(--rb-border)!important;border-radius:22px!important;background:var(--rb-lavender)!important;box-shadow:var(--rb-shadow-sm)!important}
+.woocommerce-cart .cart_totals h2{margin-bottom:20px!important;color:var(--rb-aubergine)!important;font-family:var(--rb-serif)!important;font-size:34px!important;font-weight:400!important}
+.woocommerce-cart .cart_totals table.shop_table{margin:0 0 22px!important;padding:0!important;border:1px solid rgba(33,20,41,.10)!important;border-radius:14px!important;background:rgba(255,255,255,.72)!important;box-shadow:none!important;overflow:hidden!important}
+.woocommerce-cart .cart_totals table.shop_table th,.woocommerce-cart .cart_totals table.shop_table td{padding:14px!important;border-bottom:1px solid rgba(33,20,41,.08)!important}
+.woocommerce-cart .cart_totals table.shop_table tr:last-child th,.woocommerce-cart .cart_totals table.shop_table tr:last-child td{border-bottom:0!important}
+.woocommerce-cart .cart_totals .wc-proceed-to-checkout{padding:0!important}
+.woocommerce-cart .cart_totals .checkout-button{width:100%!important;min-height:52px!important;margin:0!important;border-radius:999px!important;background:var(--rb-aubergine)!important}
+
+/* ----- Checkout: keep the same generous commerce width and stronger hierarchy. ----- */
+.woocommerce-checkout .rb-content{padding-top:62px!important;padding-bottom:88px!important}
+.woocommerce-checkout #customer_details,.woocommerce-checkout #order_review{border-radius:22px!important}
+.woocommerce-checkout #order_review{background:var(--rb-lavender)!important}
+.woocommerce-checkout #place_order{width:100%!important;min-height:52px!important}
+
+@media(max-width:1100px){
+  .woocommerce ul.products li.product>a.woocommerce-LoopProduct-link img,.woocommerce ul.products li.product>a.woocommerce-loop-product__link img{height:250px!important}
+}
+@media(max-width:900px){
+  .woocommerce-cart .rb-content article>.woocommerce{grid-template-columns:1fr!important}
+  .woocommerce-cart .woocommerce-cart-form,.woocommerce-cart .cart-collaterals{grid-column:1!important}
+  .woocommerce-cart .cart-collaterals .cart_totals{position:static!important}
+}
+@media(max-width:620px){
+  .woocommerce ul.products li.product>a.woocommerce-LoopProduct-link img,.woocommerce ul.products li.product>a.woocommerce-loop-product__link img{height:185px!important;padding:12px!important}
+  .woocommerce ul.products li.product .woocommerce-loop-product__title{padding:12px 12px 5px!important;font-size:12px!important}
+  .woocommerce ul.products li.product .price{padding:0 12px 10px!important;font-size:12px!important}
+  .woocommerce ul.products li.product .button{width:calc(100% - 24px)!important;margin:0 12px 12px!important;min-height:40px!important}
+  .woocommerce-cart .woocommerce-cart-form{padding:18px!important;overflow-x:auto!important}
+  .woocommerce-cart td.actions .coupon{width:100%!important;float:none!important;display:grid!important;grid-template-columns:1fr auto!important}
+  .woocommerce-cart td.actions .coupon #coupon_code{width:100%!important}
+  .woocommerce-cart td.actions>button[name="update_cart"]{width:100%!important;float:none!important;margin-top:10px!important}
+  .woocommerce-cart .cart-collaterals .cart_totals{padding:22px!important}
+}
