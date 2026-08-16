@@ -1,0 +1,2 @@
+/* Shared shop-card adapter for the homepage favorites rail. */
+.rwb-ref-card-grid .rwb-commerce-card{min-width:0;display:flex;flex-direction:column}.rwb-ref-card-grid .rwb-commerce-card-copy{flex:1}.rwb-ref-card-grid .rwb-commerce-card-media{width:100%}@media(max-width:782px){.rwb-ref-card-grid .rwb-commerce-card{flex:0 0 78vw;scroll-snap-align:start}}@media(max-width:520px){.rwb-ref-card-grid .rwb-commerce-card{flex-basis:84vw}}

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial commerce experience for Ruwah Beauty using live WooCommerce products, pricing, stock, media and reviews.
- * Version: 6.0.1
+ * Version: 6.1.0
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '6.0.1';
+    private const VERSION = '6.1.0';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
@@ -66,12 +66,17 @@ final class Ruwah_Fresh_Commerce_Design {
         if (! class_exists('WooCommerce')) {
             return false;
         }
-        return (function_exists('is_shop') && is_shop()) || (function_exists('is_product_taxonomy') && is_product_taxonomy()) || (function_exists('is_product') && is_product());
+        return (function_exists('is_shop') && is_shop())
+            || (function_exists('is_product_taxonomy') && is_product_taxonomy())
+            || (function_exists('is_product') && is_product())
+            || (function_exists('is_cart') && is_cart());
     }
 
     public static function assets(): void {
         if (is_front_page()) {
             self::inline_style('ruwah-reference-home', __DIR__ . '/assets/home.css');
+            self::inline_style('ruwah-reference-commerce-home', __DIR__ . '/assets/commerce.css');
+            self::inline_style('ruwah-reference-home-commerce-adapter', __DIR__ . '/assets/home-commerce.css');
             wp_enqueue_script('wc-add-to-cart');
             $js_path = __DIR__ . '/assets/home.js';
             if (is_readable($js_path)) {
@@ -84,6 +89,9 @@ final class Ruwah_Fresh_Commerce_Design {
         }
         if (self::is_commerce_surface()) {
             self::inline_style('ruwah-reference-commerce', __DIR__ . '/assets/commerce.css');
+            if (function_exists('is_cart') && is_cart()) {
+                self::inline_style('ruwah-reference-cart', __DIR__ . '/assets/cart.css');
+            }
             wp_enqueue_script('wc-add-to-cart');
         }
     }

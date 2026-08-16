@@ -145,7 +145,7 @@ $render_card = static function ($product, $best_id) {
     <div class="rwb-ref-hero-copy" data-reveal><p class="rwb-ref-kicker">FEATURED FORMULA</p><h1><?php echo esc_html($hero ? $hero->get_name() : 'Ruwah Beauty'); ?></h1><?php if ($hero_info) : ?><h2><?php echo esc_html(implode(' · ', $hero_info['benefits'])); ?></h2><p><?php echo esc_html($hero_info['tagline']); ?></p><?php else : ?><p>Luxury care for everyday skin.</p><?php endif; ?><a class="rwb-ref-hero-btn" href="<?php echo esc_url($hero ? $hero->get_permalink() : $shop_url); ?>">Shop Now</a></div>
 </section>
 <?php if ($products) : ?>
-<section class="rwb-ref-community" id="community-favorites"><div class="rwb-ref-wrap"><h2 data-reveal><?php echo esc_html($community_heading); ?></h2><div class="rwb-ref-card-grid"><?php foreach (array_slice($products, 0, 4) as $product) { $render_card($product, $best_id); } ?></div><a class="rwb-ref-text-link" href="<?php echo esc_url($shop_url); ?>">Shop All</a></div></section>
+<section class="rwb-ref-community" id="community-favorites"><div class="rwb-ref-wrap"><h2 data-reveal><?php echo esc_html($community_heading); ?></h2><div class="rwb-ref-card-grid"><?php foreach (array_slice($products, 0, 4) as $rank => $product) : ?><article class="rwb-commerce-card" data-reveal><?php Ruwah_Fresh_Commerce_Design::render_card($product, (int) $rank); ?></article><?php endforeach; ?></div><a class="rwb-ref-text-link" href="<?php echo esc_url($shop_url); ?>">Shop All</a></div></section>
 <?php endif; ?>
 <section class="rwb-ref-proof" aria-label="Ruwah product notes">
     <div class="rwb-ref-proof-shell" data-proof-slider>
