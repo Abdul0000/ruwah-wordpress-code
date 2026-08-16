@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial commerce experience for Ruwah Beauty using live WooCommerce products, pricing, stock, media and reviews.
- * Version: 6.0.0
+ * Version: 6.0.1
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,11 +10,12 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '6.0.0';
+    private const VERSION = '6.0.1';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
         add_filter('woocommerce_locate_template', [self::class, 'woocommerce_template'], 999, 3);
+        add_filter('wc_get_template_part', [self::class, 'woocommerce_template_part'], 999, 3);
         add_action('wp_enqueue_scripts', [self::class, 'assets'], 999);
         add_filter('body_class', [self::class, 'body_class']);
         add_filter('wc_price_args', [self::class, 'price_args'], 20);
@@ -40,6 +41,23 @@ final class Ruwah_Fresh_Commerce_Design {
         ];
         if (isset($map[$template_name]) && is_readable($map[$template_name])) {
             return $map[$template_name];
+        }
+        return $template;
+    }
+
+    public static function woocommerce_template_part(string $template, string $slug, string $name): string {
+        if (is_admin() && ! wp_doing_ajax()) {
+            return $template;
+        }
+        if ('content' !== $slug) {
+            return $template;
+        }
+        $map = [
+            'product' => __DIR__ . '/templates/woocommerce/content-product.php',
+            'single-product' => __DIR__ . '/templates/woocommerce/content-single-product.php',
+        ];
+        if (isset($map[$name]) && is_readable($map[$name])) {
+            return $map[$name];
         }
         return $template;
     }
