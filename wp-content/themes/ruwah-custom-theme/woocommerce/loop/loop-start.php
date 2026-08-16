@@ -6,7 +6,7 @@ if (function_exists('is_shop') && (is_shop() || is_product_taxonomy())) {
         'rwb-shop',
         get_template_directory_uri() . '/shop.css',
         ['rwb-theme'],
-        '4.1.0'
+        '4.1.1'
     );
     wp_print_styles('rwb-shop');
 }
