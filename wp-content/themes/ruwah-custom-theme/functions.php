@@ -1,7 +1,7 @@
 <?php
 defined('ABSPATH') || exit;
 
-define('RUWAH_THEME_VERSION', '2.0.2');
+define('RUWAH_THEME_VERSION', '2.1.0');
 
 add_action('after_setup_theme', function () {
     load_theme_textdomain('ruwah', get_template_directory() . '/languages');
@@ -24,7 +24,16 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('ruwah-style', get_stylesheet_uri(), ['ruwah-fonts'], RUWAH_THEME_VERSION);
     wp_add_inline_style('ruwah-style', '.rb-search[hidden],.rb-overlay[hidden]{display:none!important}');
     wp_enqueue_script('ruwah-theme', get_template_directory_uri() . '/theme.js', [], RUWAH_THEME_VERSION, true);
-});
+    wp_script_add_data('ruwah-theme', 'strategy', 'defer');
+
+    // The homepage renders custom WooCommerce product cards outside a native
+    // WooCommerce archive. Explicitly load the official handlers so AJAX
+    // add-to-cart and cart fragments work there exactly as they do in Shop.
+    if (function_exists('WC') && is_front_page()) {
+        wp_enqueue_script('wc-add-to-cart');
+        wp_enqueue_script('wc-cart-fragments');
+    }
+}, 30);
 
 function ruwah_page_url($slug) {
     $page = get_page_by_path(trim($slug, '/'));
@@ -67,12 +76,28 @@ function ruwah_product_card($product, $badge = '') {
     echo '<div class="rb-product-copy"><h3><a href="' . esc_url($product->get_permalink()) . '">' . esc_html($product->get_name()) . '</a></h3>';
     echo '<div class="rb-card-rating" role="img" aria-label="' . esc_attr($count ? sprintf(__('%1$s out of 5 based on %2$d reviews', 'ruwah'), number_format_i18n($rating, 1), $count) : __('No reviews yet', 'ruwah')) . '"><span aria-hidden="true">' . esc_html($stars) . '</span><span class="rb-rating-count">' . esc_html($count ? number_format_i18n($rating, 1) . ' · ' . $count . ' ' . ($count === 1 ? __('review', 'ruwah') : __('reviews', 'ruwah')) : __('New', 'ruwah')) . '</span></div>';
     echo '<div class="rb-price">' . wp_kses_post($product->get_price_html()) . '</div></div><div class="rb-product-actions">';
-    if ($product->is_purchasable() && $product->is_in_stock()) echo '<a rel="nofollow" data-product_id="' . esc_attr((string) $id) . '" data-quantity="1" class="button add_to_cart_button ajax_add_to_cart" href="' . esc_url($product->add_to_cart_url()) . '">' . esc_html__('Add to Bag', 'ruwah') . '</a>';
-    else echo '<a class="button" href="' . esc_url($product->get_permalink()) . '">' . esc_html__('View Product', 'ruwah') . '</a>';
+
+    if ($product->is_type('simple') && $product->is_purchasable() && $product->is_in_stock()) {
+        $label = sprintf(__('Add “%s” to your bag', 'ruwah'), $product->get_name());
+        echo '<a rel="nofollow" href="' . esc_url($product->add_to_cart_url()) . '" data-quantity="1" data-product_id="' . esc_attr((string) $id) . '" data-product_sku="' . esc_attr($product->get_sku()) . '" aria-label="' . esc_attr($label) . '" class="rb-button button product_type_simple add_to_cart_button ajax_add_to_cart">' . esc_html__('Add to Bag', 'ruwah') . '</a>';
+    } else {
+        echo '<a class="rb-button button" href="' . esc_url($product->get_permalink()) . '">' . esc_html($product->is_type('variable') ? __('Select Options', 'ruwah') : __('View Product', 'ruwah')) . '</a>';
+    }
     echo '</div></article>';
 }
+
 add_filter('woocommerce_add_to_cart_fragments', function ($fragments) {
-    ob_start(); ?><span class="rb-cart-count"><?php echo esc_html(function_exists('WC') && WC()->cart ? WC()->cart->get_cart_contents_count() : 0); ?></span><?php
-    $fragments['.rb-cart-count'] = ob_get_clean();
+    $count = function_exists('WC') && WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
+    $fragments['.rb-cart-count'] = '<span class="rb-cart-count">' . esc_html((string) $count) . '</span>';
+
+    // WooCommerce normally replaces div.widget_shopping_cart_content with a
+    // generic wrapper. Keep the Ruwah class on every AJAX refresh so the
+    // drawer remains styled and scrollable after the first add-to-cart.
+    if (function_exists('woocommerce_mini_cart')) {
+        ob_start();
+        woocommerce_mini_cart();
+        $mini_cart = ob_get_clean();
+        $fragments['div.widget_shopping_cart_content'] = '<div class="rb-cart-body widget_shopping_cart_content">' . $mini_cart . '</div>';
+    }
     return $fragments;
 });
