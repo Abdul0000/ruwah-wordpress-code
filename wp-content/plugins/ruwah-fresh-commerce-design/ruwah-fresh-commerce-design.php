@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial commerce experience for Ruwah Beauty using live WooCommerce products, pricing, stock, media and reviews.
- * Version: 6.1.0
+ * Version: 6.2.0
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '6.1.0';
+    private const VERSION = '6.2.0';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
@@ -76,6 +76,7 @@ final class Ruwah_Fresh_Commerce_Design {
         if (is_front_page()) {
             self::inline_style('ruwah-reference-home', __DIR__ . '/assets/home.css');
             self::inline_style('ruwah-reference-commerce-home', __DIR__ . '/assets/commerce.css');
+            self::inline_style('ruwah-reference-card-parity-home', __DIR__ . '/assets/card-parity.css');
             self::inline_style('ruwah-reference-home-commerce-adapter', __DIR__ . '/assets/home-commerce.css');
             wp_enqueue_script('wc-add-to-cart');
             $js_path = __DIR__ . '/assets/home.js';
@@ -89,6 +90,7 @@ final class Ruwah_Fresh_Commerce_Design {
         }
         if (self::is_commerce_surface()) {
             self::inline_style('ruwah-reference-commerce', __DIR__ . '/assets/commerce.css');
+            self::inline_style('ruwah-reference-card-parity', __DIR__ . '/assets/card-parity.css');
             if (function_exists('is_cart') && is_cart()) {
                 self::inline_style('ruwah-reference-cart', __DIR__ . '/assets/cart.css');
             }
@@ -144,7 +146,10 @@ final class Ruwah_Fresh_Commerce_Design {
         if (! $product->is_in_stock()) {
             return 'OUT OF STOCK';
         }
-        if ($product->is_on_sale() || 0 === $rank) {
+        if ($product->is_on_sale()) {
+            return 'OFFER';
+        }
+        if (0 === $rank) {
             return 'BESTSELLER';
         }
         return '';

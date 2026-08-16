@@ -1,0 +1,18 @@
+/* Ruwah Beauty — approved home card parity v6.2 */
+.rwb-commerce-card-media{aspect-ratio:1/1.03;background:#dfe7e8}
+.rwb-commerce-card-media img{width:78%!important;height:78%!important;object-fit:contain!important}
+.rwb-commerce-badge{left:10px;top:10px;padding:4px 7px;border:1px solid #777;background:rgba(247,243,233,.94);font-size:7px;font-weight:400;line-height:1;letter-spacing:.05em;text-transform:uppercase}
+.rwb-commerce-card-copy{padding-top:10px}
+.rwb-commerce-card-copy h3{min-height:42px!important;margin:0!important;font-family:var(--sans)!important;font-size:13px!important;font-weight:500!important;line-height:1.2!important;letter-spacing:0!important}
+.rwb-commerce-card-tagline{min-height:28px!important;margin:4px 0 0!important;color:#111!important;font-size:7px!important;font-weight:400!important;line-height:1.35!important;letter-spacing:.04em!important;text-transform:uppercase}
+.rwb-commerce-card-rating,.rwb-commerce-card-proof{min-height:18px;margin-top:3px;font-size:7px;letter-spacing:.05em;text-transform:uppercase}
+.rwb-commerce-card-sale{display:none!important}
+.rwb-commerce-size{display:block;margin-top:6px!important;padding-top:0!important}
+.rwb-commerce-size select{width:100%;height:28px!important;min-height:28px!important;padding:0 24px 0 7px!important;border:1px solid #9d9a92!important;border-radius:0!important;background:rgba(255,255,255,.35)!important;color:#111!important;font-size:7px!important;font-weight:400!important}
+.rwb-commerce-card-action{margin-top:5px}
+.rwb-commerce-add{min-height:32px!important;padding:0 10px!important;border:1px solid #aaa!important;border-radius:0!important;background:#fff!important;color:#111!important;font-size:7px!important;font-weight:400!important;line-height:1!important;letter-spacing:.03em!important}
+.rwb-commerce-add:hover{border-color:#111!important;background:#111!important;color:#fff!important}
+.rwb-reference-commerce-v6 .rwb-commerce>.rwb-shell{width:calc(100% - 42px)!important;max-width:1380px!important}
+.rwb-reference-commerce-v6 ul.products{gap:12px!important}
+@media(max-width:720px){.rwb-reference-commerce-v6 .rwb-commerce>.rwb-shell{width:calc(100% - 24px)!important}.rwb-commerce-card-copy h3{font-size:13px!important;min-height:42px!important}.rwb-commerce-card-tagline{font-size:7px!important;min-height:28px!important}.rwb-commerce-size select{height:32px!important;min-height:32px!important;font-size:8px!important}.rwb-commerce-add{min-height:34px!important;font-size:8px!important}}
+@media(prefers-reduced-motion:reduce){.rwb-commerce-card-media img{transition:none!important}}
