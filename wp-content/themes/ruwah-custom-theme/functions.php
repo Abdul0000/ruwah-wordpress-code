@@ -162,3 +162,5 @@ add_filter('woocommerce_add_to_cart_fragments', function ($fragments) {
     }
     return $fragments;
 });
+
+require_once __DIR__ . '/includes/cart-drawer.php';
