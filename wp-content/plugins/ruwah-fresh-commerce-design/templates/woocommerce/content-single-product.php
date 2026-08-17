@@ -15,6 +15,11 @@ if ('' === $description) {
 }
 $description = wp_trim_words($description, 34, '…');
 $sku = trim((string) $product->get_sku());
+$usage = trim(wp_strip_all_tags($product->get_short_description()));
+$testing = ! empty($info['facts'])
+    ? implode(' • ', array_map('wp_strip_all_tags', $info['facts']))
+    : 'No product-specific testing claim is published on this listing.';
+$tips = 'Refer to the supplied product packaging for usage and storage directions.';
 ?>
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class('rwb-commerce-pdp rwb-dieux-pdp', $product); ?>>
     <section class="rwb-commerce-pdp-top rwb-dieux-pdp-top">
@@ -45,10 +50,10 @@ $sku = trim((string) $product->get_sku());
 
             <div class="rwb-commerce-pdp-accordions rwb-dieux-pdp-accordions">
                 <details><summary><span>DETAILS:</span><b>+</b></summary><div><ul><?php if ('' !== $sku) : ?><li>SKU: <?php echo esc_html($sku); ?></li><?php endif; ?><?php if (! empty($info['size'])) : ?><li><?php echo esc_html($info['size']); ?></li><?php endif; ?><li><?php echo esc_html($product->is_in_stock() ? 'In stock' : 'Out of stock'); ?></li></ul></div></details>
-                <?php if (! empty($info['benefits'])) : ?><details><summary><span>WHAT IT'S GOOD FOR:</span><b>+</b></summary><div><ul><?php foreach ($info['benefits'] as $benefit) : ?><li><?php echo esc_html($benefit); ?></li><?php endforeach; ?></ul></div></details><?php endif; ?>
-                <?php if (! empty($info['tagline'])) : ?><details><summary><span>FORMULA:</span><b>+</b></summary><div><p><?php echo esc_html($info['tagline']); ?></p></div></details><?php endif; ?>
-                <?php if (! empty($info['facts'])) : ?><details><summary><span>PRODUCT FACTS:</span><b>+</b></summary><div><ul><?php foreach ($info['facts'] as $fact) : ?><li><?php echo esc_html($fact); ?></li><?php endforeach; ?></ul></div></details><?php endif; ?>
-                <details><summary><span>PACK &amp; SIZE:</span><b>+</b></summary><div><p><?php echo esc_html(! empty($info['size']) ? $info['size'] : $product->get_name()); ?></p></div></details>
+                <details><summary><span>WHAT IT'S GOOD FOR:</span><b>+</b></summary><div><?php if (! empty($info['benefits'])) : ?><ul><?php foreach ($info['benefits'] as $benefit) : ?><li><?php echo esc_html($benefit); ?></li><?php endforeach; ?></ul><?php else : ?><p><?php echo esc_html(! empty($info['tagline']) ? $info['tagline'] : $product->get_name()); ?></p><?php endif; ?></div></details>
+                <details><summary><span>HOW TO USE:</span><b>+</b></summary><div><p><?php echo esc_html('' !== $usage ? $usage : 'Refer to the supplied product packaging for usage directions.'); ?></p></div></details>
+                <details><summary><span>TESTING:</span><b>+</b></summary><div><p><?php echo esc_html($testing); ?></p></div></details>
+                <details><summary><span>TIPS:</span><b>+</b></summary><div><p><?php echo esc_html($tips); ?></p></div></details>
             </div>
 
             <?php if ($gallery_ids) : ?>
