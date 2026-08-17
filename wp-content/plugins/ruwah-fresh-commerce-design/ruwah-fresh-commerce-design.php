@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial commerce experience for Ruwah Beauty using live WooCommerce products, pricing, stock, media and reviews.
- * Version: 6.2.1
+ * Version: 6.3.0
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,10 +10,11 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '6.2.1';
+    private const VERSION = '6.3.0';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
+        add_filter('template_include', [self::class, 'shop_template'], 100);
         add_filter('woocommerce_locate_template', [self::class, 'woocommerce_template'], 999, 3);
         add_filter('wc_get_template_part', [self::class, 'woocommerce_template_part'], 999, 3);
         add_action('wp_enqueue_scripts', [self::class, 'assets'], 999);
@@ -27,6 +28,14 @@ final class Ruwah_Fresh_Commerce_Design {
             return $template;
         }
         $custom = __DIR__ . '/templates/home.php';
+        return is_readable($custom) ? $custom : $template;
+    }
+
+    public static function shop_template(string $template): string {
+        if (! class_exists('WooCommerce') || ! function_exists('is_shop') || ! is_shop()) {
+            return $template;
+        }
+        $custom = __DIR__ . '/templates/shop-all.php';
         return is_readable($custom) ? $custom : $template;
     }
 
@@ -88,6 +97,12 @@ final class Ruwah_Fresh_Commerce_Design {
             }
             return;
         }
+        if (function_exists('is_shop') && is_shop()) {
+            self::inline_style('ruwah-reference-commerce', __DIR__ . '/assets/commerce.css');
+            self::inline_style('ruwah-dieux-shop-all', __DIR__ . '/assets/shop-dieux.css');
+            wp_enqueue_script('wc-add-to-cart');
+            return;
+        }
         if (self::is_commerce_surface()) {
             self::inline_style('ruwah-reference-commerce', __DIR__ . '/assets/commerce.css');
             self::inline_style('ruwah-reference-card-parity', __DIR__ . '/assets/card-parity.css');
@@ -116,6 +131,9 @@ final class Ruwah_Fresh_Commerce_Design {
             $classes[] = 'rwb-reference-home-v5';
         } elseif (self::is_commerce_surface()) {
             $classes[] = 'rwb-reference-commerce-v6';
+            if (function_exists('is_shop') && is_shop()) {
+                $classes[] = 'rwb-dieux-shop-v1';
+            }
         }
         return $classes;
     }
@@ -162,10 +180,8 @@ final class Ruwah_Fresh_Commerce_Design {
         $badge = self::product_badge($product, $rank);
         $regular = (float) $product->get_regular_price();
         $current = (float) $product->get_price();
-        $clear_shop_media = (function_exists('is_shop') && is_shop())
-            || (function_exists('is_product_taxonomy') && is_product_taxonomy());
         ?>
-        <a class="rwb-commerce-card-media"<?php if ($clear_shop_media) : ?> style="background:transparent!important"<?php endif; ?> href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="<?php echo esc_attr($product->get_name()); ?>">
+        <a class="rwb-commerce-card-media" href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="<?php echo esc_attr($product->get_name()); ?>">
             <?php if ($badge) : ?><span class="rwb-commerce-badge"><?php echo esc_html($badge); ?></span><?php endif; ?>
             <?php echo wp_kses_post($product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
         </a>
@@ -211,7 +227,7 @@ final class Ruwah_Fresh_Commerce_Design {
     }
 
     public static function commerce_newsletter(): void {
-        if (is_front_page() || ! self::is_commerce_surface()) {
+        if (is_front_page() || ! self::is_commerce_surface() || (function_exists('is_shop') && is_shop())) {
             return;
         }
         ?>
