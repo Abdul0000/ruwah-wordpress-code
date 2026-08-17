@@ -164,3 +164,20 @@ add_filter('woocommerce_add_to_cart_fragments', function ($fragments) {
 });
 
 require_once __DIR__ . '/includes/cart-drawer.php';
+
+/* Keep the cached homepage cart UI in sync with the live WooCommerce session. */
+add_action('wp_enqueue_scripts', function () {
+    if (!is_front_page() || !function_exists('WC')) {
+        return;
+    }
+
+    $endpoint = class_exists('WC_AJAX')
+        ? WC_AJAX::get_endpoint('get_refreshed_fragments')
+        : add_query_arg('wc-ajax', 'get_refreshed_fragments', home_url('/'));
+
+    $js = <<<'JS'
+(()=>{'use strict';const endpoint='RWB_FRAGMENT_ENDPOINT';const allowed=['.rwb-cart-count','.rwb-cart-drawer-content'];const swap=(selector,html)=>{document.querySelectorAll(selector).forEach(el=>{const template=document.createElement('template');template.innerHTML=String(html||'').trim();const node=template.content.firstElementChild;if(node)el.replaceWith(node.cloneNode(true))})};const sync=()=>fetch(endpoint,{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'X-Requested-With':'XMLHttpRequest'}}).then(res=>{if(!res.ok)throw new Error('fragment refresh failed');return res.json()}).then(data=>{const fragments=data&&data.fragments?data.fragments:{};allowed.forEach(selector=>{if(fragments[selector])swap(selector,fragments[selector])});if(window.jQuery)window.jQuery(document.body).trigger('wc_fragments_refreshed')}).catch(()=>{});if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',sync,{once:true})}else{sync()}window.addEventListener('pageshow',event=>{if(event.persisted)sync()})})();
+JS;
+    $js = str_replace('RWB_FRAGMENT_ENDPOINT', esc_js($endpoint), $js);
+    wp_add_inline_script('rwb-theme', $js, 'after');
+}, 80);
