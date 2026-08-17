@@ -26,6 +26,35 @@ if ($hero) {
     $hero_image_id = (int) ($gallery[1] ?? $gallery[0] ?? $hero->get_image_id());
 }
 
+$hero_descriptor = '';
+$hero_ingredient_line = '';
+if (is_array($hero_info)) {
+    $tagline = trim((string) ($hero_info['tagline'] ?? ''));
+    if ($tagline && preg_match('/^A\s+(.+?)\s+with\b/i', $tagline, $descriptor_match)) {
+        $descriptor = trim((string) $descriptor_match[1]);
+        $descriptor = preg_replace('/\s+and\s+/i', ' + ', $descriptor);
+        $hero_descriptor = ucwords((string) $descriptor);
+    }
+    if (! $hero_descriptor && $tagline) {
+        $hero_descriptor = wp_trim_words($tagline, 7, '');
+    }
+    $ingredient_labels = [];
+    foreach ((array) ($hero_info['benefits'] ?? []) as $benefit) {
+        $parts = preg_split('/\s+for\s+/i', trim((string) $benefit), 2);
+        $label = trim((string) ($parts[0] ?? ''));
+        if ($label && ! in_array($label, $ingredient_labels, true)) {
+            $ingredient_labels[] = $label;
+        }
+    }
+    $hero_ingredient_line = implode(' · ', array_slice($ingredient_labels, 0, 3));
+}
+if (! $hero_descriptor) {
+    $hero_descriptor = 'Luxury Care For Everyday Skin';
+}
+if (! $hero_ingredient_line && is_array($hero_info) && ! empty($hero_info['tagline'])) {
+    $hero_ingredient_line = (string) $hero_info['tagline'];
+}
+
 $total_reviews = 0;
 $best_sales = -1;
 $best_id = 0;
@@ -89,16 +118,45 @@ $render_card = static function ($product, $best_id) {
 <meta charset="<?php bloginfo('charset'); ?>">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <?php wp_head(); ?>
+<style id="rwb-dieux-home-hero-menu-v65">
+.rwb-reference-home-v5 .rwb-ref-utility{position:relative;height:40px;min-height:40px;background:#2d2d2d;color:#fff}
+.rwb-reference-home-v5 .rwb-ref-utility a{height:40px;min-height:40px;padding:0 70px;color:#fff;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;font-weight:500;line-height:1;letter-spacing:.035em;text-transform:uppercase}
+.rwb-reference-home-v5 .rwb-ref-utility-pause{position:absolute;right:24px;top:50%;transform:translateY(-50%);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;letter-spacing:-.15em}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact){position:absolute;left:0;right:0;top:40px;border:0;background:transparent;color:#fff;backdrop-filter:none}
+.admin-bar.rwb-reference-home-v5 .rwb-ref-header:not(.compact){top:72px}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-shell{width:calc(100% - 112px);max-width:none}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-header-row{min-height:112px;grid-template-columns:1fr auto 1fr}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav{gap:56px}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav a,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-account-link,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link{color:#fff;font-size:16px;font-weight:500;line-height:1;letter-spacing:.015em;text-transform:uppercase;text-shadow:0 1px 12px rgba(0,0,0,.18)}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-account-link{margin:0}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-tools{gap:30px}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{width:auto;max-width:205px;max-height:92px;filter:brightness(0) invert(1);object-fit:contain}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-icon{width:52px;height:52px;color:#fff}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-icon svg{width:30px;height:30px;stroke-width:1.7}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link{display:flex;align-items:center;gap:0;min-height:52px;padding:0;border:0;background:transparent}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link .rwb-cart-count{position:static;width:auto;height:auto;display:inline;background:transparent;color:inherit;font-size:16px;font-weight:500}
+.rwb-reference-home-v5 .rwb-ref-header.compact .rwb-header-row{min-height:64px}
+.rwb-reference-home-v5 .rwb-ref-header.compact .rwb-brand .custom-logo{max-width:118px;max-height:50px}
+.rwb-reference-home-v5 .rwb-ref-hero{height:calc(100vh - 40px);min-height:720px;display:grid;place-items:center;background:#514645;color:#fff}
+.rwb-reference-home-v5 .rwb-ref-hero-media img{width:100%;height:100%;object-fit:cover;object-position:center center;filter:saturate(.92) contrast(1.04) brightness(.78);transform:scale(1.012)}
+.rwb-reference-home-v5 .rwb-ref-hero-wash{background:linear-gradient(90deg,rgba(0,0,0,.10),rgba(0,0,0,.03) 42%,rgba(0,0,0,.12)),linear-gradient(0deg,rgba(0,0,0,.18),transparent 48%,rgba(0,0,0,.04))}
+.rwb-reference-home-v5 .rwb-ref-hero-copy{width:940px;max-width:90vw;padding:122px 24px 0;text-align:center;text-shadow:0 2px 18px rgba(0,0,0,.22)}
+.rwb-reference-home-v5 .rwb-ref-hero-copy .rwb-ref-kicker{margin:0;color:#fff;font-size:16px;font-weight:500;line-height:1;letter-spacing:.015em;text-transform:uppercase}
+.rwb-reference-home-v5 .rwb-ref-hero-copy h1{margin:20px 0 0;color:#fff;font-family:var(--sans,Inter,Arial,sans-serif);font-size:clamp(62px,4vw,78px);font-weight:600;line-height:.95;letter-spacing:-.04em}
+.rwb-reference-home-v5 .rwb-ref-hero-copy h2{max-width:900px;margin:12px auto 0;color:#fff;font-family:var(--sans,Inter,Arial,sans-serif);font-size:clamp(36px,2.8vw,52px);font-weight:500;line-height:1.02;letter-spacing:-.035em}
+.rwb-reference-home-v5 .rwb-ref-hero-copy>p:not(.rwb-ref-kicker){margin:22px auto 0;color:#fff;font-size:23px;font-weight:400;line-height:1.25;letter-spacing:-.015em}
+.rwb-reference-home-v5 .rwb-ref-hero-btn{width:228px;min-width:228px;height:64px;min-height:64px;margin-top:34px;padding:0 24px;border:0;background:#f8f5ee;color:#2c2a28;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:18px;font-weight:400;line-height:1;text-shadow:none;text-transform:none}
+.rwb-reference-home-v5 .rwb-ref-hero-btn:hover{background:#fff;color:#111}
+@media(max-width:1200px) and (min-width:783px){.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-shell{width:calc(100% - 64px)}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav{gap:30px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav a,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-account-link,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link .rwb-cart-count{font-size:12px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{max-width:160px;max-height:78px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-tools{gap:16px}.rwb-reference-home-v5 .rwb-ref-hero-copy{padding-top:105px}.rwb-reference-home-v5 .rwb-ref-hero-copy>p:not(.rwb-ref-kicker){font-size:18px}}
+@media(max-width:782px){.rwb-reference-home-v5 .rwb-ref-utility{height:30px;min-height:30px}.rwb-reference-home-v5 .rwb-ref-utility a{height:30px;min-height:30px;padding:0 38px 0 12px;font-size:8px;letter-spacing:.05em}.rwb-reference-home-v5 .rwb-ref-utility-pause{right:10px;font-size:9px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact){top:30px}.admin-bar.rwb-reference-home-v5 .rwb-ref-header:not(.compact){top:76px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-shell{width:calc(100% - 24px)}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-header-row{min-height:68px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{max-width:108px;max-height:56px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-icon{width:42px;height:42px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-icon svg{width:23px;height:23px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link{font-size:0}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link:before{content:'BAG (';font-size:9px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link:after{content:')';font-size:9px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link .rwb-cart-count{font-size:9px}.rwb-reference-home-v5 .rwb-ref-hero{height:auto;min-height:calc(100svh - 30px)}.rwb-reference-home-v5 .rwb-ref-hero-copy{width:100%;max-width:94vw;padding:94px 16px 30px}.rwb-reference-home-v5 .rwb-ref-hero-copy .rwb-ref-kicker{font-size:11px}.rwb-reference-home-v5 .rwb-ref-hero-copy h1{margin-top:14px;font-size:clamp(46px,12vw,62px)}.rwb-reference-home-v5 .rwb-ref-hero-copy h2{margin-top:10px;font-size:clamp(26px,7.6vw,38px)}.rwb-reference-home-v5 .rwb-ref-hero-copy>p:not(.rwb-ref-kicker){margin-top:17px;font-size:14px}.rwb-reference-home-v5 .rwb-ref-hero-btn{width:168px;min-width:168px;height:50px;min-height:50px;margin-top:25px;font-size:14px}}
+</style>
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <a class="screen-reader-text" href="#main">Skip to content</a>
 <div class="rwb-announcement rwb-ref-utility">
-    <?php if ($hero) : ?>
-        <a href="<?php echo esc_url($hero->get_permalink()); ?>"><span>NEW</span><span><?php echo esc_html($hero->get_name()); ?></span><span>SHOP</span></a>
-    <?php else : ?>
-        <a href="<?php echo esc_url($shop_url); ?>"><span>RUWAH BEAUTY</span><span>FIVE FOCUSED FORMULAS</span><span>SHOP</span></a>
-    <?php endif; ?>
+    <a href="<?php echo esc_url($shop_url); ?>"><span class="rwb-ref-utility-copy">PAKISTAN-WIDE DELIVERY · SECURE CHECKOUT</span></a>
+    <span class="rwb-ref-utility-pause" aria-hidden="true">Ⅱ</span>
 </div>
 <header class="rwb-header rwb-ref-header" data-header>
     <div class="rwb-shell rwb-header-row">
@@ -107,16 +165,16 @@ $render_card = static function ($product, $best_id) {
             <nav class="rwb-desktop-nav rwb-ref-nav" aria-label="Primary">
                 <a href="<?php echo esc_url($shop_url); ?>">Shop</a>
                 <a href="#rwb-genesis">Learn</a>
-                <a href="<?php echo esc_url($sun_product ? $sun_product->get_permalink() : $shop_url); ?>">Sun Care</a>
+                <a href="<?php echo esc_url($sun_product ? $sun_product->get_permalink() : $shop_url); ?>">Sunscreen Decoder</a>
             </nav>
         </div>
         <div class="rwb-brand">
             <?php if (has_custom_logo()) { the_custom_logo(); } else { ?><a href="<?php echo esc_url(home_url('/')); ?>">RUWAH</a><?php } ?>
         </div>
         <div class="rwb-tools">
-            <button class="rwb-icon" data-search-open aria-label="Search"><?php echo function_exists('rwb_icon') ? rwb_icon('search') : '⌕'; ?></button>
+            <button class="rwb-icon" data-search-open aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.7"></circle><path d="m15.5 15.5 5 5"></path></svg></button>
             <a class="rwb-ref-account-link" href="<?php echo esc_url($account_url); ?>">My Account</a>
-            <button class="rwb-ref-cart-link" data-cart-open aria-label="Cart">Cart <span class="rwb-cart-count"><?php echo esc_html((string) $count); ?></span></button>
+            <button class="rwb-ref-cart-link" data-cart-open aria-label="Cart">CART (<span class="rwb-cart-count"><?php echo esc_html((string) $count); ?></span>)</button>
         </div>
     </div>
 </header>
@@ -125,7 +183,7 @@ $render_card = static function ($product, $best_id) {
     <nav>
         <a href="<?php echo esc_url($shop_url); ?>">Shop all</a>
         <a href="#rwb-genesis">Learn</a>
-        <a href="<?php echo esc_url($sun_product ? $sun_product->get_permalink() : $shop_url); ?>">Sun Care</a>
+        <a href="<?php echo esc_url($sun_product ? $sun_product->get_permalink() : $shop_url); ?>">Sunscreen Decoder</a>
         <?php foreach ($products as $product) : ?><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($product->get_name()); ?></a><?php endforeach; ?>
         <a href="<?php echo esc_url($account_url); ?>">My account</a>
     </nav>
@@ -142,7 +200,7 @@ $render_card = static function ($product, $best_id) {
 <section class="rwb-ref-hero" aria-label="Featured formula">
     <div class="rwb-ref-hero-media" aria-hidden="true"><?php if ($hero_image_id) { echo wp_kses_post(wp_get_attachment_image($hero_image_id, 'full', false, ['loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'async'])); } elseif ($hero) { echo wp_kses_post($hero->get_image('full', ['loading' => 'eager', 'fetchpriority' => 'high'])); } ?></div>
     <div class="rwb-ref-hero-wash"></div>
-    <div class="rwb-ref-hero-copy" data-reveal><p class="rwb-ref-kicker">FEATURED FORMULA</p><h1><?php echo esc_html($hero ? $hero->get_name() : 'Ruwah Beauty'); ?></h1><?php if ($hero_info) : ?><h2><?php echo esc_html(implode(' · ', $hero_info['benefits'])); ?></h2><p><?php echo esc_html($hero_info['tagline']); ?></p><?php else : ?><p>Luxury care for everyday skin.</p><?php endif; ?><a class="rwb-ref-hero-btn" href="<?php echo esc_url($hero ? $hero->get_permalink() : $shop_url); ?>">Shop Now</a></div>
+    <div class="rwb-ref-hero-copy" data-reveal><p class="rwb-ref-kicker">NEW</p><h1><?php echo esc_html($hero ? $hero->get_name() : 'Ruwah Beauty'); ?></h1><h2><?php echo esc_html($hero_descriptor); ?></h2><?php if ($hero_ingredient_line) : ?><p><?php echo esc_html($hero_ingredient_line); ?></p><?php endif; ?><a class="rwb-ref-hero-btn" href="<?php echo esc_url($hero ? $hero->get_permalink() : $shop_url); ?>">Shop Now</a></div>
 </section>
 <?php if ($products) : ?>
 <section class="rwb-ref-community" id="community-favorites"><div class="rwb-ref-wrap"><h2 data-reveal><?php echo esc_html($community_heading); ?></h2><div class="rwb-ref-card-grid"><?php foreach (array_slice($products, 0, 4) as $rank => $product) : ?><article class="rwb-commerce-card" data-reveal><?php Ruwah_Fresh_Commerce_Design::render_card($product, (int) $rank); ?></article><?php endforeach; ?></div><a class="rwb-ref-text-link" href="<?php echo esc_url($shop_url); ?>">Shop All</a></div></section>
