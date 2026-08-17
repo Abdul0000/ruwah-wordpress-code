@@ -1,2 +1,7 @@
 /* Shared shop-card adapter for the homepage favorites rail. */
-.rwb-ref-card-grid .rwb-commerce-card{min-width:0;display:flex;flex-direction:column}.rwb-ref-card-grid .rwb-commerce-card-copy{flex:1}.rwb-ref-card-grid .rwb-commerce-card-media{width:100%}@media(max-width:782px){.rwb-ref-card-grid .rwb-commerce-card{flex:0 0 78vw;scroll-snap-align:start}}@media(max-width:520px){.rwb-ref-card-grid .rwb-commerce-card{flex-basis:84vw}}
+.rwb-ref-card-grid{gap:0!important;border-left:1px solid rgba(17,17,17,.16);border-top:1px solid rgba(17,17,17,.16)}
+.rwb-ref-card-grid .rwb-commerce-card{min-width:0;display:flex;flex-direction:column;margin:0!important;padding:12px 12px 10px!important;border-right:1px solid rgba(17,17,17,.16);border-bottom:1px solid rgba(17,17,17,.16);background:transparent}
+.rwb-ref-card-grid .rwb-commerce-card-copy{flex:1}
+.rwb-ref-card-grid .rwb-commerce-card-media{width:100%}
+@media(max-width:782px){.rwb-ref-card-grid{gap:0!important;padding-bottom:8px}.rwb-ref-card-grid .rwb-commerce-card{flex:0 0 78vw;scroll-snap-align:start}}
+@media(max-width:520px){.rwb-ref-card-grid .rwb-commerce-card{flex-basis:84vw}}
