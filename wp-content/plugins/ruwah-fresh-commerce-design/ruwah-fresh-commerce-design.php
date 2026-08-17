@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial commerce experience for Ruwah Beauty using live WooCommerce products, pricing, stock, media and reviews.
- * Version: 6.3.0
+ * Version: 6.4.0
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '6.3.0';
+    private const VERSION = '6.4.0';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
@@ -20,7 +20,7 @@ final class Ruwah_Fresh_Commerce_Design {
         add_action('wp_enqueue_scripts', [self::class, 'assets'], 999);
         add_filter('body_class', [self::class, 'body_class']);
         add_filter('wc_price_args', [self::class, 'price_args'], 20);
-        add_action('get_footer', [self::class, 'commerce_newsletter'], 5);
+        add_action('wp_footer', [self::class, 'reference_footer'], 5);
     }
 
     public static function front_page_template(string $template): string {
@@ -82,6 +82,7 @@ final class Ruwah_Fresh_Commerce_Design {
     }
 
     public static function assets(): void {
+        self::inline_global_style('ruwah-reference-footer', __DIR__ . '/assets/footer-dieux.css');
         if (is_front_page()) {
             self::inline_style('ruwah-reference-home', __DIR__ . '/assets/home.css');
             self::inline_style('ruwah-reference-commerce-home', __DIR__ . '/assets/commerce.css');
@@ -122,6 +123,19 @@ final class Ruwah_Fresh_Commerce_Design {
             return;
         }
         wp_register_style($handle, false, ['rwb-theme'], self::VERSION);
+        wp_enqueue_style($handle);
+        wp_add_inline_style($handle, $css);
+    }
+
+    private static function inline_global_style(string $handle, string $path): void {
+        if (! is_readable($path)) {
+            return;
+        }
+        $css = file_get_contents($path);
+        if (false === $css || '' === trim($css)) {
+            return;
+        }
+        wp_register_style($handle, false, [], self::VERSION);
         wp_enqueue_style($handle);
         wp_add_inline_style($handle, $css);
     }
@@ -226,22 +240,57 @@ final class Ruwah_Fresh_Commerce_Design {
         return array_slice($items, 0, 4);
     }
 
-    public static function commerce_newsletter(): void {
-        if (is_front_page() || ! self::is_commerce_surface() || (function_exists('is_shop') && is_shop())) {
+    private static function footer_products(): array {
+        if (function_exists('rwb_products')) {
+            return array_slice(array_values(array_filter(rwb_products(), static fn($item) => $item instanceof WC_Product && $item->is_visible())), 0, 5);
+        }
+        if (function_exists('wc_get_products')) {
+            return wc_get_products(['status' => 'publish', 'limit' => 5, 'orderby' => 'menu_order', 'order' => 'ASC']);
+        }
+        return [];
+    }
+
+    public static function reference_footer(): void {
+        if (is_admin()) {
             return;
         }
+        $products = self::footer_products();
+        $shop_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('shop') : home_url('/shop/');
+        $account_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
+        $privacy_url = get_privacy_policy_url();
+        $contact_url = function_exists('ruwah_page_url') ? ruwah_page_url('contact') : home_url('/contact/');
+        $refund_url = function_exists('ruwah_page_url') ? ruwah_page_url('refund-policy') : home_url('/refund-policy/');
+        $terms_url = '';
+        if (function_exists('wc_get_page_id')) {
+            $terms_id = (int) wc_get_page_id('terms');
+            if ($terms_id > 0) {
+                $terms_url = get_permalink($terms_id);
+            }
+        }
         ?>
-        <section class="rwb-commerce-newsletter">
-            <div class="rwb-shell">
-                <div><p class="rwb-eyebrow">GET RUWAH-Y</p><h2>New drops, ritual edits and useful skin notes.</h2></div>
-                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                    <input type="hidden" name="action" value="rwb_newsletter">
-                    <?php wp_nonce_field('rwb_newsletter', 'rwb_nonce'); ?>
-                    <input type="email" name="email" required placeholder="My email address is">
-                    <button type="submit">Initiate me</button>
-                </form>
+        <footer class="rwb-dieux-footer" id="rwb-reference-footer">
+            <div class="rwb-dieux-footer-main">
+                <section class="rwb-dieux-footer-signup" aria-labelledby="rwb-footer-signup-title">
+                    <h2 id="rwb-footer-signup-title">Get Ruwah-y</h2>
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                        <input type="hidden" name="action" value="rwb_newsletter">
+                        <?php wp_nonce_field('rwb_newsletter', 'rwb_nonce'); ?>
+                        <label class="screen-reader-text" for="rwb-dieux-footer-email">Email address</label>
+                        <div class="rwb-dieux-footer-form"><input id="rwb-dieux-footer-email" type="email" name="email" required placeholder="My email address is"><button type="submit">Initiate Me</button></div>
+                    </form>
+                    <div class="rwb-dieux-footer-socials" aria-label="Ruwah social channels"><span aria-label="Facebook">f</span><span aria-label="Instagram">◎</span><span aria-label="TikTok">♪</span></div>
+                </section>
+                <section class="rwb-dieux-footer-col"><h2>Shop</h2><?php foreach ($products as $product) : ?><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($product->get_name()); ?></a><?php endforeach; ?><a href="<?php echo esc_url($shop_url); ?>">Shop All</a></section>
+                <section class="rwb-dieux-footer-col"><h2>Learn</h2><a href="<?php echo esc_url(home_url('/#rwb-genesis')); ?>">Our Genesis</a><a href="<?php echo esc_url(home_url('/#rwb-standard')); ?>">The Ruwah Standard</a><a href="<?php echo esc_url(home_url('/#rituals')); ?>">Rituals</a><a href="<?php echo esc_url($shop_url); ?>">Formula Guide</a></section>
+                <section class="rwb-dieux-footer-col"><h2>Contact</h2><a href="<?php echo esc_url($contact_url); ?>">Contact Us</a><?php if ($privacy_url) : ?><a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a><?php endif; ?><a href="<?php echo esc_url($account_url); ?>">My Account</a><a href="<?php echo esc_url($shop_url); ?>">Shopping Bag</a></section>
+                <section class="rwb-dieux-footer-promise"><h2>Our Promise</h2><div class="rwb-dieux-promise-mark" aria-hidden="true"><span>◉</span><b>RUWAH<br>PROMISE</b></div><p>Exact pack details.<br>Live price &amp; stock.<br>No filler claims.</p></section>
             </div>
-        </section>
+            <div class="rwb-dieux-footer-bottom">
+                <div class="rwb-dieux-footer-meta"><b>© <?php echo esc_html(wp_date('Y')); ?> Ruwah Beauty</b><span>Pakistan · Online skincare</span><div class="rwb-dieux-payments"><span>PAYFAST</span><span>SECURE</span></div></div>
+                <nav class="rwb-dieux-footer-legal" aria-label="Footer legal links"><?php if ($terms_url) : ?><a href="<?php echo esc_url($terms_url); ?>">Terms of Service</a><?php endif; ?><?php if ($privacy_url) : ?><a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a><?php endif; ?><a href="<?php echo esc_url($refund_url); ?>">Refund Policy</a><a href="<?php echo esc_url($contact_url); ?>">Contact</a></nav>
+            </div>
+            <a class="rwb-dieux-footer-promo" href="#rwb-dieux-footer-email">Join Ruwah Notes <span aria-hidden="true">×</span></a>
+        </footer>
         <?php
     }
 }
