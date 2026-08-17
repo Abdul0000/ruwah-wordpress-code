@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Product Images
  * Description: Authoritative transparent PNG product image and logo mapping for Ruwah Beauty.
- * Version: 3.4.0
+ * Version: 3.4.1
  * Author: Ruwah Beauty
  * Requires at least: 6.5
  * Requires PHP: 8.1
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Product_Images_V3 {
-    const VERSION = '3.4.0';
+    const VERSION = '3.4.1';
     const STATE_OPTION = 'ruwah_product_images_v3_state';
     const SNAPSHOT_OPTION = 'ruwah_product_images_v3_snapshot';
 
@@ -161,6 +161,7 @@ final class Ruwah_Product_Images_V3 {
                 'name' => $map['name'],
                 'exists' => (bool) $p,
                 'featured_ok' => $p && $ef && (int) $p->get_image_id() === (int) $ef,
+                'featured_alpha_ok' => $ef ? self::transparent_featured_ok($ef) : false,
                 'gallery_ok' => $p && array_map('intval', $p->get_gallery_image_ids()) === array_map('intval', $eg),
             ];
         }
@@ -183,7 +184,9 @@ final class Ruwah_Product_Images_V3 {
         foreach (self::mappings() as $id => $map) {
             $p = function_exists('wc_get_product') ? wc_get_product($id) : null;
             if (!$p) return false;
-            if ((int) $p->get_image_id() !== (int) self::attachment_for_key('product-' . $map['featured'])) return false;
+            $featured = self::attachment_for_key('product-' . $map['featured']);
+            if ((int) $p->get_image_id() !== (int) $featured) return false;
+            if (!$featured || !self::transparent_featured_ok($featured)) return false;
             $expected = [];
             foreach ($map['gallery'] as $n) $expected[] = (int) self::attachment_for_key('product-' . $n);
             if (array_map('intval', $p->get_gallery_image_ids()) !== $expected) return false;
@@ -328,6 +331,27 @@ final class Ruwah_Product_Images_V3 {
         return 0;
     }
 
+    private static function transparent_featured_ok($attachment_id) {
+        if (!function_exists('imagecreatefrompng')) return false;
+        $file = get_attached_file((int) $attachment_id);
+        if (!$file || !is_readable($file)) return false;
+        $im = @imagecreatefrompng($file);
+        if (!$im) return false;
+        $w = imagesx($im);
+        $h = imagesy($im);
+        if ($w < 20 || $h < 20) { imagedestroy($im); return false; }
+        $points = [[0,0],[$w-1,0],[0,$h-1],[$w-1,$h-1],[10,10],[$w-11,10],[10,$h-11],[$w-11,$h-11]];
+        foreach ($points as $point) {
+            $rgba = imagecolorat($im, $point[0], $point[1]);
+            $alpha = ($rgba >> 24) & 0x7F;
+            if ($alpha < 120) { imagedestroy($im); return false; }
+        }
+        $center = imagecolorat($im, intdiv($w, 2), intdiv($h, 2));
+        $center_alpha = ($center >> 24) & 0x7F;
+        imagedestroy($im);
+        return $center_alpha < 120;
+    }
+
     private static function active_conflicts() {
         if (!function_exists('get_plugins')) require_once ABSPATH . 'wp-admin/includes/plugin.php';
         $active = (array) get_option('active_plugins', []);
@@ -356,7 +380,7 @@ if (defined('WP_CLI') && WP_CLI) {
     class Ruwah_Product_Images_V3_CLI {
         public function begin($a, $b) { Ruwah_Product_Images_V3::begin(); WP_CLI::success('Ruwah product image snapshot created and conflicting image plugins deactivated.'); }
         public function stage($a, $b) { $batch = isset($b['batch-size']) ? (int) $b['batch-size'] : 2; $retry = isset($b['retry-failed']); $count = Ruwah_Product_Images_V3::stage($batch, $retry); WP_CLI::success('Staged/refreshed ' . $count . ' PNG asset(s).'); }
-        public function apply($a, $b) { $complete = Ruwah_Product_Images_V3::apply(); if (!$complete) WP_CLI::error('Ruwah transparent PNG apply finished but verification is incomplete.'); WP_CLI::success('Featured RWB card images use exact silhouette masks and mappings are complete.'); }
+        public function apply($a, $b) { $complete = Ruwah_Product_Images_V3::apply(); if (!$complete) WP_CLI::error('Ruwah transparent PNG apply finished but verification is incomplete.'); WP_CLI::success('Featured RWB card images are alpha-transparent and mappings are complete.'); }
         public function restore($a, $b) { if (!Ruwah_Product_Images_V3::restore()) WP_CLI::error('No valid snapshot was found.'); WP_CLI::success('Previous product images and logo restored.'); }
         public function status($a, $b) { $s = Ruwah_Product_Images_V3::status(); WP_CLI::line(wp_json_encode($s, JSON_PRETTY_PRINT)); if (isset($b['require-complete']) && !$s['complete']) WP_CLI::error('Ruwah PNG product image status is incomplete.'); if ($s['complete']) WP_CLI::success('Ruwah PNG product image status is complete.'); }
     }
