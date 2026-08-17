@@ -136,7 +136,7 @@ $render_card = static function ($product, $best_id) {
 </div>
 <div class="rwb-layer" data-cart hidden>
     <button class="rwb-backdrop" data-cart-close aria-label="Close cart"></button>
-    <aside class="rwb-cart-panel"><div class="rwb-panel-head"><b>Your bag</b><button class="rwb-icon" data-cart-close aria-label="Close cart"><?php echo function_exists('rwb_icon') ? rwb_icon('close') : '×'; ?></button></div><div class="rwb-mini-cart"><?php if (function_exists('woocommerce_mini_cart')) { woocommerce_mini_cart(); } ?></div><a class="rwb-cart-checkout" href="<?php echo esc_url($cart_url); ?>">View bag &amp; checkout</a></aside>
+    <aside class="rwb-cart-panel rwb-shop-cart-drawer"><?php if (function_exists('rwb_render_cart_drawer_content')) { rwb_render_cart_drawer_content(); } ?></aside>
 </div>
 <main id="main" class="rwb-ref-home">
 <section class="rwb-ref-hero" aria-label="Featured formula">
