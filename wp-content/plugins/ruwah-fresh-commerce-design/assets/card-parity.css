@@ -1,6 +1,6 @@
 /* Ruwah Beauty — approved home card parity v6.2 */
 .rwb-commerce-card-media{aspect-ratio:1/1.03;background:#dfe7e8}
-.rwb-reference-commerce-v6 .rwb-commerce ul.products .rwb-commerce-card-media{background:transparent!important}
+.rwb-reference-commerce-v6 ul.products .rwb-commerce-card-media{background:transparent!important}
 .rwb-commerce-card-media img{width:78%!important;height:78%!important;object-fit:contain!important}
 .rwb-commerce-badge{left:10px;top:10px;padding:4px 7px;border:1px solid #777;background:rgba(247,243,233,.94);font-size:7px;font-weight:400;line-height:1;letter-spacing:.05em;text-transform:uppercase}
 .rwb-commerce-card-copy{padding-top:10px}
