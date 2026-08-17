@@ -73,50 +73,6 @@ foreach ($products as $product) {
     }
 }
 $community_heading = $total_reviews > 0 ? 'Community Favorites' : 'Ruwah Favorites';
-
-$render_card = static function ($product, $best_id) {
-    if (! $product) {
-        return;
-    }
-    $info = function_exists('rwb_info') ? rwb_info($product) : null;
-    $rating = (float) $product->get_average_rating();
-    $review_count = (int) $product->get_review_count();
-    $badge = (int) $product->get_id() === (int) $best_id
-        ? 'Bestseller'
-        : ($product->is_on_sale() ? 'Offer' : '');
-    ?>
-    <article class="rwb-ref-card" data-reveal>
-        <a class="rwb-ref-card-media" href="<?php echo esc_url($product->get_permalink()); ?>">
-            <?php if ($badge) : ?>
-                <span class="rwb-ref-badge"><?php echo esc_html($badge); ?></span>
-            <?php endif; ?>
-            <?php echo wp_kses_post($product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
-        </a>
-        <div class="rwb-ref-card-body">
-            <h3><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($product->get_name()); ?></a></h3>
-            <?php if ($info) : ?>
-                <p class="rwb-ref-card-tagline"><?php echo esc_html($info['tagline']); ?></p>
-            <?php endif; ?>
-            <div class="rwb-ref-rating">
-                <?php if ($review_count > 0) : ?>
-                    <span aria-hidden="true"><?php echo esc_html(str_repeat('★', max(1, min(5, (int) round($rating))))); ?></span>
-                    <small><?php echo esc_html((string) $review_count); ?></small>
-                <?php else : ?>
-                    <span class="rwb-ref-rating-neutral">Ruwah formula</span>
-                <?php endif; ?>
-            </div>
-            <?php if ($info && ! empty($info['size'])) : ?>
-                <div class="rwb-ref-size-control"><span><?php echo esc_html($info['size']); ?></span><b aria-hidden="true">⌄</b></div>
-            <?php endif; ?>
-            <?php if ($product->is_type('simple') && $product->is_purchasable() && $product->is_in_stock()) : ?>
-                <a rel="nofollow" class="rwb-ref-cart add_to_cart_button ajax_add_to_cart" data-product_id="<?php echo esc_attr((string) $product->get_id()); ?>" data-product_sku="<?php echo esc_attr($product->get_sku()); ?>" data-quantity="1" href="<?php echo esc_url($product->add_to_cart_url()); ?>"><span>Add to Cart</span><span><?php echo wp_kses_post(wc_price((float) $product->get_price())); ?></span></a>
-            <?php else : ?>
-                <a class="rwb-ref-cart" href="<?php echo esc_url($product->get_permalink()); ?>"><span>View Product</span><span>↗</span></a>
-            <?php endif; ?>
-        </div>
-    </article>
-    <?php
-};
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -144,7 +100,6 @@ $render_card = static function ($product, $best_id) {
 .rwb-reference-home-v5 .rwb-ref-header.compact .rwb-header-row{min-height:64px}
 .rwb-reference-home-v5 .rwb-ref-header.compact .rwb-brand .custom-logo{max-width:118px;max-height:50px}
 .rwb-reference-home-v5 .rwb-ref-hero{height:calc(100vh - 40px);min-height:720px;display:grid;place-items:center;background:#514645;color:#fff}
-.rwb-reference-home-v5 .rwb-ref-hero-media img{width:100%;height:100%;object-fit:cover;object-position:center center;filter:saturate(.92) contrast(1.04) brightness(.78);transform:scale(1.012)}
 .rwb-reference-home-v5 .rwb-ref-hero-wash{background:linear-gradient(90deg,rgba(0,0,0,.10),rgba(0,0,0,.03) 42%,rgba(0,0,0,.12)),linear-gradient(0deg,rgba(0,0,0,.18),transparent 48%,rgba(0,0,0,.04))}
 .rwb-reference-home-v5 .rwb-ref-hero-copy{width:940px;max-width:90vw;padding:122px 24px 0;text-align:center;text-shadow:0 2px 18px rgba(0,0,0,.22)}
 .rwb-reference-home-v5 .rwb-ref-hero-copy .rwb-ref-kicker{margin:0;color:#fff;font-size:16px;font-weight:500;line-height:1;letter-spacing:.015em;text-transform:uppercase}
@@ -157,13 +112,13 @@ $render_card = static function ($product, $best_id) {
 .rwb-reference-home-v5 .rwb-ref-hero-media{inset:0!important;overflow:hidden!important;background:transparent!important}
 .rwb-reference-home-v5 .rwb-ref-hero-bg,.rwb-reference-home-v5 .rwb-ref-hero-focus{position:absolute;inset:0;overflow:hidden}
 .rwb-reference-home-v5 .rwb-ref-hero-bg{z-index:0}
-.rwb-reference-home-v5 .rwb-ref-hero-bg img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;transform:scale(1.055)!important;filter:blur(11px) saturate(.9) contrast(1.03) brightness(.76)!important}
+.rwb-reference-home-v5 .rwb-ref-hero-bg img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;transform:scale(1.012)!important;filter:saturate(.92) contrast(1.04) brightness(.78)!important}
 .rwb-reference-home-v5 .rwb-ref-hero-focus{z-index:1;display:grid;place-items:center;pointer-events:none}
-.rwb-reference-home-v5 .rwb-ref-hero-focus img{width:92%!important;height:92%!important;object-fit:contain!important;object-position:center center!important;transform:scale(.88)!important;background:transparent!important;filter:saturate(.94) contrast(1.035) brightness(.8)!important;-webkit-mask-image:radial-gradient(ellipse 70% 76% at center,#000 52%,rgba(0,0,0,.98) 70%,transparent 100%);mask-image:radial-gradient(ellipse 70% 76% at center,#000 52%,rgba(0,0,0,.98) 70%,transparent 100%)}
+.rwb-reference-home-v5 .rwb-ref-hero-focus img{width:88%!important;height:88%!important;object-fit:contain!important;object-position:center center!important;transform:scale(.86)!important;background:transparent!important;filter:saturate(.94) contrast(1.035) brightness(.80)!important;-webkit-mask-image:radial-gradient(ellipse 24% 72% at 50% 53%,#000 0 46%,rgba(0,0,0,.88) 55%,rgba(0,0,0,.40) 63%,transparent 74%);mask-image:radial-gradient(ellipse 24% 72% at 50% 53%,#000 0 46%,rgba(0,0,0,.88) 55%,rgba(0,0,0,.40) 63%,transparent 74%)}
 .rwb-reference-home-v5 .rwb-ref-hero-wash{z-index:2!important}
 .rwb-reference-home-v5 .rwb-ref-hero-copy{z-index:3!important}
 }
-@media(max-width:1200px) and (min-width:783px){.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-shell{width:calc(100% - 64px)}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav{gap:30px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav a,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-account-link,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link .rwb-cart-count{font-size:12px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{max-width:160px;max-height:78px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-tools{gap:16px}.rwb-reference-home-v5 .rwb-ref-hero-focus img{transform:scale(.91)!important}.rwb-reference-home-v5 .rwb-ref-hero-copy{padding-top:105px}.rwb-reference-home-v5 .rwb-ref-hero-copy>p:not(.rwb-ref-kicker){font-size:18px}}
+@media(max-width:1200px) and (min-width:783px){.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-shell{width:calc(100% - 64px)}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav{gap:30px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav a,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-account-link,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link .rwb-cart-count{font-size:12px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{max-width:160px;max-height:78px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-tools{gap:16px}.rwb-reference-home-v5 .rwb-ref-hero-focus img{transform:scale(.90)!important}.rwb-reference-home-v5 .rwb-ref-hero-copy{padding-top:105px}.rwb-reference-home-v5 .rwb-ref-hero-copy>p:not(.rwb-ref-kicker){font-size:18px}}
 @media(max-width:782px){.rwb-reference-home-v5 .rwb-ref-utility{height:30px;min-height:30px}.rwb-reference-home-v5 .rwb-ref-utility a{height:30px;min-height:30px;padding:0 38px 0 12px;font-size:8px;letter-spacing:.05em}.rwb-reference-home-v5 .rwb-ref-utility-pause{right:10px;font-size:9px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact){top:30px}.admin-bar.rwb-reference-home-v5 .rwb-ref-header:not(.compact){top:76px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-shell{width:calc(100% - 24px)}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-header-row{min-height:68px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{max-width:108px;max-height:56px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-icon{width:42px;height:42px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-icon svg{width:23px;height:23px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link{font-size:0}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link:before{content:'BAG (';font-size:9px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link:after{content:')';font-size:9px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link .rwb-cart-count{font-size:9px}.rwb-reference-home-v5 .rwb-ref-hero{height:auto;min-height:calc(100svh - 30px)}.rwb-reference-home-v5 .rwb-ref-hero-focus{display:none!important}.rwb-reference-home-v5 .rwb-ref-hero-bg{position:absolute;inset:0}.rwb-reference-home-v5 .rwb-ref-hero-bg img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;transform:scale(1.012)!important;filter:saturate(.92) contrast(1.04) brightness(.78)!important}.rwb-reference-home-v5 .rwb-ref-hero-copy{width:100%;max-width:94vw;padding:94px 16px 30px}.rwb-reference-home-v5 .rwb-ref-hero-copy .rwb-ref-kicker{font-size:11px}.rwb-reference-home-v5 .rwb-ref-hero-copy h1{margin-top:14px;font-size:clamp(46px,12vw,62px)}.rwb-reference-home-v5 .rwb-ref-hero-copy h2{margin-top:10px;font-size:clamp(26px,7.6vw,38px)}.rwb-reference-home-v5 .rwb-ref-hero-copy>p:not(.rwb-ref-kicker){margin-top:17px;font-size:14px}.rwb-reference-home-v5 .rwb-ref-hero-btn{width:168px;min-width:168px;height:50px;min-height:50px;margin-top:25px;font-size:14px}}
 </style>
 </head>
