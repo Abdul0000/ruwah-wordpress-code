@@ -1,7 +1,7 @@
 <?php
 defined('ABSPATH') || exit;
 
-define('RUWAH_THEME_VERSION', '2.2.0');
+define('RUWAH_THEME_VERSION', '2.2.1');
 
 add_action('after_setup_theme', function () {
     load_theme_textdomain('ruwah', get_template_directory() . '/languages');
@@ -23,10 +23,13 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('ruwah-fonts', 'https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap', [], null);
     wp_enqueue_style('ruwah-style', get_stylesheet_uri(), ['ruwah-fonts'], RUWAH_THEME_VERSION);
 
-    // Keep critical visual states and route-specific premium fixes on the
-    // canonical theme stylesheet handle so LiteSpeed cannot drop a secondary
-    // CSS request and leave the route partially styled.
     $inline_css = '.rb-search[hidden],.rb-overlay[hidden]{display:none!important}';
+    foreach (['/assets/purple-atelier.css', '/assets/ruwah-purple-luxe-v2.css'] as $relative_css) {
+        $base_css = get_template_directory() . $relative_css;
+        if (is_readable($base_css)) {
+            $inline_css .= "\n" . file_get_contents($base_css);
+        }
+    }
 
     if (is_front_page()) {
         $home_css = get_template_directory() . '/assets/home-atelier.css';
@@ -45,12 +48,16 @@ add_action('wp_enqueue_scripts', function () {
 
     wp_add_inline_style('ruwah-style', $inline_css);
 
-    wp_enqueue_script('ruwah-theme', get_template_directory_uri() . '/theme.js', [], RUWAH_THEME_VERSION, true);
-    wp_script_add_data('ruwah-theme', 'strategy', 'defer');
+    wp_register_script('ruwah-theme', false, [], RUWAH_THEME_VERSION, true);
+    wp_enqueue_script('ruwah-theme');
+    $theme_js = get_template_directory() . '/theme.js';
+    if (is_readable($theme_js)) {
+        $js = file_get_contents($theme_js);
+        if (false !== $js && '' !== trim($js)) {
+            wp_add_inline_script('ruwah-theme', $js, 'after');
+        }
+    }
 
-    // The homepage uses custom WooCommerce cards outside the native archive.
-    // wc-add-to-cart is sufficient for the AJAX request and response fragments;
-    // do not force wc-cart-fragments, which adds an unnecessary initial request.
     if (function_exists('WC') && is_front_page()) {
         wp_enqueue_script('wc-add-to-cart');
     }
@@ -111,9 +118,6 @@ add_filter('woocommerce_add_to_cart_fragments', function ($fragments) {
     $count = function_exists('WC') && WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
     $fragments['.rb-cart-count'] = '<span class="rb-cart-count">' . esc_html((string) $count) . '</span>';
 
-    // WooCommerce normally replaces div.widget_shopping_cart_content with a
-    // generic wrapper. Keep the Ruwah class on every AJAX refresh so the
-    // drawer remains styled and scrollable after the first add-to-cart.
     if (function_exists('woocommerce_mini_cart')) {
         ob_start();
         woocommerce_mini_cart();
@@ -122,5 +126,3 @@ add_filter('woocommerce_add_to_cart_fragments', function ($fragments) {
     }
     return $fragments;
 });
-
-require_once get_template_directory() . '/includes/reference-cart-drawer.php';
