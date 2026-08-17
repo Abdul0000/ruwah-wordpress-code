@@ -1,7 +1,7 @@
 <?php
 defined('ABSPATH') || exit;
 
-define('RUWAH_THEME_VERSION', '2.2.1');
+define('RUWAH_THEME_VERSION', '4.0.0');
 
 add_action('after_setup_theme', function () {
     load_theme_textdomain('ruwah', get_template_directory() . '/languages');
@@ -21,44 +21,13 @@ add_action('after_setup_theme', function () {
 
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('ruwah-fonts', 'https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap', [], null);
-    wp_enqueue_style('ruwah-style', get_stylesheet_uri(), ['ruwah-fonts'], RUWAH_THEME_VERSION);
+    wp_enqueue_style('rwb-theme', get_stylesheet_uri(), ['ruwah-fonts'], RUWAH_THEME_VERSION);
+    wp_add_inline_style('rwb-theme', '.rwb-layer[hidden],.rwb-mobile-menu[hidden]{display:none!important}');
 
-    $inline_css = '.rb-search[hidden],.rb-overlay[hidden]{display:none!important}';
-    foreach (['/assets/purple-atelier.css', '/assets/ruwah-purple-luxe-v2.css'] as $relative_css) {
-        $base_css = get_template_directory() . $relative_css;
-        if (is_readable($base_css)) {
-            $inline_css .= "\n" . file_get_contents($base_css);
-        }
-    }
+    wp_enqueue_script('rwb-theme', get_template_directory_uri() . '/theme.js', [], RUWAH_THEME_VERSION, true);
+    wp_script_add_data('rwb-theme', 'strategy', 'defer');
 
-    if (is_front_page()) {
-        $home_css = get_template_directory() . '/assets/home-atelier.css';
-        if (is_readable($home_css)) {
-            $inline_css .= "\n" . file_get_contents($home_css);
-        }
-        $inline_css .= "\n.home .rb-category-media>i{width:72px;height:72px;display:grid;place-items:center;border:1px solid rgba(122,63,160,.18);border-radius:50%;background:rgba(255,255,255,.72);color:var(--rb-orchid);font-family:var(--rb-serif);font-size:30px;font-style:normal;box-shadow:var(--rb-shadow-sm)}";
-    }
-
-    if (function_exists('is_woocommerce') && (is_woocommerce() || is_cart() || is_checkout())) {
-        $commerce_css = get_template_directory() . '/assets/commerce-plan.css';
-        if (is_readable($commerce_css)) {
-            $inline_css .= "\n" . file_get_contents($commerce_css);
-        }
-    }
-
-    wp_add_inline_style('ruwah-style', $inline_css);
-
-    wp_register_script('ruwah-theme', false, [], RUWAH_THEME_VERSION, true);
-    wp_enqueue_script('ruwah-theme');
-    $theme_js = get_template_directory() . '/theme.js';
-    if (is_readable($theme_js)) {
-        $js = file_get_contents($theme_js);
-        if (false !== $js && '' !== trim($js)) {
-            wp_add_inline_script('ruwah-theme', $js, 'after');
-        }
-    }
-
-    if (function_exists('WC') && is_front_page()) {
+    if (function_exists('WC') && (is_front_page() || (function_exists('is_woocommerce') && is_woocommerce()) || is_cart() || is_checkout())) {
         wp_enqueue_script('wc-add-to-cart');
     }
 }, 30);
@@ -98,31 +67,27 @@ function ruwah_product_card($product, $badge = '') {
     $count = (int) $product->get_review_count();
     $filled = max(0, min(5, (int) round($rating)));
     $stars = str_repeat('★', $filled) . str_repeat('☆', 5 - $filled);
-    echo '<article class="rb-product-card rb-reveal">';
-    if ($badge) echo '<span class="rb-badge">' . esc_html($badge) . '</span>';
-    echo '<a class="rb-product-media" href="' . esc_url($product->get_permalink()) . '">' . wp_kses_post($product->get_image('woocommerce_thumbnail', ['loading' => 'lazy', 'decoding' => 'async'])) . '</a>';
-    echo '<div class="rb-product-copy"><h3><a href="' . esc_url($product->get_permalink()) . '">' . esc_html($product->get_name()) . '</a></h3>';
-    echo '<div class="rb-card-rating" role="img" aria-label="' . esc_attr($count ? sprintf(__('%1$s out of 5 based on %2$d reviews', 'ruwah'), number_format_i18n($rating, 1), $count) : __('No reviews yet', 'ruwah')) . '"><span aria-hidden="true">' . esc_html($stars) . '</span><span class="rb-rating-count">' . esc_html($count ? number_format_i18n($rating, 1) . ' · ' . $count . ' ' . ($count === 1 ? __('review', 'ruwah') : __('reviews', 'ruwah')) : __('New', 'ruwah')) . '</span></div>';
-    echo '<div class="rb-price">' . wp_kses_post($product->get_price_html()) . '</div></div><div class="rb-product-actions">';
-
+    echo '<article class="rwb-card" data-reveal>';
+    if ($badge) echo '<span class="rwb-badge">' . esc_html($badge) . '</span>';
+    echo '<a class="rwb-card-media" href="' . esc_url($product->get_permalink()) . '">' . wp_kses_post($product->get_image('woocommerce_thumbnail', ['loading' => 'lazy', 'decoding' => 'async'])) . '</a>';
+    echo '<div class="rwb-card-copy"><div class="rwb-card-head"><h3><a href="' . esc_url($product->get_permalink()) . '">' . esc_html($product->get_name()) . '</a></h3><div class="rwb-price">' . wp_kses_post($product->get_price_html()) . '</div></div>';
+    echo '<div class="rwb-rating"><span aria-hidden="true">' . esc_html($stars) . '</span><small>' . esc_html($count ? number_format_i18n($rating, 1) . ' · ' . $count : __('New', 'ruwah')) . '</small></div></div><div class="rwb-card-action">';
     if ($product->is_type('simple') && $product->is_purchasable() && $product->is_in_stock()) {
-        $label = sprintf(__('Add “%s” to your bag', 'ruwah'), $product->get_name());
-        echo '<a rel="nofollow" href="' . esc_url($product->add_to_cart_url()) . '" data-quantity="1" data-product_id="' . esc_attr((string) $id) . '" data-product_sku="' . esc_attr($product->get_sku()) . '" aria-label="' . esc_attr($label) . '" class="rb-button button product_type_simple add_to_cart_button ajax_add_to_cart">' . esc_html__('Add to Bag', 'ruwah') . '</a>';
+        echo '<a rel="nofollow" href="' . esc_url($product->add_to_cart_url()) . '" data-quantity="1" data-product_id="' . esc_attr((string) $id) . '" data-product_sku="' . esc_attr($product->get_sku()) . '" class="rwb-add button product_type_simple add_to_cart_button ajax_add_to_cart"><span>' . esc_html__('Add to Bag', 'ruwah') . '</span><span>+</span></a>';
     } else {
-        echo '<a class="rb-button button" href="' . esc_url($product->get_permalink()) . '">' . esc_html($product->is_type('variable') ? __('Select Options', 'ruwah') : __('View Product', 'ruwah')) . '</a>';
+        echo '<a class="rwb-add button" href="' . esc_url($product->get_permalink()) . '"><span>' . esc_html__('View Product', 'ruwah') . '</span><span>↗</span></a>';
     }
     echo '</div></article>';
 }
 
 add_filter('woocommerce_add_to_cart_fragments', function ($fragments) {
     $count = function_exists('WC') && WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
-    $fragments['.rb-cart-count'] = '<span class="rb-cart-count">' . esc_html((string) $count) . '</span>';
-
+    $fragments['.rwb-cart-count'] = '<span class="rwb-cart-count">' . esc_html((string) $count) . '</span>';
     if (function_exists('woocommerce_mini_cart')) {
         ob_start();
         woocommerce_mini_cart();
         $mini_cart = ob_get_clean();
-        $fragments['div.widget_shopping_cart_content'] = '<div class="rb-cart-body widget_shopping_cart_content">' . $mini_cart . '</div>';
+        $fragments['div.widget_shopping_cart_content'] = '<div class="rwb-mini-cart widget_shopping_cart_content">' . $mini_cart . '</div>';
     }
     return $fragments;
 });
