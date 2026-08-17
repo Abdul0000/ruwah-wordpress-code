@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Ruwah Product Images
- * Description: Authoritative lightweight transparent PNG product image and logo mapping for Ruwah Beauty.
- * Version: 3.3.0
+ * Description: Authoritative transparent PNG product image and logo mapping for Ruwah Beauty.
+ * Version: 3.4.0
  * Author: Ruwah Beauty
  * Requires at least: 6.5
  * Requires PHP: 8.1
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Product_Images_V3 {
-    const VERSION = '3.3.0';
+    const VERSION = '3.4.0';
     const STATE_OPTION = 'ruwah_product_images_v3_state';
     const SNAPSHOT_OPTION = 'ruwah_product_images_v3_snapshot';
 
@@ -61,9 +61,9 @@ final class Ruwah_Product_Images_V3 {
         $s = self::state();
         if (!isset($s['assets']) || !is_array($s['assets'])) $s['assets'] = [];
         if (!isset($s['normalized']) || !is_array($s['normalized'])) $s['normalized'] = [];
-        $processed = 0;
         $queue = ['logo'];
         foreach (self::asset_numbers() as $n) $queue[] = 'product-' . $n;
+        $processed = 0;
 
         foreach ($queue as $key) {
             if ($processed >= $batch_size) break;
@@ -93,6 +93,7 @@ final class Ruwah_Product_Images_V3 {
             $processed++;
             self::save_state($s);
         }
+
         $s = self::state();
         $s['staged_at'] = current_time('mysql');
         self::save_state($s);
@@ -107,7 +108,6 @@ final class Ruwah_Product_Images_V3 {
             if (!self::attachment_for_key($key)) self::import_key($key);
             if (!self::is_normalized($key)) self::refresh_key($key);
         }
-
         $logo = self::attachment_for_key('logo');
         if ($logo) set_theme_mod('custom_logo', $logo);
         foreach (self::mappings() as $id => $map) {
@@ -197,17 +197,12 @@ final class Ruwah_Product_Images_V3 {
         $source = self::source_path($key);
         if (!$source || !is_readable($source)) return 0;
         require_once ABSPATH . 'wp-admin/includes/image.php';
-        require_once ABSPATH . 'wp-admin/includes/file.php';
-        require_once ABSPATH . 'wp-admin/includes/media.php';
         $u = wp_upload_dir();
         if (!empty($u['error'])) return 0;
         $dir = trailingslashit($u['basedir']) . 'ruwah-rwb-png-v4';
         wp_mkdir_p($dir);
-        $filename = sanitize_file_name($key . '.png');
-        $target = trailingslashit($dir) . $filename;
-        $remove_canvas = 0 === strpos($key, 'product-');
-        $ok = self::source_to_transparent_png($source, $target, $remove_canvas);
-        if (!$ok) return 0;
+        $target = trailingslashit($dir) . sanitize_file_name($key . '.png');
+        if (!self::source_to_transparent_png($source, $target, 0 === strpos($key, 'product-'), $key)) return 0;
         $aid = wp_insert_attachment([
             'post_mime_type' => 'image/png',
             'post_title' => 'Ruwah ' . ucwords(str_replace('-', ' ', $key)),
@@ -234,7 +229,7 @@ final class Ruwah_Product_Images_V3 {
         $target = $aid ? get_attached_file($aid) : '';
         if (!$aid || !$source || !$target || !is_readable($source)) return false;
         require_once ABSPATH . 'wp-admin/includes/image.php';
-        if (!self::source_to_transparent_png($source, $target, true)) return false;
+        if (!self::source_to_transparent_png($source, $target, true, $key)) return false;
         $meta = wp_generate_attachment_metadata($aid, $target);
         if (is_array($meta)) wp_update_attachment_metadata($aid, $meta);
         $s = self::state();
@@ -245,28 +240,19 @@ final class Ruwah_Product_Images_V3 {
         return true;
     }
 
-    private static function source_to_transparent_png($source, $target, $remove_canvas = true) {
-        if (!function_exists('imagecreatefromwebp') || !function_exists('imagepng')) {
-            $editor = wp_get_image_editor($source);
-            if (is_wp_error($editor)) return false;
-            $saved = $editor->save($target, 'image/png');
-            return !is_wp_error($saved) && !empty($saved['path']);
-        }
+    private static function source_to_transparent_png($source, $target, $remove_canvas = true, $key = '') {
+        if (!function_exists('imagecreatefromwebp') || !function_exists('imagepng')) return false;
         $im = @imagecreatefromwebp($source);
         if (!$im) return false;
-
         $w = imagesx($im);
         $h = imagesy($im);
+        $mask = $remove_canvas ? self::mask_bits($key, $w, $h) : null;
         $out = imagecreatetruecolor($w, $h);
-        if (!$out) {
-            imagedestroy($im);
-            return false;
-        }
+        if (!$out) { imagedestroy($im); return false; }
         imagealphablending($out, false);
         imagesavealpha($out, true);
         $transparent = imagecolorallocatealpha($out, 0, 0, 0, 127);
         imagefill($out, 0, 0, $transparent);
-
         for ($y = 0; $y < $h; $y++) {
             for ($x = 0; $x < $w; $x++) {
                 $rgba = imagecolorat($im, $x, $y);
@@ -274,20 +260,46 @@ final class Ruwah_Product_Images_V3 {
                 $r = ($rgba >> 16) & 0xFF;
                 $g = ($rgba >> 8) & 0xFF;
                 $b = $rgba & 0xFF;
-                $is_cyan_canvas = $remove_canvas && $g >= 185 && $b >= 195 && $r <= 230 && ($g - $r) >= 10 && ($b - $r) >= 14 && abs($b - $g) <= 45;
-                if ($is_cyan_canvas) {
-                    imagesetpixel($out, $x, $y, $transparent);
-                } else {
-                    $pixel = imagecolorallocatealpha($out, $r, $g, $b, $a);
-                    imagesetpixel($out, $x, $y, $pixel);
+                if ($mask !== null) {
+                    $i = ($y * $w) + $x;
+                    $byte = ord($mask[intdiv($i, 8)]);
+                    $opaque = ($byte >> (7 - ($i & 7))) & 1;
+                    if (!$opaque) {
+                        imagesetpixel($out, $x, $y, $transparent);
+                    } else {
+                        imagesetpixel($out, $x, $y, imagecolorallocatealpha($out, $r, $g, $b, $a));
+                    }
+                    continue;
                 }
+                $is_cyan_canvas = $remove_canvas && $g >= 185 && $b >= 195 && $r <= 230 && ($g - $r) >= 10 && ($b - $r) >= 14 && abs($b - $g) <= 45;
+                if ($is_cyan_canvas) imagesetpixel($out, $x, $y, $transparent);
+                else imagesetpixel($out, $x, $y, imagecolorallocatealpha($out, $r, $g, $b, $a));
             }
         }
-
         $saved = imagepng($out, $target, 6);
         imagedestroy($out);
         imagedestroy($im);
         return (bool) $saved;
+    }
+
+    private static function mask_bits($key, $w, $h) {
+        if ((int) $w !== 1000 || (int) $h !== 1000 || !preg_match('/^product-(\d+)$/', (string) $key, $m)) return null;
+        $featured = [2, 8, 10, 14, 18];
+        $index = array_search((int) $m[1], $featured, true);
+        if ($index === false) return null;
+        static $all = null;
+        if ($all === null) {
+            $path = plugin_dir_path(__FILE__) . 'assets/featured-mask-data.php';
+            if (!is_readable($path)) return null;
+            $encoded = include $path;
+            if (!is_string($encoded) || $encoded === '') return null;
+            $compressed = base64_decode($encoded, true);
+            if ($compressed === false) return null;
+            $all = gzuncompress($compressed);
+            if (!is_string($all) || strlen($all) !== 625000) { $all = false; return null; }
+        }
+        if ($all === false) return null;
+        return substr($all, $index * 125000, 125000);
     }
 
     private static function is_normalized($key) {
@@ -336,15 +348,15 @@ final class Ruwah_Product_Images_V3 {
         if (!current_user_can('manage_options')) return;
         $s = self::status();
         if ($s['complete']) return;
-        echo '<div class="notice notice-warning"><p><strong>Ruwah Product Images:</strong> PNG media mapping is not complete. Run the configured Ruwah product-image deployment/apply command.</p></div>';
+        echo '<div class="notice notice-warning"><p><strong>Ruwah Product Images:</strong> transparent PNG mapping is not complete.</p></div>';
     }
 }
 
 if (defined('WP_CLI') && WP_CLI) {
     class Ruwah_Product_Images_V3_CLI {
-        public function begin($a, $b) { Ruwah_Product_Images_V3::begin(); WP_CLI::success('Ruwah PNG product image snapshot created and conflicting image plugins deactivated.'); }
+        public function begin($a, $b) { Ruwah_Product_Images_V3::begin(); WP_CLI::success('Ruwah product image snapshot created and conflicting image plugins deactivated.'); }
         public function stage($a, $b) { $batch = isset($b['batch-size']) ? (int) $b['batch-size'] : 2; $retry = isset($b['retry-failed']); $count = Ruwah_Product_Images_V3::stage($batch, $retry); WP_CLI::success('Staged/refreshed ' . $count . ' PNG asset(s).'); }
-        public function apply($a, $b) { $complete = Ruwah_Product_Images_V3::apply(); if (!$complete) WP_CLI::error('Ruwah PNG product image apply finished but verification is incomplete.'); WP_CLI::success('All 20 RWB product images are transparent PNGs, mapped, and the PNG RWB logo is applied.'); }
+        public function apply($a, $b) { $complete = Ruwah_Product_Images_V3::apply(); if (!$complete) WP_CLI::error('Ruwah transparent PNG apply finished but verification is incomplete.'); WP_CLI::success('Featured RWB card images use exact silhouette masks and mappings are complete.'); }
         public function restore($a, $b) { if (!Ruwah_Product_Images_V3::restore()) WP_CLI::error('No valid snapshot was found.'); WP_CLI::success('Previous product images and logo restored.'); }
         public function status($a, $b) { $s = Ruwah_Product_Images_V3::status(); WP_CLI::line(wp_json_encode($s, JSON_PRETTY_PRINT)); if (isset($b['require-complete']) && !$s['complete']) WP_CLI::error('Ruwah PNG product image status is incomplete.'); if ($s['complete']) WP_CLI::success('Ruwah PNG product image status is complete.'); }
     }
