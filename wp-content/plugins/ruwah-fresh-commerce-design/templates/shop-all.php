@@ -22,6 +22,14 @@ if ($editorial_product) {
     $editorial_id = (int) (end($editorial_ids) ?: $editorial_product->get_image_id());
 }
 
+$plugin_file = dirname(__DIR__) . '/ruwah-fresh-commerce-design.php';
+wp_enqueue_style(
+    'ruwah-reference-card-parity-shop',
+    plugins_url('assets/card-parity.css', $plugin_file),
+    [],
+    '6.5.0'
+);
+
 get_header();
 ?>
 <main id="main-content" class="rwb-dieux-shop" aria-labelledby="rwb-shop-all-title">
@@ -47,11 +55,6 @@ get_header();
         </article>
 
         <?php foreach ($products as $index => $product) :
-            $info = Ruwah_Fresh_Commerce_Design::product_info($product);
-            $reviews = (int) $product->get_review_count();
-            $rating = (float) $product->get_average_rating();
-            $badge = Ruwah_Fresh_Commerce_Design::product_badge($product, $index);
-            $current = (float) $product->get_price();
             $name_key = strtolower($product->get_name());
             $anchor = '';
             if (str_contains($name_key, 'triple action')) $anchor = 'serums';
@@ -59,30 +62,8 @@ get_header();
             elseif (str_contains($name_key, 'face wash')) $anchor = 'cleanse';
             elseif (str_contains($name_key, 'sun lotion')) $anchor = 'sun-care';
             ?>
-            <article class="rwb-dieux-product-card"<?php if ($anchor) : ?> id="<?php echo esc_attr($anchor); ?>"<?php endif; ?>>
-                <a class="rwb-dieux-product-media" href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="<?php echo esc_attr($product->get_name()); ?>">
-                    <?php if ($badge) : ?><span class="rwb-dieux-badge"><?php echo esc_html($badge); ?></span><?php endif; ?>
-                    <?php echo wp_kses_post($product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
-                </a>
-                <div class="rwb-dieux-product-copy">
-                    <h2><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($product->get_name()); ?></a></h2>
-                    <?php if (! empty($info['tagline'])) : ?><p class="rwb-dieux-product-tagline"><?php echo esc_html($info['tagline']); ?></p><?php endif; ?>
-                    <?php if ($reviews > 0) : ?>
-                        <div class="rwb-dieux-proof" aria-label="<?php echo esc_attr(number_format_i18n($rating, 1) . ' out of 5'); ?>"><span><?php echo esc_html(str_repeat('★', max(1, min(5, (int) round($rating))))); ?></span><small><?php echo esc_html((string) $reviews); ?></small></div>
-                    <?php else : ?>
-                        <div class="rwb-dieux-proof"><span>RUWAH FORMULA</span></div>
-                    <?php endif; ?>
-                    <?php if (! empty($info['size'])) : ?>
-                        <label class="rwb-dieux-size"><span class="screen-reader-text">Pack size</span><select aria-label="Pack size for <?php echo esc_attr($product->get_name()); ?>"><option><?php echo esc_html(strtoupper($info['size'])); ?></option></select></label>
-                    <?php endif; ?>
-                    <div class="rwb-dieux-action">
-                        <?php if ($product->is_type('simple') && $product->is_purchasable() && $product->is_in_stock()) : ?>
-                            <a rel="nofollow" class="add_to_cart_button ajax_add_to_cart" data-product_id="<?php echo esc_attr((string) $product->get_id()); ?>" data-product_sku="<?php echo esc_attr($product->get_sku()); ?>" data-quantity="1" href="<?php echo esc_url($product->add_to_cart_url()); ?>"><span>Add to Cart</span><span><?php echo wp_kses_post(wc_price($current, ['decimals' => 0])); ?></span></a>
-                        <?php else : ?>
-                            <a href="<?php echo esc_url($product->get_permalink()); ?>"><span>View Product</span><span><?php echo wp_kses_post(wc_price($current, ['decimals' => 0])); ?></span></a>
-                        <?php endif; ?>
-                    </div>
-                </div>
+            <article class="rwb-dieux-product-card rwb-commerce-card"<?php if ($anchor) : ?> id="<?php echo esc_attr($anchor); ?>"<?php endif; ?>>
+                <?php Ruwah_Fresh_Commerce_Design::render_card($product, (int) $index); ?>
             </article>
         <?php endforeach; ?>
     </section>
