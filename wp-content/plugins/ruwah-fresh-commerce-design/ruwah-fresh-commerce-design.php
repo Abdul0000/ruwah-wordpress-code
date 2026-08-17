@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial commerce experience for Ruwah Beauty using live WooCommerce products, pricing, stock, media and reviews.
- * Version: 6.4.1
+ * Version: 6.4.0
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '6.4.1';
+    private const VERSION = '6.4.0';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
@@ -122,7 +122,7 @@ final class Ruwah_Fresh_Commerce_Design {
         if (false === $css || '' === trim($css)) {
             return;
         }
-        wp_register_style($handle, false, [], self::VERSION);
+        wp_register_style($handle, false, ['rwb-theme'], self::VERSION);
         wp_enqueue_style($handle);
         wp_add_inline_style($handle, $css);
     }
