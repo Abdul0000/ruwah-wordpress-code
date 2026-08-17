@@ -80,6 +80,77 @@ function ruwah_product_card($product, $badge = '') {
     echo '</div></article>';
 }
 
+/* Compatibility layer used by the reference commerce templates. */
+if (!function_exists('rwb_product')) {
+    function rwb_product($product_id) {
+        if (!function_exists('wc_get_product')) return null;
+        $product = wc_get_product((int) $product_id);
+        return $product instanceof WC_Product ? $product : null;
+    }
+}
+
+if (!function_exists('rwb_products')) {
+    function rwb_products($limit = 5) {
+        if (!function_exists('wc_get_product')) return [];
+        $ids = [54, 62, 64, 60, 68];
+        $products = [];
+        foreach ($ids as $id) {
+            $product = wc_get_product($id);
+            if (!$product instanceof WC_Product) continue;
+            if ('publish' !== get_post_status($id) || !$product->is_visible()) continue;
+            $products[] = $product;
+        }
+        $limit = (int) $limit;
+        return $limit > 0 ? array_slice($products, 0, $limit) : $products;
+    }
+}
+
+if (!function_exists('rwb_info')) {
+    function rwb_info($product) {
+        if (!$product instanceof WC_Product) return null;
+        $tagline = trim(wp_strip_all_tags($product->get_short_description()));
+        if ('' === $tagline) {
+            $tagline = wp_trim_words(wp_strip_all_tags($product->get_description()), 24, '…');
+        }
+
+        $benefits = [];
+        $description = (string) $product->get_description();
+        if ($description && preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $description, $matches)) {
+            foreach ($matches[1] as $item) {
+                $item = trim(wp_strip_all_tags($item));
+                if ('' !== $item) $benefits[] = $item;
+            }
+        }
+        $benefits = array_values(array_unique(array_slice($benefits, 0, 4)));
+
+        $size = '';
+        foreach (['pa_size', 'size', 'pa_volume', 'volume'] as $attribute) {
+            $value = trim((string) $product->get_attribute($attribute));
+            if ('' !== $value) {
+                $size = $value;
+                break;
+            }
+        }
+
+        return [
+            'tagline' => $tagline,
+            'benefits' => $benefits,
+            'size' => $size,
+            'facts' => [],
+        ];
+    }
+}
+
+if (!function_exists('rwb_shop_url')) {
+    function rwb_shop_url() { return ruwah_shop_url(); }
+}
+if (!function_exists('rwb_cart_url')) {
+    function rwb_cart_url() { return ruwah_cart_url(); }
+}
+if (!function_exists('rwb_account_url')) {
+    function rwb_account_url() { return ruwah_account_url(); }
+}
+
 add_filter('woocommerce_add_to_cart_fragments', function ($fragments) {
     $count = function_exists('WC') && WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
     $fragments['.rwb-cart-count'] = '<span class="rwb-cart-count">' . esc_html((string) $count) . '</span>';
