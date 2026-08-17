@@ -1,8 +1,8 @@
 /* Ruwah Beauty — centralized shared product card parity v6.5 */
 .rwb-commerce-card{min-width:0;display:flex;flex-direction:column;background:transparent}
-.rwb-commerce-card-media{position:relative;aspect-ratio:1/1.04;display:grid;place-items:center;overflow:hidden;background:#e5ebec}
-.rwb-reference-commerce-v6 ul.products .rwb-commerce-card-media{background:#e5ebec!important}
-.rwb-commerce-card-media img{width:84%!important;height:84%!important;max-width:none!important;margin:0!important;padding:0!important;object-fit:contain!important;background:transparent!important;transition:transform .24s ease}
+.rwb-commerce-card-media{position:relative;aspect-ratio:1/1.04;display:grid;place-items:center;overflow:hidden;background:#DFE5E6!important}
+.rwb-reference-commerce-v6 ul.products .rwb-commerce-card-media{background:#DFE5E6!important}
+.rwb-commerce-card-media img{width:84%!important;height:84%!important;max-width:none!important;margin:0!important;padding:0!important;object-fit:contain!important;background:transparent!important;box-shadow:none!important;transition:transform .24s ease}
 .rwb-commerce-card:hover .rwb-commerce-card-media img{transform:scale(1.018)}
 .rwb-commerce-badge{left:12px;top:12px;padding:6px 9px;border:1px solid rgba(17,17,17,.56);background:rgba(247,243,233,.96);color:#111;font-size:9px;font-weight:500;line-height:1;letter-spacing:.055em;text-transform:uppercase}
 .rwb-commerce-card-copy{display:flex;flex:1;flex-direction:column;padding-top:13px}
