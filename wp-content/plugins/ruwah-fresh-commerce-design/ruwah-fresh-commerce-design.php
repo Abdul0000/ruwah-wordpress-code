@@ -107,6 +107,17 @@ final class Ruwah_Fresh_Commerce_Design {
         if (self::is_commerce_surface()) {
             self::inline_style('ruwah-reference-commerce', __DIR__ . '/assets/commerce.css');
             self::inline_style('ruwah-reference-card-parity', __DIR__ . '/assets/card-parity.css');
+            if (function_exists('is_product') && is_product()) {
+                self::inline_style('ruwah-dieux-pdp', __DIR__ . '/assets/pdp-dieux.css');
+                wp_enqueue_script(
+                    'ruwah-dieux-pdp',
+                    plugins_url('assets/pdp-dieux.js', __FILE__),
+                    ['jquery'],
+                    self::VERSION,
+                    true
+                );
+                wp_script_add_data('ruwah-dieux-pdp', 'strategy', 'defer');
+            }
             if (function_exists('is_cart') && is_cart()) {
                 self::inline_style('ruwah-reference-cart', __DIR__ . '/assets/cart.css');
             }
