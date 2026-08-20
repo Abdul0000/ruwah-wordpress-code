@@ -100,3 +100,7 @@
 .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-accordions summary b::before{width:14px;height:1px}
 .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-accordions summary b::after{width:1px;height:14px}
 .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-accordions details[open] summary b{transform:none!important}
+
+/* Breathing room between the site header and the PDP content. */
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp{padding-top:24px}
+@media(max-width:720px){.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp{padding-top:18px}}
