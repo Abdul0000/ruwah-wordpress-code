@@ -236,3 +236,19 @@ add_action('wp_head', function () {
     echo '<link rel="icon" href="' . esc_url($logo_url) . '">' . "\n";
     echo '<link rel="shortcut icon" href="' . esc_url($logo_url) . '">' . "\n";
 }, 100);
+
+/* Home hero: keep the original purple logo while improving contrast over photography. */
+add_action('wp_head', function () {
+    if (! is_front_page()) return;
+    ?>
+    <style id="rwb-home-hero-logo-contrast-v1">
+    body.rwb-reference-home-v5.home .rwb-ref-header:not(.compact) .rwb-brand{position:relative;isolation:isolate;padding:0 12px}
+    body.rwb-reference-home-v5.home .rwb-ref-header:not(.compact) .rwb-brand:before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:235px;height:104px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center,rgba(247,243,233,.64) 0%,rgba(247,243,233,.34) 48%,rgba(247,243,233,.10) 66%,rgba(247,243,233,0) 79%);filter:blur(5px);pointer-events:none}
+    body.rwb-reference-home-v5.home .rwb-ref-header:not(.compact) .rwb-brand .custom-logo-link{filter:none!important}
+    body.rwb-reference-home-v5.home .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{opacity:1!important;filter:drop-shadow(0 1px 0 rgba(255,255,255,.42)) drop-shadow(0 4px 11px rgba(15,10,18,.34))!important}
+    body.rwb-reference-home-v5.home .rwb-ref-header.compact .rwb-brand:before{display:none!important}
+    body.rwb-reference-home-v5.home .rwb-ref-header.compact .rwb-brand .custom-logo{filter:none!important}
+    @media(max-width:782px){body.rwb-reference-home-v5.home .rwb-ref-header:not(.compact) .rwb-brand{padding:0 7px}body.rwb-reference-home-v5.home .rwb-ref-header:not(.compact) .rwb-brand:before{width:154px;height:72px;filter:blur(3px)}}
+    </style>
+    <?php
+}, 999);
