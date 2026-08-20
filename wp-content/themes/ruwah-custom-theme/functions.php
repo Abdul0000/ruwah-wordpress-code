@@ -182,3 +182,57 @@ JS;
     $js = str_replace('RWB_FRAGMENT_ENDPOINT', esc_js($endpoint), $js);
     wp_add_inline_script('rwb-theme', $js, 'after');
 }, 80);
+
+/* Official Ruwah pricing sheet v3: live/current price + struck-through website price. */
+function ruwah_official_price_sheet_v3() {
+    return [
+        60 => ['current' => '1500', 'regular' => '1800'],
+        68 => ['current' => '1600', 'regular' => '1920'],
+        62 => ['current' => '1999', 'regular' => '2399'],
+        64 => ['current' => '2200', 'regular' => '2640'],
+        54 => ['current' => '2200', 'regular' => '2640'],
+    ];
+}
+
+function ruwah_official_price_for_product($product) {
+    if (!$product instanceof WC_Product) return null;
+    $id = (int) $product->get_id();
+    if ($product->is_type('variation')) {
+        $id = (int) $product->get_parent_id();
+    }
+    $sheet = ruwah_official_price_sheet_v3();
+    return $sheet[$id] ?? null;
+}
+
+add_filter('woocommerce_product_get_regular_price', function ($price, $product) {
+    $row = ruwah_official_price_for_product($product);
+    return $row ? $row['regular'] : $price;
+}, 50, 2);
+add_filter('woocommerce_product_get_sale_price', function ($price, $product) {
+    $row = ruwah_official_price_for_product($product);
+    return $row ? $row['current'] : $price;
+}, 50, 2);
+add_filter('woocommerce_product_get_price', function ($price, $product) {
+    $row = ruwah_official_price_for_product($product);
+    return $row ? $row['current'] : $price;
+}, 50, 2);
+add_filter('woocommerce_product_variation_get_regular_price', function ($price, $product) {
+    $row = ruwah_official_price_for_product($product);
+    return $row ? $row['regular'] : $price;
+}, 50, 2);
+add_filter('woocommerce_product_variation_get_sale_price', function ($price, $product) {
+    $row = ruwah_official_price_for_product($product);
+    return $row ? $row['current'] : $price;
+}, 50, 2);
+add_filter('woocommerce_product_variation_get_price', function ($price, $product) {
+    $row = ruwah_official_price_for_product($product);
+    return $row ? $row['current'] : $price;
+}, 50, 2);
+
+/* Use the authoritative current Ruwah logo as the browser/site icon too. */
+add_action('wp_head', function () {
+    $logo_url = wp_get_attachment_image_url(262, 'full');
+    if (!$logo_url) return;
+    echo '<link rel="icon" href="' . esc_url($logo_url) . '">' . "\n";
+    echo '<link rel="shortcut icon" href="' . esc_url($logo_url) . '">' . "\n";
+}, 100);
