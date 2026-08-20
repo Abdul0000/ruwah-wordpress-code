@@ -1,6 +1,6 @@
 /* Ruwah Beauty — Privacy Policy editorial layout. Dedicated page classes only. */
 .rwb-policy-page{width:100%;overflow:hidden;background:#f7f3e9!important;color:#111!important}
-.rwb-policy-page .rwb-policy-shell{width:100%!important;max-width:none!important;margin:0!important;padding-left:2in!important;padding-right:2in!important;box-sizing:border-box!important}
+.rwb-policy-page .rwb-policy-shell{width:100%!important;max-width:none!important;margin:0!important;padding-left:1in!important;padding-right:1in!important;box-sizing:border-box!important}
 .rwb-policy-page .rwb-policy-hero{padding:62px 0 44px;border-bottom:1px solid rgba(17,17,17,.18);background:#f7f3e9!important}
 .rwb-policy-page .rwb-policy-kicker{margin:0 0 24px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1;letter-spacing:.07em;text-transform:uppercase}
 .rwb-policy-page .rwb-policy-hero h1{max-width:900px;margin:0!important;color:#111!important;font-family:var(--serif,Georgia,serif)!important;font-size:clamp(58px,6vw,94px)!important;font-weight:400!important;line-height:.9!important;letter-spacing:-.045em!important}

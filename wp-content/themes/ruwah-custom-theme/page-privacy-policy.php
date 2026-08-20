@@ -4,17 +4,10 @@
  */
 defined('ABSPATH') || exit;
 
-$privacy_css = get_template_directory() . '/assets/privacy-policy.css';
-wp_enqueue_style(
-    'rwb-privacy-policy',
-    get_template_directory_uri() . '/assets/privacy-policy.css',
-    [],
-    is_readable($privacy_css) ? (string) filemtime($privacy_css) : (defined('RUWAH_THEME_VERSION') ? RUWAH_THEME_VERSION : null)
-);
-
+/* Privacy CSS is inlined by header.php on this page to avoid host-level 403s on the standalone stylesheet URL. */
 get_header();
 ?>
-<main class="rwb-policy-page" id="main-content">
+<div class="rwb-policy-page">
     <section class="rwb-policy-hero">
         <div class="rwb-policy-shell rwb-policy-shell--wide">
             <p class="rwb-policy-kicker">RUWAH BEAUTY · PRIVACY</p>
@@ -68,5 +61,5 @@ get_header();
             </article>
         </div>
     </section>
-</main>
+</div>
 <?php get_footer(); ?>
