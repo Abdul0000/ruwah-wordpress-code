@@ -93,3 +93,10 @@
 .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-action-strip{gap:7px}
 .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-action-strip button{flex-basis:74px;width:74px;height:90px}
 }
+
+/* Minimal two-stroke accordion plus: exactly one horizontal and one vertical line. */
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-accordions summary b{position:relative!important;display:block!important;flex:0 0 14px!important;width:14px!important;height:14px!important;overflow:visible!important;font-size:0!important;line-height:0!important;color:transparent!important;transform:none!important}
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-accordions summary b::before,.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-accordions summary b::after{content:"";position:absolute;left:50%;top:50%;display:block;background:#111;transform:translate(-50%,-50%)}
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-accordions summary b::before{width:14px;height:1px}
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-accordions summary b::after{width:1px;height:14px}
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-accordions details[open] summary b{transform:none!important}
