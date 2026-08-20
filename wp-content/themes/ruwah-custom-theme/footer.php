@@ -1,3 +1,12 @@
+<?php
+$ruwah_product_cleanup = __DIR__ . '/includes/product-62-image-cleanup.php';
+if (is_readable($ruwah_product_cleanup)) {
+    require_once $ruwah_product_cleanup;
+    if (function_exists('ruwah_product_62_remove_baked_floor')) {
+        ruwah_product_62_remove_baked_floor();
+    }
+}
+?>
 </main>
 <style id="rwb-contact-dock-server-styles">
 .rwb-contact-dock{position:fixed;right:22px;bottom:max(22px,env(safe-area-inset-bottom));z-index:125;display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-family:Inter,Arial,sans-serif}
