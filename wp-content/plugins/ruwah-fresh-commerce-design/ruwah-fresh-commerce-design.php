@@ -19,6 +19,9 @@ final class Ruwah_Fresh_Commerce_Design {
         add_filter('wc_get_template_part', [self::class, 'woocommerce_template_part'], 999, 3);
         add_action('wp_enqueue_scripts', [self::class, 'assets'], 999);
         add_filter('body_class', [self::class, 'body_class']);
+        add_filter('woocommerce_currency', [self::class, 'currency_code'], 99);
+        add_filter('woocommerce_currency_symbol', [self::class, 'currency_symbol'], 99, 2);
+        add_filter('woocommerce_price_format', [self::class, 'price_format'], 99, 2);
         add_filter('wc_price_args', [self::class, 'price_args'], 20);
         add_action('wp_footer', [self::class, 'reference_footer'], 5);
     }
@@ -161,6 +164,18 @@ final class Ruwah_Fresh_Commerce_Design {
             }
         }
         return $classes;
+    }
+
+    public static function currency_code(string $currency): string {
+        return 'PKR';
+    }
+
+    public static function currency_symbol(string $symbol, string $currency = ''): string {
+        return 'PKR' === $currency ? 'PKR' : $symbol;
+    }
+
+    public static function price_format(string $format, string $currency_pos = ''): string {
+        return '%1$s&nbsp;%2$s';
     }
 
     public static function price_args(array $args): array {
