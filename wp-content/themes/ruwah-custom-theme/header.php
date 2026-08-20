@@ -11,7 +11,32 @@ $cart_url = function_exists('ruwah_cart_url') ? ruwah_cart_url() : home_url('/ca
 <meta charset="<?php bloginfo('charset'); ?>">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script>document.documentElement.classList.add('rwb-js');</script>
-<?php wp_head(); ?>
+<?php
+/* Replace the legacy WordPress site icon with the active Ruwah brand logo. */
+remove_action('wp_head', 'wp_site_icon', 99);
+wp_head();
+
+$rwb_logo_id = (int) get_theme_mod('custom_logo', 0);
+$rwb_logo_url = $rwb_logo_id ? wp_get_attachment_url($rwb_logo_id) : '';
+if ($rwb_logo_url) {
+    $rwb_favicon_url = add_query_arg('rwb-favicon', '20260820', $rwb_logo_url);
+    echo '<link rel="icon" href="' . esc_url($rwb_favicon_url) . '">';
+    echo '<link rel="shortcut icon" href="' . esc_url($rwb_favicon_url) . '">';
+    echo '<link rel="apple-touch-icon" href="' . esc_url($rwb_favicon_url) . '">';
+}
+
+/* Host security blocks direct requests to this page-specific CSS asset.
+ * Inline the trusted local stylesheet so Privacy Policy styling is guaranteed. */
+if (is_page('privacy-policy')) {
+    $rwb_privacy_css = get_template_directory() . '/assets/privacy-policy.css';
+    if (is_readable($rwb_privacy_css)) {
+        $rwb_privacy_rules = file_get_contents($rwb_privacy_css);
+        if (false !== $rwb_privacy_rules && '' !== trim($rwb_privacy_rules)) {
+            echo '<style id="rwb-privacy-policy-inline">' . $rwb_privacy_rules . '</style>';
+        }
+    }
+}
+?>
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
