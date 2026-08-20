@@ -93,9 +93,12 @@ body.rwb-reference-checkout-v1 .rwb-ref-checkout-body .select2-container{width:1
 body.rwb-reference-checkout-v1 .rwb-ref-checkout-body .select2-container .select2-selection--single{height:56px!important;border:1px solid #cfc5d2!important;border-radius:0!important;background:#fffdfa!important;box-shadow:none!important}
 body.rwb-reference-checkout-v1 .rwb-ref-checkout-body .select2-container .select2-selection--single .select2-selection__rendered{height:56px!important;line-height:33px!important}
 body.rwb-reference-checkout-v1 .rwb-ref-checkout-body .select2-container .select2-selection--single .select2-selection__arrow{height:54px!important}
-body.rwb-reference-checkout-v1 .rwb-checkout-coupon{grid-template-columns:minmax(0,1fr) 96px!important;gap:10px!important}
+body.rwb-reference-checkout-v1 .rwb-checkout-coupon{grid-template-columns:1fr!important;row-gap:12px!important;column-gap:0!important}
+body.rwb-reference-checkout-v1 .rwb-checkout-coupon .form-row-first{width:100%!important}
+body.rwb-reference-checkout-v1 .rwb-checkout-coupon .form-row-last{width:auto!important;margin-top:0!important;justify-self:start!important}
 body.rwb-reference-checkout-v1 .rwb-checkout-coupon input,body.rwb-reference-checkout-v1 .rwb-checkout-coupon button{height:56px!important;min-height:56px!important;border-radius:0!important}
 body.rwb-reference-checkout-v1 .rwb-checkout-coupon input{width:100%!important;border-color:#cfc5d2!important;background:#fffdfa!important}
+body.rwb-reference-checkout-v1 .rwb-checkout-coupon button{width:auto!important;min-width:110px!important;padding:0 22px!important}
 body.rwb-reference-checkout-v1 .rwb-ref-checkout-body #payment div.payment_box{min-height:56px!important;display:flex!important;align-items:center!important;border-color:#d8cedb!important;border-radius:0!important;background:#fffdfa!important}
 body.rwb-reference-checkout-v1 .rwb-ref-checkout-body #place_order{border-radius:0!important}
 body.rwb-reference-checkout-v1 .rwb-ref-checkout-body #order_review{border-radius:0!important;box-shadow:0 18px 46px rgba(55,37,67,.07)!important}
