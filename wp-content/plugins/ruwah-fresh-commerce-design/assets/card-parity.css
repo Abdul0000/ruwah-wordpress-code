@@ -12,7 +12,10 @@
 .rwb-commerce-card-rating,.rwb-commerce-card-proof{min-height:24px;display:flex;align-items:center;gap:6px;margin-top:5px;color:#111;font-size:10px;letter-spacing:.035em;text-transform:uppercase}
 .rwb-commerce-card-rating small{font-size:9px}
 .rwb-commerce-card-proof{font-weight:500;letter-spacing:.075em}
-.rwb-commerce-card-sale{display:none!important}
+.rwb-commerce-card-sale{min-height:26px;display:flex!important;flex-direction:row-reverse;justify-content:flex-end;align-items:baseline;gap:8px;margin-top:5px;font-size:10px;line-height:1}
+.rwb-commerce-card-sale ins{color:#111;text-decoration:none;font-weight:500}
+.rwb-commerce-card-sale del{color:#6f6b66;font-weight:400;text-decoration-thickness:1px}
+.rwb-commerce-card-sale .woocommerce-Price-amount{font-size:inherit!important;white-space:nowrap}
 .rwb-commerce-size{display:block;margin-top:auto!important;padding-top:9px!important}
 .rwb-commerce-size select{width:100%;height:38px!important;min-height:38px!important;padding:0 32px 0 10px!important;border:1px solid rgba(17,17,17,.4)!important;border-radius:0!important;background:rgba(255,255,255,.34)!important;color:#111!important;font-size:9px!important;font-weight:400!important;letter-spacing:.02em!important}
 .rwb-commerce-card-action{margin-top:7px}
@@ -25,5 +28,5 @@
 .rwb-commerce-pair-grid{gap:0!important;border-top:1px solid rgba(17,17,17,.16);border-left:1px solid rgba(17,17,17,.16)}
 .rwb-commerce-pair-grid .rwb-commerce-card{padding:14px 14px 12px!important;border-right:1px solid rgba(17,17,17,.16);border-bottom:1px solid rgba(17,17,17,.16)}
 .rwb-dieux-catalog .rwb-dieux-product-card.rwb-commerce-card{padding:14px 14px 12px;background:#f7f3e9}
-@media(max-width:720px){.rwb-reference-commerce-v6 .rwb-commerce>.rwb-shell{width:calc(100% - 24px)!important}.rwb-commerce-card-copy h3{min-height:0!important;font-size:16px!important}.rwb-commerce-card-tagline{min-height:0!important;font-size:9px!important}.rwb-commerce-card-rating,.rwb-commerce-card-proof{font-size:10px}.rwb-commerce-size select{height:40px!important;min-height:40px!important;font-size:10px!important}.rwb-commerce-add{min-height:44px!important;font-size:10px!important}.rwb-commerce-badge{font-size:9px}}
+@media(max-width:720px){.rwb-reference-commerce-v6 .rwb-commerce>.rwb-shell{width:calc(100% - 24px)!important}.rwb-commerce-card-copy h3{min-height:0!important;font-size:16px!important}.rwb-commerce-card-tagline{min-height:0!important;font-size:9px!important}.rwb-commerce-card-rating,.rwb-commerce-card-proof{font-size:10px}.rwb-commerce-card-sale{min-height:24px;font-size:10px}.rwb-commerce-size select{height:40px!important;min-height:40px!important;font-size:10px!important}.rwb-commerce-add{min-height:44px!important;font-size:10px!important}.rwb-commerce-badge{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.rwb-commerce-card-media img{transition:none!important}.rwb-commerce-card:hover .rwb-commerce-card-media img{transform:none!important}}
