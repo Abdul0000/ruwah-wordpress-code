@@ -322,3 +322,130 @@ final class Ruwah_Fresh_Commerce_Design {
 }
 
 Ruwah_Fresh_Commerce_Design::boot();
+
+if (! function_exists('rwb_checkout_value')) {
+    function rwb_checkout_value(array $data, string $key): string {
+        return isset($data[$key]) ? trim(wp_strip_all_tags((string) $data[$key])) : '';
+    }
+}
+
+if (! function_exists('rwb_checkout_length')) {
+    function rwb_checkout_length(string $value): int {
+        return function_exists('mb_strlen') ? (int) mb_strlen($value) : strlen($value);
+    }
+}
+
+if (! function_exists('rwb_checkout_validate_name')) {
+    function rwb_checkout_validate_name(array $data, WP_Error $errors, string $key, string $label): void {
+        $value = rwb_checkout_value($data, $key);
+        if ('' === $value) return;
+        $length = rwb_checkout_length($value);
+        if ($length < 2 || $length > 60 || ! preg_match("/^[\\p{L}\\p{M}][\\p{L}\\p{M}\\s.'-]*$/u", $value)) {
+            $errors->add('rwb_' . $key . '_invalid', sprintf('Please enter a valid %s using letters only.', $label));
+        }
+    }
+}
+
+if (! function_exists('rwb_checkout_validate_address')) {
+    function rwb_checkout_validate_address(array $data, WP_Error $errors, string $key, string $label): void {
+        $value = rwb_checkout_value($data, $key);
+        if ('' === $value) return;
+        $length = rwb_checkout_length($value);
+        $tokens = preg_split('/[\\s,\\/-]+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
+        if ($length < 8 || $length > 160 || ! preg_match('/\\p{L}/u', $value) || count((array) $tokens) < 2) {
+            $errors->add('rwb_' . $key . '_invalid', sprintf('Please enter a complete %s with street/area details.', $label));
+        }
+    }
+}
+
+if (! function_exists('rwb_checkout_validate_city')) {
+    function rwb_checkout_validate_city(array $data, WP_Error $errors, string $key, string $label): void {
+        $value = rwb_checkout_value($data, $key);
+        if ('' === $value) return;
+        $length = rwb_checkout_length($value);
+        if ($length < 2 || $length > 80 || ! preg_match("/^[\\p{L}\\p{M}][\\p{L}\\p{M}\\s.'-]*$/u", $value)) {
+            $errors->add('rwb_' . $key . '_invalid', sprintf('Please enter a valid %s.', $label));
+        }
+    }
+}
+
+if (! function_exists('rwb_checkout_validate_postcode')) {
+    function rwb_checkout_validate_postcode(array $data, WP_Error $errors, string $key, string $country_key, string $label): void {
+        $value = rwb_checkout_value($data, $key);
+        if ('' === $value) return;
+        $country = strtoupper(rwb_checkout_value($data, $country_key));
+        if ('PK' === $country) {
+            if (! preg_match('/^\\d{5}$/', $value)) {
+                $errors->add('rwb_' . $key . '_invalid', sprintf('%s must be a 5-digit Pakistan postal code.', $label));
+            }
+            return;
+        }
+        if (rwb_checkout_length($value) > 12 || ! preg_match('/^[A-Za-z0-9 -]+$/', $value)) {
+            $errors->add('rwb_' . $key . '_invalid', sprintf('Please enter a valid %s.', $label));
+        }
+    }
+}
+
+if (! function_exists('rwb_checkout_validate_phone')) {
+    function rwb_checkout_validate_phone(array $data, WP_Error $errors): void {
+        $phone = rwb_checkout_value($data, 'billing_phone');
+        if ('' === $phone) return;
+        $country = strtoupper(rwb_checkout_value($data, 'billing_country')) ?: 'PK';
+        $digits = preg_replace('/\\D+/', '', $phone);
+        if ('PK' === $country) {
+            $valid = (bool) preg_match('/^(?:03\\d{9}|923\\d{9}|3\\d{9})$/', (string) $digits);
+            if (! $valid) {
+                $errors->add('rwb_billing_phone_invalid', 'Please enter a valid Pakistani mobile number, e.g. 03001234567 or +923001234567.');
+            }
+            return;
+        }
+        $length = strlen((string) $digits);
+        if ($length < 7 || $length > 15) {
+            $errors->add('rwb_billing_phone_invalid', 'Please enter a valid phone number including country code when needed.');
+        }
+    }
+}
+
+if (! function_exists('rwb_validate_checkout_contact_fields')) {
+    function rwb_validate_checkout_contact_fields(array $data, WP_Error $errors): void {
+        rwb_checkout_validate_name($data, $errors, 'billing_first_name', 'first name');
+        rwb_checkout_validate_name($data, $errors, 'billing_last_name', 'last name');
+        rwb_checkout_validate_address($data, $errors, 'billing_address_1', 'billing address');
+        rwb_checkout_validate_city($data, $errors, 'billing_city', 'billing city');
+        rwb_checkout_validate_postcode($data, $errors, 'billing_postcode', 'billing_country', 'Billing postcode');
+        rwb_checkout_validate_phone($data, $errors);
+
+        if (! empty($data['ship_to_different_address'])) {
+            rwb_checkout_validate_name($data, $errors, 'shipping_first_name', 'shipping first name');
+            rwb_checkout_validate_name($data, $errors, 'shipping_last_name', 'shipping last name');
+            rwb_checkout_validate_address($data, $errors, 'shipping_address_1', 'shipping address');
+            rwb_checkout_validate_city($data, $errors, 'shipping_city', 'shipping city');
+            rwb_checkout_validate_postcode($data, $errors, 'shipping_postcode', 'shipping_country', 'Shipping postcode');
+        }
+    }
+}
+add_action('woocommerce_after_checkout_validation', 'rwb_validate_checkout_contact_fields', 20, 2);
+
+if (! function_exists('rwb_checkout_field_hints')) {
+    function rwb_checkout_field_hints(array $fields): array {
+        if (isset($fields['billing']['billing_phone'])) {
+            $fields['billing']['billing_phone']['type'] = 'tel';
+            $fields['billing']['billing_phone']['placeholder'] = '03001234567';
+            $fields['billing']['billing_phone']['autocomplete'] = 'tel';
+            $fields['billing']['billing_phone']['custom_attributes']['inputmode'] = 'tel';
+            $fields['billing']['billing_phone']['custom_attributes']['maxlength'] = '18';
+        }
+        foreach (['billing_first_name','billing_last_name'] as $key) {
+            if (isset($fields['billing'][$key])) $fields['billing'][$key]['custom_attributes']['maxlength'] = '60';
+        }
+        if (isset($fields['billing']['billing_address_1'])) $fields['billing']['billing_address_1']['custom_attributes']['maxlength'] = '160';
+        if (isset($fields['billing']['billing_city'])) $fields['billing']['billing_city']['custom_attributes']['maxlength'] = '80';
+        foreach (['shipping_first_name','shipping_last_name'] as $key) {
+            if (isset($fields['shipping'][$key])) $fields['shipping'][$key]['custom_attributes']['maxlength'] = '60';
+        }
+        if (isset($fields['shipping']['shipping_address_1'])) $fields['shipping']['shipping_address_1']['custom_attributes']['maxlength'] = '160';
+        if (isset($fields['shipping']['shipping_city'])) $fields['shipping']['shipping_city']['custom_attributes']['maxlength'] = '80';
+        return $fields;
+    }
+}
+add_filter('woocommerce_checkout_fields', 'rwb_checkout_field_hints', 50);
