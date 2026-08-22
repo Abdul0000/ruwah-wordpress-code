@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial commerce experience for Ruwah Beauty using live WooCommerce products, pricing, stock, media and reviews.
- * Version: 6.4.0
+ * Version: 6.4.1
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '6.4.0';
+    private const VERSION = '6.4.1';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
@@ -143,6 +143,25 @@ final class Ruwah_Fresh_Commerce_Design {
         return ['tagline' => wp_strip_all_tags($product->get_short_description()), 'benefits' => [], 'size' => '', 'facts' => []];
     }
 
+    public static function display_copy(WC_Product $product): array {
+        $info = self::product_info($product);
+        $map = [
+            54 => ['name' => 'Triple Action Serum', 'tagline' => 'A brightening and hydrating serum with Vitamin C, Niacinamide and Hyaluronic Acid.', 'benefits' => ['Vitamin C for visible radiance', 'Niacinamide for tone and barrier support', 'Hyaluronic Acid for deep hydration']],
+            62 => ['name' => 'Rice Whitening Cream', 'tagline' => 'A brightening rice cream with Rice Extract, Glutathione, Vitamin C, Niacinamide and Alpha Arbutin.', 'benefits' => ['Rice Extract for brightening care', 'Glutathione and Vitamin C for radiance', 'Niacinamide and Alpha Arbutin for even-looking tone']],
+            64 => ['name' => 'Rice Glow Serum', 'tagline' => 'A lightweight glow serum with Vitamin C, Niacinamide and Hyaluronic Acid for brighter-looking, hydrated skin.', 'benefits' => ['Vitamin C for visible radiance', 'Niacinamide for tone support', 'Hyaluronic Acid for hydration']],
+            60 => ['name' => 'Rice Brightening Face Wash', 'tagline' => 'A gentle rice-based face wash for daily cleansing and a brighter, refreshed-looking complexion.', 'benefits' => ['Rice-based daily cleansing', 'Helps remove daily buildup', 'Leaves skin feeling fresh and comfortable']],
+            68 => ['name' => 'Rice Glow Sun Lotion', 'tagline' => 'A lightweight daily sun lotion designed to protect while keeping skin comfortable and radiant-looking.', 'benefits' => ['Lightweight daily sun care', 'Comfortable skin feel', 'Radiant-looking finish']],
+        ];
+        $override = $map[(int) $product->get_id()] ?? [];
+        return [
+            'name' => (string) ($override['name'] ?? $product->get_name()),
+            'tagline' => (string) ($override['tagline'] ?? ($info['tagline'] ?? '')),
+            'benefits' => (array) ($override['benefits'] ?? ($info['benefits'] ?? [])),
+            'size' => (string) ($info['size'] ?? ''),
+            'facts' => (array) ($info['facts'] ?? []),
+        ];
+    }
+
     public static function product_badge(WC_Product $product, int $rank = 0): string {
         if (! $product->is_in_stock()) return 'OUT OF STOCK';
         if ($product->is_on_sale()) return 'OFFER';
@@ -150,18 +169,18 @@ final class Ruwah_Fresh_Commerce_Design {
     }
 
     public static function render_card(WC_Product $product, int $rank = 0): void {
-        $info = self::product_info($product); $reviews = (int) $product->get_review_count(); $rating = (float) $product->get_average_rating();
+        $info = self::display_copy($product); $reviews = (int) $product->get_review_count(); $rating = (float) $product->get_average_rating();
         $badge = self::product_badge($product, $rank); $regular = (float) $product->get_regular_price(); $current = (float) $product->get_price(); ?>
-        <a class="rwb-commerce-card-media" href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="<?php echo esc_attr($product->get_name()); ?>">
+        <a class="rwb-commerce-card-media" href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="<?php echo esc_attr($info['name']); ?>">
             <?php if ($badge) : ?><span class="rwb-commerce-badge"><?php echo esc_html($badge); ?></span><?php endif; ?>
             <?php echo wp_kses_post($product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
         </a>
         <div class="rwb-commerce-card-copy">
-            <h3><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($product->get_name()); ?></a></h3>
+            <h3><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($info['name']); ?></a></h3>
             <?php if (! empty($info['tagline'])) : ?><p class="rwb-commerce-card-tagline"><?php echo esc_html($info['tagline']); ?></p><?php endif; ?>
             <?php if ($reviews > 0) : ?><div class="rwb-commerce-card-rating" aria-label="<?php echo esc_attr(number_format_i18n($rating, 1) . ' out of 5'); ?>"><span><?php echo esc_html(str_repeat('★', max(1, min(5, (int) round($rating))))); ?></span><small><?php echo esc_html((string) $reviews); ?></small></div><?php else : ?><div class="rwb-commerce-card-proof">RUWAH FORMULA</div><?php endif; ?>
             <?php if ($product->is_on_sale() && $regular > 0 && $current < $regular) : ?><div class="rwb-commerce-card-sale"><del><?php echo wp_kses_post(wc_price($regular, ['decimals' => 0])); ?></del><ins><?php echo wp_kses_post(wc_price($current, ['decimals' => 0])); ?></ins></div><?php endif; ?>
-            <?php if (! empty($info['size'])) : ?><label class="rwb-commerce-size"><span class="screen-reader-text">Pack size</span><select aria-label="Pack size for <?php echo esc_attr($product->get_name()); ?>"><option><?php echo esc_html(strtoupper($info['size'])); ?></option></select></label><?php endif; ?>
+            <?php if (! empty($info['size'])) : ?><label class="rwb-commerce-size"><span class="screen-reader-text">Pack size</span><select aria-label="Pack size for <?php echo esc_attr($info['name']); ?>"><option><?php echo esc_html(strtoupper($info['size'])); ?></option></select></label><?php endif; ?>
             <div class="rwb-commerce-card-action">
                 <?php if ($product->is_type('simple') && $product->is_purchasable() && $product->is_in_stock()) : ?><a rel="nofollow" class="rwb-commerce-add add_to_cart_button ajax_add_to_cart" data-product_id="<?php echo esc_attr((string) $product->get_id()); ?>" data-product_sku="<?php echo esc_attr($product->get_sku()); ?>" data-quantity="1" href="<?php echo esc_url($product->add_to_cart_url()); ?>"><span>Add to Cart</span><span><?php echo wp_kses_post(wc_price($current, ['decimals' => 0])); ?></span></a><?php else : ?><a class="rwb-commerce-add" href="<?php echo esc_url($product->get_permalink()); ?>"><span>View Product</span><span><?php echo wp_kses_post(wc_price($current, ['decimals' => 0])); ?></span></a><?php endif; ?>
             </div>
@@ -189,7 +208,7 @@ final class Ruwah_Fresh_Commerce_Design {
         <footer class="rwb-dieux-footer" id="rwb-reference-footer">
             <div class="rwb-dieux-footer-main">
                 <section class="rwb-dieux-footer-signup" aria-labelledby="rwb-footer-signup-title"><h2 id="rwb-footer-signup-title">Get Ruwah-y</h2><form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"><input type="hidden" name="action" value="rwb_newsletter"><?php wp_nonce_field('rwb_newsletter', 'rwb_nonce'); ?><label class="screen-reader-text" for="rwb-dieux-footer-email">Email address</label><div class="rwb-dieux-footer-form"><input id="rwb-dieux-footer-email" type="email" name="email" required placeholder="My email address is"><button type="submit">Initiate Me</button></div></form><div class="rwb-dieux-footer-socials" aria-label="Ruwah social channels"><span aria-label="Facebook">f</span><span aria-label="Instagram">◎</span><span aria-label="TikTok">♪</span></div></section>
-                <section class="rwb-dieux-footer-col"><h2>Shop</h2><?php foreach ($products as $product) : ?><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($product->get_name()); ?></a><?php endforeach; ?><a href="<?php echo esc_url($shop_url); ?>">Shop All</a></section>
+                <section class="rwb-dieux-footer-col"><h2>Shop</h2><?php foreach ($products as $product) : $copy = self::display_copy($product); ?><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($copy['name']); ?></a><?php endforeach; ?><a href="<?php echo esc_url($shop_url); ?>">Shop All</a></section>
                 <section class="rwb-dieux-footer-col"><h2>Learn</h2><a href="<?php echo esc_url(home_url('/#rwb-genesis')); ?>">Our Genesis</a><a href="<?php echo esc_url(home_url('/#rwb-standard')); ?>">The Ruwah Standard</a><a href="<?php echo esc_url(home_url('/#rituals')); ?>">Rituals</a><a href="<?php echo esc_url($shop_url); ?>">Formula Guide</a></section>
                 <section class="rwb-dieux-footer-col"><h2>Contact</h2><a href="<?php echo esc_url($contact_url); ?>">Contact Us</a><?php if ($privacy_url) : ?><a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a><?php endif; ?><a href="<?php echo esc_url($account_url); ?>">My Account</a><a href="<?php echo esc_url($shop_url); ?>">Shopping Bag</a></section>
                 <section class="rwb-dieux-footer-promise"><h2>Our Promise</h2><div class="rwb-dieux-promise-mark" aria-hidden="true"><span>◉</span><b>RUWAH<br>PROMISE</b></div><p>Exact pack details.<br>Live price &amp; stock.<br>No filler claims.</p></section>
