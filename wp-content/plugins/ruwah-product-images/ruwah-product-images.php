@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Product Images
  * Description: Authoritative original-background PNG product image and logo mapping for Ruwah Beauty.
- * Version: 3.5.0
+ * Version: 3.5.1
  * Author: Ruwah Beauty
  * Requires at least: 6.5
  * Requires PHP: 8.1
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Product_Images_V3 {
-    const VERSION = '3.5.0';
+    const VERSION = '3.5.1';
     const STATE_OPTION = 'ruwah_product_images_v3_state';
     const SNAPSHOT_OPTION = 'ruwah_product_images_v3_snapshot';
 
