@@ -308,3 +308,24 @@ add_action('init', static function (): void {
 
     update_option('rwb_catalogue_truth_migration', '20260828-v1', false);
 }, 30);
+
+/* Footer bottom cleanup: remove the legacy promo and give support details enough desktop width. */
+add_action('wp_enqueue_scripts', static function (): void {
+    wp_add_inline_style('rwb-theme', '
+        .rwb-dieux-footer-promo{display:none!important}
+        .rwb-dieux-footer-bottom{display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:24px!important;flex-wrap:wrap!important}
+        .rwb-dieux-footer-meta{flex:1 1 680px!important;width:auto!important;max-width:none!important;min-width:0!important}
+        .rwb-dieux-footer-meta .rwb-dieux-payments{display:flex!important;gap:10px!important;flex-wrap:nowrap!important}
+        .rwb-dieux-footer-legal{flex:0 1 auto!important;margin-left:auto!important}
+        @media (min-width:900px){
+            .rwb-dieux-footer-bottom>.rwb-dieux-footer-meta{min-width:680px!important}
+            .rwb-dieux-footer-meta p,.rwb-dieux-footer-meta small,.rwb-dieux-footer-meta .rwb-footer-support,.rwb-dieux-footer-meta .rwb-dieux-support{max-width:none!important;white-space:nowrap!important}
+        }
+        @media (max-width:899px){
+            .rwb-dieux-footer-bottom{align-items:flex-start!important}
+            .rwb-dieux-footer-meta{flex-basis:100%!important}
+            .rwb-dieux-footer-meta p,.rwb-dieux-footer-meta small,.rwb-dieux-footer-meta .rwb-footer-support,.rwb-dieux-footer-meta .rwb-dieux-support{white-space:normal!important}
+            .rwb-dieux-footer-legal{margin-left:0!important}
+        }
+    ');
+}, 30000);
