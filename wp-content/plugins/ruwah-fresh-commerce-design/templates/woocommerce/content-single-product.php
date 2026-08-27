@@ -5,23 +5,45 @@ if (! $product || ! is_a($product, 'WC_Product')) return;
 do_action('woocommerce_before_single_product');
 if (post_password_required()) { echo get_the_password_form(); return; }
 
-$info = Ruwah_Fresh_Commerce_Design::product_info($product);
+/*
+ * Keep PDP copy aligned with the same packaging-first display source used by
+ * the shop/home cards. WooCommerce remains authoritative for transactional
+ * data (price, stock, media, reviews, SKU and add-to-cart).
+ */
+$info = Ruwah_Fresh_Commerce_Design::display_copy($product);
 $gallery_ids = Ruwah_Fresh_Commerce_Design::gallery_ids($product);
 $related = Ruwah_Fresh_Commerce_Design::related_products($product);
 $reviews = (int) $product->get_review_count();
-$description = trim(wp_strip_all_tags($product->get_description()));
-if ('' === $description) {
-    $description = trim(wp_strip_all_tags($product->get_short_description()));
-}
-$description = wp_trim_words($description, 34, '…');
+$description = trim((string) ($info['tagline'] ?? ''));
 $sku = trim((string) $product->get_sku());
-$usage = trim(wp_strip_all_tags($product->get_short_description()));
+
+/* Never treat the marketing short description as usage instructions. */
+$usage = '';
+foreach (['pa_how-to-use', 'how-to-use', 'how_to_use', 'pa_usage', 'usage'] as $attribute) {
+    $value = trim(wp_strip_all_tags((string) $product->get_attribute($attribute)));
+    if ('' !== $value) {
+        $usage = $value;
+        break;
+    }
+}
+if ('' === $usage) {
+    foreach (['_how_to_use', 'how_to_use', '_usage', 'usage'] as $meta_key) {
+        $value = trim(wp_strip_all_tags((string) get_post_meta($product->get_id(), $meta_key, true)));
+        if ('' !== $value) {
+            $usage = $value;
+            break;
+        }
+    }
+}
+if ('' === $usage) {
+    $usage = 'Follow the directions printed on the product packaging.';
+}
 ?>
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class('rwb-commerce-pdp rwb-dieux-pdp', $product); ?>>
     <section class="rwb-commerce-pdp-top rwb-dieux-pdp-top">
         <div class="rwb-commerce-pdp-gallery rwb-dieux-pdp-gallery"><?php do_action('woocommerce_before_single_product_summary'); ?></div>
         <div class="rwb-commerce-pdp-summary rwb-dieux-pdp-summary">
-            <h1 class="product_title entry-title"><?php echo esc_html($product->get_name()); ?></h1>
+            <h1 class="product_title entry-title"><?php echo esc_html((string) ($info['name'] ?? $product->get_name())); ?></h1>
 
             <div class="rwb-dieux-pdp-rating">
                 <?php if ($reviews > 0) : ?>
@@ -33,8 +55,6 @@ $usage = trim(wp_strip_all_tags($product->get_short_description()));
 
             <?php if (! empty($info['benefits'])) : ?>
                 <p class="rwb-dieux-pdp-benefits"><?php echo esc_html(implode(', ', array_map('strtoupper', $info['benefits']))); ?></p>
-            <?php elseif (! empty($info['tagline'])) : ?>
-                <p class="rwb-dieux-pdp-benefits"><?php echo esc_html(strtoupper($info['tagline'])); ?></p>
             <?php endif; ?>
 
             <?php if ('' !== $description) : ?><p class="rwb-dieux-pdp-description"><?php echo esc_html($description); ?></p><?php endif; ?>
@@ -45,8 +65,8 @@ $usage = trim(wp_strip_all_tags($product->get_short_description()));
             </div>
 
             <div class="rwb-commerce-pdp-accordions rwb-dieux-pdp-accordions">
-                <details><summary><span>DETAILS:</span><b>+</b></summary><div><ul><?php if ('' !== $sku) : ?><li>SKU: <?php echo esc_html($sku); ?></li><?php endif; ?><?php if (! empty($info['size'])) : ?><li><?php echo esc_html($info['size']); ?></li><?php endif; ?><li><?php echo esc_html($product->is_in_stock() ? 'In stock' : 'Out of stock'); ?></li></ul></div></details>
-                <details><summary><span>HOW TO USE:</span><b>+</b></summary><div><p><?php echo esc_html('' !== $usage ? $usage : 'Refer to the supplied product packaging for usage directions.'); ?></p></div></details>
+                <details><summary><span>DETAILS:</span><b>+</b></summary><div><ul><?php if (! empty($info['benefits'])) : ?><?php foreach ($info['benefits'] as $benefit) : ?><li><?php echo esc_html((string) $benefit); ?></li><?php endforeach; ?><?php endif; ?><?php if ('' !== $sku) : ?><li>SKU: <?php echo esc_html($sku); ?></li><?php endif; ?><?php if (! empty($info['size'])) : ?><li><?php echo esc_html($info['size']); ?></li><?php endif; ?><li><?php echo esc_html($product->is_in_stock() ? 'In stock' : 'Out of stock'); ?></li></ul></div></details>
+                <details><summary><span>HOW TO USE:</span><b>+</b></summary><div><p><?php echo esc_html($usage); ?></p></div></details>
             </div>
 
             <?php if ($gallery_ids) : ?>
