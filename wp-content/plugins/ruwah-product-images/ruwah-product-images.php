@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Product Images
  * Description: Authoritative original-background PNG product image and logo mapping for Ruwah Beauty.
- * Version: 3.5.1
+ * Version: 3.5.0
  * Author: Ruwah Beauty
  * Requires at least: 6.5
  * Requires PHP: 8.1
@@ -10,11 +10,13 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Product_Images_V3 {
-    const VERSION = '3.5.1';
+    const VERSION = '3.5.0';
     const STATE_OPTION = 'ruwah_product_images_v3_state';
     const SNAPSHOT_OPTION = 'ruwah_product_images_v3_snapshot';
+    const PRODUCT_2_HOTFIX_OPTION = 'ruwah_product_images_product_2_hotfix_20260828';
 
     public static function init() {
+        add_action('init', [__CLASS__, 'apply_product_2_hotfix'], 1);
         add_action('admin_notices', [__CLASS__, 'admin_notice']);
         if (defined('WP_CLI') && WP_CLI) {
             WP_CLI::add_command('ruwah product-images', 'Ruwah_Product_Images_V3_CLI');
@@ -36,6 +38,21 @@ final class Ruwah_Product_Images_V3 {
     public static function asset_numbers() { return range(1, 20); }
     public static function state() { $s = get_option(self::STATE_OPTION, []); return is_array($s) ? $s : []; }
     public static function save_state($s) { update_option(self::STATE_OPTION, $s, false); }
+
+    public static function apply_product_2_hotfix() {
+        if ('done' === (string) get_option(self::PRODUCT_2_HOTFIX_OPTION, '')) return;
+        $aid = self::attachment_for_key('product-2');
+        if (!$aid || !self::refresh_key('product-2')) return;
+        $product = function_exists('wc_get_product') ? wc_get_product(54) : null;
+        if ($product) {
+            if ((int) $product->get_image_id() !== (int) $aid) {
+                $product->set_image_id((int) $aid);
+                $product->save();
+            }
+            if (function_exists('wc_delete_product_transients')) wc_delete_product_transients(54);
+        }
+        update_option(self::PRODUCT_2_HOTFIX_OPTION, 'done', false);
+    }
 
     public static function begin() {
         self::deactivate_conflicts();
