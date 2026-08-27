@@ -30,12 +30,6 @@ add_action('template_redirect', static function (): void {
             $html
         );
 
-        /*
-         * Product cards already expose the sale/current price immediately above
-         * the CTA and the CTA itself has an accessible action label. Replace the
-         * duplicate CTA price with a decorative plus so assistive output does not
-         * announce the same current price twice.
-         */
         $html = preg_replace_callback(
             '/(<a\b[^>]*class="[^"]*rwb-commerce-add[^"]*"[^>]*>\s*<span>[^<]+<\/span>)\s*<span>.*?<\/span>(\s*<\/a>)/is',
             static function (array $matches): string {
@@ -134,7 +128,6 @@ add_action('wp_footer', static function (): void {
     <?php
 }, 6);
 
-/* Advertise the canonical WordPress core sitemap to compliant crawlers. */
 add_filter('robots_txt', static function (string $output, bool $public): string {
     if (! $public) {
         return $output;
@@ -146,10 +139,6 @@ add_filter('robots_txt', static function (string $output, bool $public): string 
     return $output;
 }, 20, 2);
 
-/*
- * SEO/audit compatibility endpoint. Serve a real 200 sitemap-index document
- * and point it at WordPress core's canonical sitemap implementation.
- */
 add_action('template_redirect', static function (): void {
     $path = isset($_SERVER['REQUEST_URI']) ? (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI']), PHP_URL_PATH) : '';
     if ('/sitemap_index.xml' !== rtrim($path, '/') && '/sitemap_index.xml' !== $path) {
@@ -166,12 +155,10 @@ add_action('template_redirect', static function (): void {
     exit;
 }, 1);
 
-/* Hide any legacy/global newsletter submit button so it cannot overlap footer content. */
 add_action('wp_enqueue_scripts', static function (): void {
     wp_add_inline_style('rwb-theme', '.rwb-dieux-footer-form button,.rwb-ref-footer-signup form button{display:none!important}');
 }, 10020);
 
-/* Final Pakistan checkout phone policy: fixed +92 prefix + exactly 10 mobile digits. */
 add_filter('woocommerce_checkout_fields', static function (array $fields): array {
     if (! function_exists('is_checkout') || ! is_checkout()) {
         return $fields;
@@ -269,3 +256,19 @@ add_action('wp_footer', static function (): void {
     </script>
     <?php
 }, 20000);
+
+/* Production launch defaults: keep one authoritative Pakistan/COD presentation. */
+add_filter('pre_option_blogname', static fn() => 'Ruwah Beauty', 20000);
+add_filter('pre_option_woocommerce_default_country', static fn() => 'PK', 20000);
+add_filter('pre_option_woocommerce_customer_default_location', static fn() => 'base', 20000);
+add_filter('pre_option_woocommerce_allowed_countries', static fn() => 'specific', 20000);
+add_filter('pre_option_woocommerce_specific_allowed_countries', static fn() => ['PK'], 20000);
+add_filter('pre_option_woocommerce_ship_to_countries', static fn() => 'specific', 20000);
+add_filter('pre_option_woocommerce_specific_ship_to_countries', static fn() => ['PK'], 20000);
+add_filter('pre_option_woocommerce_price_num_decimals', static fn() => '0', 20000);
+add_filter('pre_option_woocommerce_enable_myaccount_registration', static fn() => 'yes', 20000);
+
+/* Remove the developer-style Gmail floating shortcut; normal mailto support stays in the footer/contact page. */
+add_action('wp_enqueue_scripts', static function (): void {
+    wp_add_inline_style('rwb-theme', '.rwb-contact-dock-item--gmail{display:none!important}.rwb-contact-dock{gap:0!important}');
+}, 20050);
