@@ -275,3 +275,35 @@ add_action('wp_footer', function () {
     <script id="rwb-home-footer-social-links-server">(()=>{'use strict';const links={Facebook:'https://www.facebook.com/share/1BNAdjWpYW/',Instagram:'https://www.instagram.com/rawah.beauty?utm_source=qr&igsh=ZjMzazdrNmk1aTVt',TikTok:'https://vt.tiktok.com/ZSX6WqwS2/'};document.querySelectorAll('.rwb-dieux-footer-socials span[aria-label]').forEach(span=>{if(span.closest('a'))return;const label=span.getAttribute('aria-label')||'';const href=links[label];if(!href)return;const a=document.createElement('a');a.href=href;a.target='_blank';a.rel='noopener noreferrer';a.className='rwb-dieux-social-link';a.setAttribute('aria-label',label+' — Ruwah Beauty');span.parentNode.insertBefore(a,span);a.appendChild(span);});})();</script>
     <?php
 }, 8);
+
+/* Checkout payment policy: COD now; online payments preserved for future re-enable. */
+add_filter('pre_option_woocommerce_cod_settings', function ($pre_option) {
+    return [
+        'enabled' => 'yes',
+        'title' => 'Cash on Delivery',
+        'description' => 'Pay with cash when your order is delivered.',
+        'instructions' => 'Please keep the order amount ready at delivery.',
+        'enable_for_methods' => [],
+        'enable_for_virtual' => 'yes',
+    ];
+}, 20, 1);
+
+add_filter('woocommerce_available_payment_gateways', function ($gateways) {
+    if (is_admin() && !wp_doing_ajax()) {
+        return $gateways;
+    }
+    if (isset($gateways['cod'])) {
+        return ['cod' => $gateways['cod']];
+    }
+    return [];
+}, 9999);
+
+add_action('woocommerce_review_order_before_payment', function () {
+    if (function_exists('is_checkout') && !is_checkout()) return;
+    echo '<div class="rwb-online-coming-soon" role="note"><strong>Online Payment</strong><span>Coming Soon</span><small>For now, orders are confirmed with Cash on Delivery.</small></div>';
+}, 5);
+
+add_action('wp_enqueue_scripts', function () {
+    if (!function_exists('is_checkout') || !is_checkout()) return;
+    wp_add_inline_style('rwb-theme', '.rwb-online-coming-soon{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;margin:18px 0 12px;padding:14px 16px;border:1px solid #d8cedb;background:#fffdfa;color:#282328}.rwb-online-coming-soon strong{font-size:12px}.rwb-online-coming-soon span{padding:5px 8px;background:#f1edf3;color:#705591;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}.rwb-online-coming-soon small{grid-column:1/-1;color:#706870;font-size:10px;line-height:1.45}');
+}, 10000);
