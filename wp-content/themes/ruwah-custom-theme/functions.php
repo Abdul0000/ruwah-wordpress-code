@@ -165,6 +165,7 @@ add_filter('woocommerce_add_to_cart_fragments', function ($fragments) {
 
 require_once __DIR__ . '/includes/cart-drawer.php';
 require_once __DIR__ . '/includes/reference-checkout.php';
+require_once __DIR__ . '/includes/home-footer-dedup.php';
 
 /* Keep the cached homepage cart UI in sync with the live WooCommerce session. */
 add_action('wp_enqueue_scripts', function () {
