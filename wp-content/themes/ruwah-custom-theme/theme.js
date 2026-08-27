@@ -77,6 +77,34 @@ const installContactDock=()=>{
   document.body.appendChild(dock);
 };
 
+const protectContactDock=()=>{
+  const dock=q('#rwb-contact-dock');
+  if(!dock)return;
+  if(!q('#rwb-contact-dock-overlap-fix')){
+    const style=document.createElement('style');
+    style.id='rwb-contact-dock-overlap-fix';
+    style.textContent=`
+      #rwb-contact-dock{transition:opacity .18s ease,visibility .18s ease,transform .18s ease;right:max(18px,env(safe-area-inset-right))}
+      #rwb-contact-dock.rwb-contact-dock--footer{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transform:translateY(10px)}
+      @media(max-width:820px){#rwb-contact-dock{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}}
+      @media(max-width:520px){#rwb-contact-dock{gap:7px}#rwb-contact-dock .rwb-contact-dock-item{width:44px;height:44px}#rwb-contact-dock .rwb-contact-dock-item svg{width:23px;height:23px}}
+      @media(max-width:380px){#rwb-contact-dock{right:max(9px,env(safe-area-inset-right));bottom:max(9px,env(safe-area-inset-bottom))}#rwb-contact-dock .rwb-contact-dock-item{width:42px;height:42px}}
+    `;
+    document.head.appendChild(style);
+  }
+  const footer=q('.rwb-ref-footer')||q('#rwb-reference-footer')||q('footer');
+  if(!footer)return;
+  const toggle=visible=>dock.classList.toggle('rwb-contact-dock--footer',visible);
+  if('IntersectionObserver'in window){
+    const observer=new IntersectionObserver(entries=>entries.forEach(entry=>toggle(entry.isIntersecting)),{root:null,threshold:0,rootMargin:'0px 0px 72px 0px'});
+    observer.observe(footer);
+  }else{
+    const check=()=>{const rect=footer.getBoundingClientRect();toggle(rect.top<innerHeight&&rect.bottom>0)};
+    addEventListener('scroll',check,{passive:true});addEventListener('resize',check,{passive:true});check();
+  }
+};
+
 wireFooterSocials();
 installContactDock();
+protectContactDock();
 })();
