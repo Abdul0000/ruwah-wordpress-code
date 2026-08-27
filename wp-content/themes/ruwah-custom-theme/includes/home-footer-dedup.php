@@ -13,6 +13,41 @@ add_action('wp', static function (): void {
     remove_action('wp_footer', [Ruwah_Fresh_Commerce_Design::class, 'reference_footer'], 5);
 }, 1000);
 
+/*
+ * Normalize final homepage markup server-side so browsers, screen readers and
+ * crawlers all receive the same launch-ready copy. This is intentionally
+ * bounded to the front page and only replaces exact known commerce fragments.
+ */
+add_action('template_redirect', static function (): void {
+    if (! is_front_page()) {
+        return;
+    }
+
+    ob_start(static function (string $html): string {
+        $html = str_replace(
+            'PAKISTAN-WIDE DELIVERY · CASH ON DELIVERY · ONLINE PAYMENT COMING SOON',
+            'PAKISTAN-WIDE DELIVERY · CASH ON DELIVERY',
+            $html
+        );
+
+        /*
+         * Product cards already expose the sale/current price immediately above
+         * the CTA and the CTA itself has an accessible action label. Replace the
+         * duplicate CTA price with a decorative plus so assistive output does not
+         * announce the same current price twice.
+         */
+        $html = preg_replace_callback(
+            '/(<a\b[^>]*class="[^"]*rwb-commerce-add[^"]*"[^>]*>\s*<span>[^<]+<\/span>)\s*<span>.*?<\/span>(\s*<\/a>)/is',
+            static function (array $matches): string {
+                return $matches[1] . '<span aria-hidden="true">+</span>' . $matches[2];
+            },
+            $html
+        ) ?: $html;
+
+        return $html;
+    });
+}, 0);
+
 add_action('wp_footer', static function (): void {
     if (! is_front_page()) {
         return;
@@ -48,9 +83,9 @@ add_action('wp_footer', static function (): void {
                 </form>
                 <?php if ($privacy_url) : ?><small>By subscribing, you agree to receive Ruwah Notes. See our <a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a>.</small><?php endif; ?>
                 <div class="rwb-dieux-footer-socials" aria-label="Ruwah Beauty social channels">
-                    <a href="https://www.facebook.com/share/1BNAdjWpYW/" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on Facebook">f</a>
-                    <a href="https://www.instagram.com/rawah.beauty" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on Instagram">◎</a>
-                    <a href="https://vt.tiktok.com/ZSX6WqwS2/" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on TikTok">♪</a>
+                    <a href="https://www.facebook.com/share/1BNAdjWpYW/" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on Facebook">Facebook</a>
+                    <a href="https://www.instagram.com/rawah.beauty" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on Instagram">Instagram</a>
+                    <a href="https://vt.tiktok.com/ZSX6WqwS2/" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on TikTok">TikTok</a>
                 </div>
             </section>
 
@@ -87,7 +122,7 @@ add_action('wp_footer', static function (): void {
             <div class="rwb-dieux-footer-meta">
                 <b>© <?php echo esc_html(wp_date('Y')); ?> Ruwah Beauty</b>
                 <span>Pakistan · Online skincare</span>
-                <div class="rwb-dieux-payments"><span>COD ONLY</span><span>ONLINE: SOON</span></div>
+                <div class="rwb-dieux-payments"><span>COD ONLY</span></div>
             </div>
             <nav class="rwb-dieux-footer-legal" aria-label="Footer legal links">
                 <?php if ($terms_url) : ?><a href="<?php echo esc_url($terms_url); ?>">Terms of Service</a><?php endif; ?>
@@ -106,7 +141,7 @@ add_filter('robots_txt', static function (string $output, bool $public): string 
     if (! $public) {
         return $output;
     }
-    $sitemap = home_url('/wp-sitemap.xml');
+    $sitemap = home_url('/sitemap_index.xml');
     if (false === stripos($output, 'Sitemap:')) {
         $output = rtrim($output) . "\nSitemap: " . esc_url_raw($sitemap) . "\n";
     }
@@ -114,15 +149,21 @@ add_filter('robots_txt', static function (string $output, bool $public): string 
 }, 20, 2);
 
 /*
- * Some audit/SEO tools probe Yoast-style /sitemap_index.xml. Ruwah uses the
- * WordPress core sitemap, so expose a permanent compatibility redirect rather
- * than maintaining a second sitemap implementation.
+ * SEO/audit compatibility endpoint. Serve a real 200 sitemap-index document
+ * and point it at WordPress core's canonical sitemap implementation.
  */
 add_action('template_redirect', static function (): void {
     $path = isset($_SERVER['REQUEST_URI']) ? (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI']), PHP_URL_PATH) : '';
     if ('/sitemap_index.xml' !== rtrim($path, '/') && '/sitemap_index.xml' !== $path) {
         return;
     }
-    wp_safe_redirect(home_url('/wp-sitemap.xml'), 301, 'Ruwah Sitemap Compatibility');
+
+    status_header(200);
+    nocache_headers();
+    header('Content-Type: application/xml; charset=UTF-8');
+    echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    echo '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    echo '  <sitemap><loc>' . esc_url(home_url('/wp-sitemap.xml')) . '</loc></sitemap>' . "\n";
+    echo '</sitemapindex>';
     exit;
 }, 1);
