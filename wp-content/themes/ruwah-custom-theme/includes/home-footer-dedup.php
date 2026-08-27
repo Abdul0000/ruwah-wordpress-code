@@ -13,11 +13,6 @@ add_action('wp', static function (): void {
     remove_action('wp_footer', [Ruwah_Fresh_Commerce_Design::class, 'reference_footer'], 5);
 }, 1000);
 
-/*
- * Normalize final homepage markup server-side so browsers, screen readers and
- * crawlers all receive the same launch-ready copy. This is intentionally
- * bounded to the front page and only replaces exact known commerce fragments.
- */
 add_action('template_redirect', static function (): void {
     if (! is_front_page()) {
         return;
@@ -257,7 +252,6 @@ add_action('wp_footer', static function (): void {
     <?php
 }, 20000);
 
-/* Production launch defaults: keep one authoritative Pakistan/COD presentation. */
 add_filter('pre_option_blogname', static fn() => 'Ruwah Beauty', 20000);
 add_filter('pre_option_woocommerce_default_country', static fn() => 'PK', 20000);
 add_filter('pre_option_woocommerce_customer_default_location', static fn() => 'base', 20000);
@@ -268,7 +262,49 @@ add_filter('pre_option_woocommerce_specific_ship_to_countries', static fn() => [
 add_filter('pre_option_woocommerce_price_num_decimals', static fn() => '0', 20000);
 add_filter('pre_option_woocommerce_enable_myaccount_registration', static fn() => 'yes', 20000);
 
-/* Remove the developer-style Gmail floating shortcut; normal mailto support stays in the footer/contact page. */
 add_action('wp_enqueue_scripts', static function (): void {
     wp_add_inline_style('rwb-theme', '.rwb-contact-dock-item--gmail{display:none!important}.rwb-contact-dock{gap:0!important}');
 }, 20050);
+
+/* One-time product truth migration: make WooCommerce itself the customer-facing catalogue. */
+add_action('init', static function (): void {
+    if ('20260828-v1' === get_option('rwb_catalogue_truth_migration')) {
+        return;
+    }
+
+    $products = [
+        62 => [
+            'post_title' => 'Rice Whitening Cream',
+            'post_name' => 'rice-whitening-cream',
+            'post_excerpt' => 'A brightening rice cream with Rice Extract, Glutathione, Vitamin C, Niacinamide and Alpha Arbutin.',
+            'post_content' => '<p>A brightening rice cream created for a more radiant, even-looking complexion.</p><ul><li>Rice Extract for brightening care</li><li>Glutathione and Vitamin C for radiance</li><li>Niacinamide and Alpha Arbutin for even-looking tone</li></ul>',
+        ],
+        64 => [
+            'post_title' => 'Rice Glow Serum',
+            'post_name' => 'rice-glow-serum',
+            'post_excerpt' => 'A lightweight glow serum with Vitamin C, Niacinamide and Hyaluronic Acid for brighter-looking, hydrated skin.',
+            'post_content' => '<p>A lightweight daily serum created to support brighter-looking, hydrated skin.</p><ul><li>Vitamin C for visible radiance</li><li>Niacinamide for tone support</li><li>Hyaluronic Acid for hydration</li></ul>',
+        ],
+        60 => [
+            'post_title' => 'Rice Brightening Face Wash',
+            'post_name' => 'rice-brightening-face-wash',
+            'post_excerpt' => 'A gentle rice-based face wash for daily cleansing and a brighter, refreshed-looking complexion.',
+            'post_content' => '<p>A gentle rice-based face wash for comfortable everyday cleansing.</p><ul><li>Rice-based daily cleansing</li><li>Helps remove daily buildup</li><li>Leaves skin feeling fresh and comfortable</li></ul>',
+        ],
+        68 => [
+            'post_title' => 'Rice Glow Sun Lotion',
+            'post_name' => 'rice-glow-sun-lotion',
+            'post_excerpt' => 'A lightweight daily sun lotion designed to protect while keeping skin comfortable and radiant-looking.',
+            'post_content' => '<p>A lightweight daily sun lotion designed for comfortable everyday sun-care routines.</p><ul><li>Lightweight daily sun care</li><li>Comfortable skin feel</li><li>Radiant-looking finish</li></ul>',
+        ],
+    ];
+
+    foreach ($products as $id => $changes) {
+        if ('product' !== get_post_type($id)) {
+            continue;
+        }
+        wp_update_post(array_merge(['ID' => $id], $changes));
+    }
+
+    update_option('rwb_catalogue_truth_migration', '20260828-v1', false);
+}, 30);
