@@ -54,8 +54,8 @@ $contact_url = home_url('/contact/');
             <?php if ('' !== $description) : ?><p class="rwb-dieux-pdp-description"><?php echo esc_html($description); ?></p><?php endif; ?>
 
             <div class="rwb-dieux-pdp-buy" data-live-price="<?php echo esc_attr(wp_strip_all_tags($product->get_price_html())); ?>">
+                <div class="rwb-dieux-pdp-buy-price"><?php woocommerce_template_single_price(); ?></div>
                 <?php woocommerce_template_single_add_to_cart(); ?>
-                <span class="rwb-dieux-pdp-buy-price" aria-hidden="true"><?php echo wp_kses_post($product->get_price_html()); ?></span>
             </div>
 
             <div class="rwb-dieux-pdp-trust" role="note" aria-label="Delivery and payment information">
