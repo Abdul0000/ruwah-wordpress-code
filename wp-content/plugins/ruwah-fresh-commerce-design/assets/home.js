@@ -13,6 +13,21 @@ menu?.addEventListener('click',e=>{if(e.target.closest('a'))closeMenu();});
 menu?.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeMenu();return;}if(e.key!=='Tab')return;const items=focusables(menu);if(!items.length)return;const first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&menu&&!menu.hidden)closeMenu();});
 
+/* Shopping reassurance is informational only: keep the existing visual cards, remove navigation. */
+const trustItems=[...document.querySelectorAll('.rhp-trust-strip>a')];
+trustItems.forEach(item=>{
+  item.removeAttribute('href');
+  item.setAttribute('aria-disabled','true');
+  item.setAttribute('tabindex','-1');
+  item.style.cursor='default';
+});
+document.addEventListener('click',e=>{
+  const item=e.target.closest?.('.rhp-trust-strip>a');
+  if(!item)return;
+  e.preventDefault();
+  e.stopPropagation();
+},true);
+
 const searchLayer=document.querySelector('[data-search]');const searchOpen=document.querySelector('[data-search-open]');const closeSearch=()=>{if(searchLayer){searchLayer.hidden=true;body.classList.remove('rhp-layer-open');searchOpen?.focus();}};searchOpen?.addEventListener('click',()=>{if(!searchLayer)return;searchLayer.hidden=false;body.classList.add('rhp-layer-open');requestAnimationFrame(()=>searchLayer.querySelector('input[type="search"]')?.focus());});searchLayer?.querySelectorAll('[data-search-close]').forEach(el=>el.addEventListener('click',closeSearch));
 
 const cartLayer=document.querySelector('[data-cart]');const cartOpen=document.querySelector('[data-cart-open]');const closeCart=()=>{if(cartLayer){cartLayer.hidden=true;body.classList.remove('rhp-layer-open');cartOpen?.focus();}};cartOpen?.addEventListener('click',()=>{if(!cartLayer)return;cartLayer.hidden=false;body.classList.add('rhp-layer-open');requestAnimationFrame(()=>cartLayer.querySelector('button,a,input')?.focus());});cartLayer?.querySelectorAll('[data-cart-close]').forEach(el=>el.addEventListener('click',closeCart));
