@@ -23,14 +23,14 @@ html body .rwb-ref-cart-qty{grid-template-columns:42px 52px 42px!important;margi
 html body .rwb-ref-cart-qty button,html body .rwb-ref-cart-qty span{height:34px!important;font-size:17px!important}
 html body .rwb-ref-cart-qty span{font-size:16px!important}
 html body .rwb-ref-cart-remove{font-size:12px!important}
-html body .rwb-ref-cart-paired{padding:14px 22px 0!important}
-html body .rwb-ref-cart-paired>h3{margin:0 0 10px!important;font-size:14px!important}
-html body .rwb-ref-cart-paired-row{grid-template-columns:84px minmax(0,1fr) auto!important;gap:16px!important;min-height:0!important;height:auto!important;align-items:center!important;margin:0!important;padding:0!important}
-html body .rwb-ref-cart-paired-media{width:84px!important;height:84px!important;min-width:84px!important;min-height:84px!important;max-width:84px!important;max-height:84px!important;margin:0!important;align-self:center!important}
+html body .rwb-ref-cart-paired{padding:20px 22px 14px!important}
+html body .rwb-ref-cart-paired>h3{margin-bottom:16px!important;font-size:14px!important}
+html body .rwb-ref-cart-paired-row{grid-template-columns:110px minmax(0,1fr) auto!important;gap:18px!important;min-height:0!important;height:auto!important;align-items:center!important;margin:0!important;padding:0!important}
+html body .rwb-ref-cart-paired-media{width:110px!important;height:96px!important;min-width:110px!important;min-height:96px!important;max-width:110px!important;max-height:96px!important;margin:0!important;align-self:center!important}
 html body .rwb-ref-cart-paired-media img{width:100%!important;height:100%!important;object-fit:contain!important}
 html body .rwb-ref-cart-paired-copy{align-self:center!important;margin:0!important;padding:0!important}
-html body .rwb-ref-cart-paired-copy>a{font-size:18px!important;line-height:1.08!important}
-html body .rwb-ref-cart-paired-copy small{margin:4px 0 0!important;font-size:10px!important;line-height:1.15!important}
+html body .rwb-ref-cart-paired-copy>a{font-size:19px!important;line-height:1.08!important}
+html body .rwb-ref-cart-paired-copy small{margin:5px 0 0!important;font-size:11px!important;line-height:1.2!important}
 html body .rwb-ref-cart-paired-add{min-width:145px!important;min-height:40px!important;padding:0 12px!important;font-size:13px!important;align-self:center!important;margin:0!important}
 html body .rwb-ref-cart-paired-row>*{margin-bottom:0!important}
 html body .rwb-ref-cart-coupon{grid-template-columns:1fr 108px!important;gap:10px!important;padding:16px 22px!important}
@@ -47,7 +47,13 @@ html body .rwb-ref-cart-checkout{height:52px!important;font-size:17px!important}
 .single-product.rwb-reference-commerce-v6 .rwb-commerce-pdp-views .rwb-commerce-section-head h2{max-width:none!important;white-space:nowrap!important;font-size:clamp(42px,4.2vw,60px)!important;letter-spacing:-.04em!important}
 }
 
-/* Paired product drawer: keep the section content-height with no trailing void. */
-html body .rwb-ref-cart-paired{height:auto!important;min-height:0!important;padding-bottom:0!important;margin-bottom:0!important}
+/* Paired product drawer: preserve product geometry; only keep deliberate bottom breathing room. */
+html body .rwb-ref-cart-paired{height:auto!important;min-height:0!important;margin-bottom:0!important}
 html body .rwb-ref-cart-paired-row{height:auto!important;min-height:0!important;margin-bottom:0!important}
-@media(max-width:680px){html body .rwb-ref-cart-paired{padding-bottom:0!important}html body .rwb-ref-cart-paired-row{min-height:0!important;height:auto!important}}
+@media(max-width:680px){html body .rwb-ref-cart-paired{padding-bottom:14px!important}}
+
+/* Homepage hero logo: keep original purple artwork, add clean separation from photography. */
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand{position:relative!important;isolation:isolate!important;padding:8px 18px!important;border:1px solid rgba(255,255,255,.62)!important;border-radius:16px!important;background:rgba(247,243,233,.88)!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;box-shadow:0 8px 28px rgba(28,18,36,.18)!important}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand:before{display:none!important;content:none!important}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{opacity:1!important;filter:drop-shadow(0 1px 0 rgba(255,255,255,.78)) drop-shadow(0 3px 9px rgba(38,22,48,.30))!important}
+@media(max-width:782px){.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand{padding:6px 12px!important;border-radius:13px!important}}
