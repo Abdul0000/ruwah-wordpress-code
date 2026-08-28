@@ -2,8 +2,8 @@
 defined('ABSPATH') || exit;
 
 /**
- * Correct only the standalone homepage navigation targets supplied by the
- * commerce plugin. Reuses existing content; creates no pages or forms.
+ * Correct standalone homepage links and keep product-labelled CTA copy tied
+ * to the live WooCommerce product object. Creates no pages or product data.
  */
 add_action('template_redirect', static function (): void {
     if (! is_front_page()) {
@@ -16,17 +16,24 @@ add_action('template_redirect', static function (): void {
         $contact_old = esc_url(home_url('/contact-us/'));
         $contact_new = esc_url(home_url('/contact/'));
 
-        return str_replace(
-            [
-                'href="' . $learn_old . '"',
-                'href="' . $contact_old . '"',
-            ],
-            [
-                'href="' . $learn_new . '"',
-                'href="' . $contact_new . '"',
-            ],
-            $html
-        );
+        $search = [
+            'href="' . $learn_old . '"',
+            'href="' . $contact_old . '"',
+        ];
+        $replace = [
+            'href="' . $learn_new . '"',
+            'href="' . $contact_new . '"',
+        ];
+
+        if (function_exists('wc_get_product')) {
+            $hero = wc_get_product(54);
+            if ($hero instanceof WC_Product) {
+                $search[] = '>Shop Triple Action Serum</a>';
+                $replace[] = '>Shop ' . esc_html($hero->get_name()) . '</a>';
+            }
+        }
+
+        return str_replace($search, $replace, $html);
     });
 }, 2);
 
