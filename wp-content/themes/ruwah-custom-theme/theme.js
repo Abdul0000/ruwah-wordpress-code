@@ -114,7 +114,8 @@ const installCheckoutInlineErrors=()=>{
       body.rwb-reference-checkout-v1 .form-row.rwb-field-has-error textarea,
       body.rwb-reference-checkout-v1 .form-row.rwb-field-has-error select{border-color:#a63f54!important;box-shadow:0 0 0 3px rgba(166,63,84,.08)!important}
       body.rwb-reference-checkout-v1 .form-row.rwb-field-has-error .select2-selection--single{border-color:#a63f54!important;box-shadow:0 0 0 3px rgba(166,63,84,.08)!important}
-      body.rwb-reference-checkout-v1 .rwb-inline-field-error{display:block;margin:5px 3px 0;color:#9a2f3f;font-size:10px;font-weight:600;line-height:1.35;letter-spacing:.005em}
+      body.rwb-reference-checkout-v1 .rwb-inline-field-error{display:flex;align-items:center;gap:5px;margin:6px 3px 0;color:#922f3f;font-size:10px;font-weight:600;line-height:1.35;letter-spacing:.005em}
+      body.rwb-reference-checkout-v1 .rwb-inline-field-error:before{content:'!';flex:0 0 15px;width:15px;height:15px;display:grid;place-items:center;border-radius:50%;background:#922f3f;color:#fff;font-size:9px;font-weight:800;line-height:1}
       body.rwb-reference-checkout-v1 .woocommerce-NoticeGroup-checkout:empty,body.rwb-reference-checkout-v1 .woocommerce-notices-wrapper:empty{display:none!important}
     `;
     document.head.appendChild(style);
@@ -134,6 +135,27 @@ const installCheckoutInlineErrors=()=>{
     if(t.includes('address')||t.includes('street')||t.includes('area details'))return prefix+'address_1';
     if(t.includes('country')||t.includes('region'))return prefix+'country';
     return'';
+  };
+  const friendlyMessage=(key,fallback)=>{
+    const messages={
+      billing_first_name:'Enter your first name.',
+      billing_last_name:'Enter your last name.',
+      billing_email:'Enter a valid email address.',
+      billing_country:'Select your country.',
+      billing_state:'Select your state / province.',
+      billing_address_1:'Enter street + area.',
+      billing_city:'Enter your city.',
+      billing_postcode:'Enter a 5-digit postal code.',
+      billing_phone:'Enter a 10-digit Pakistan mobile number.',
+      shipping_first_name:'Enter the first name.',
+      shipping_last_name:'Enter the last name.',
+      shipping_country:'Select the country.',
+      shipping_state:'Select the state / province.',
+      shipping_address_1:'Enter street + area.',
+      shipping_city:'Enter the city.',
+      shipping_postcode:'Enter a 5-digit postal code.'
+    };
+    return messages[key]||fallback||'Please check this field.';
   };
   const fieldControl=key=>{
     const input=q('#'+CSS.escape(key));
@@ -168,7 +190,7 @@ const installCheckoutInlineErrors=()=>{
       input.setAttribute('aria-invalid','true');
       const id='rwb-error-'+key;
       const error=document.createElement('span');
-      error.className='rwb-inline-field-error';error.id=id;error.setAttribute('role','alert');error.textContent=entry.text;
+      error.className='rwb-inline-field-error';error.id=id;error.setAttribute('role','alert');error.textContent=friendlyMessage(key,entry.text);
       row.appendChild(error);
       const described=(input.getAttribute('aria-describedby')||'').split(/\s+/).filter(Boolean);if(!described.includes(id))described.push(id);input.setAttribute('aria-describedby',described.join(' '));
       entry.items.forEach(li=>li.remove());
