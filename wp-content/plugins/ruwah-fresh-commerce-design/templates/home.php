@@ -236,32 +236,8 @@ $premium_css = is_readable($premium_css_path) ? (string) file_get_contents($prem
     <section class="rhp-section rhp-bestsellers" id="bestsellers">
         <div class="rhp-section-head"><div><p class="rhp-eyebrow">Product discovery</p><h2>Ruwah essentials.</h2></div><p>Current product data, price, stock and genuine review counts — no placeholder ratings.</p></div>
         <div class="rhp-product-grid">
-            <?php foreach ($best as $rank => $product) :
-                $info = Ruwah_Fresh_Commerce_Design::display_copy($product);
-                $regular = (float) $product->get_regular_price(); $price = (float) $product->get_price(); $saving = ($regular > $price && $price > 0) ? $regular - $price : 0;
-                $reviews = (int) $product->get_review_count(); $rating = (float) $product->get_average_rating();
-                $can_cart = $product->is_type('simple') && $product->is_purchasable() && $product->is_in_stock();
-                $image_url = wp_get_attachment_image_url((int) $product->get_image_id(), 'woocommerce_single') ?: '';
-                $benefit = ! empty($info['benefits'][0]) ? (string) $info['benefits'][0] : (string) $info['tagline'];
-                $stock_text = $product->is_in_stock() ? 'In stock' : 'Out of stock';
-            ?>
-            <article class="rhp-product-card">
-                <a class="rhp-product-image" href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="View <?php echo esc_attr($info['name']); ?>">
-                    <?php echo wp_kses_post($product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
-                    <?php if ($saving > 0) : ?><span class="rhp-product-badge">Save <?php echo wp_kses_post(wc_price($saving, ['decimals' => 0])); ?></span><?php elseif (0 === $rank) : ?><span class="rhp-product-badge">Popular pick</span><?php endif; ?>
-                </a>
-                <div class="rhp-product-copy">
-                    <div class="rhp-product-meta"><span><?php echo esc_html($stock_text); ?></span><?php if (! empty($info['size'])) : ?><span><?php echo esc_html($info['size']); ?></span><?php endif; ?></div>
-                    <h3><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($info['name']); ?></a></h3>
-                    <p><?php echo esc_html($benefit); ?></p>
-                    <?php if ($reviews > 0) : ?><div class="rhp-rating" aria-label="<?php echo esc_attr(number_format_i18n($rating, 1) . ' out of 5 from ' . $reviews . ' reviews'); ?>"><span aria-hidden="true">★ <?php echo esc_html(number_format_i18n($rating, 1)); ?></span><small><?php echo esc_html((string) $reviews); ?> reviews</small></div><?php endif; ?>
-                    <div class="rhp-price"><?php if ($saving > 0) : ?><del><?php echo wp_kses_post(wc_price($regular, ['decimals' => 0])); ?></del><?php endif; ?><strong><?php echo wp_kses_post(wc_price($price, ['decimals' => 0])); ?></strong><?php if ($saving > 0) : ?><small>You save <?php echo wp_kses_post(wc_price($saving, ['decimals' => 0])); ?></small><?php endif; ?></div>
-                    <div class="rhp-card-actions">
-                        <?php if ($can_cart) : ?><a class="rhp-add add_to_cart_button ajax_add_to_cart" rel="nofollow" data-product_id="<?php echo esc_attr((string) $product->get_id()); ?>" data-product_sku="<?php echo esc_attr($product->get_sku()); ?>" data-quantity="1" href="<?php echo esc_url($product->add_to_cart_url()); ?>">Add to cart</a><?php else : ?><a class="rhp-add" href="<?php echo esc_url($product->get_permalink()); ?>">View product</a><?php endif; ?>
-                        <button class="rhp-quick" type="button" data-quick-view data-qv-name="<?php echo esc_attr($info['name']); ?>" data-qv-image="<?php echo esc_url($image_url); ?>" data-qv-copy="<?php echo esc_attr($benefit); ?>" data-qv-price="<?php echo esc_attr(wp_strip_all_tags(wc_price($price, ['decimals' => 0]))); ?>" data-qv-stock="<?php echo esc_attr($stock_text); ?>" data-qv-url="<?php echo esc_url($product->get_permalink()); ?>" data-qv-add="<?php echo esc_url($can_cart ? $product->add_to_cart_url() : $product->get_permalink()); ?>" data-qv-can-cart="<?php echo $can_cart ? '1' : '0'; ?>">Quick view</button>
-                    </div>
-                </div>
-            </article>
+            <?php foreach ($best as $rank => $product) : ?>
+                <?php if (function_exists('rwb_render_master_product_card')) rwb_render_master_product_card($product, (int) $rank); ?>
             <?php endforeach; ?>
         </div>
         <div class="rhp-centered"><a class="rhp-text-link" href="<?php echo esc_url($shop_url); ?>">Shop all skincare →</a></div>
