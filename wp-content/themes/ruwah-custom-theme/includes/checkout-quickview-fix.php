@@ -198,3 +198,46 @@ add_action('wp_footer', static function (): void {
     </script>
     <?php
 }, 50000);
+
+/* Product-page reliability: force the current guarded PDP script to bypass stale browser/CDN cache. */
+add_action('wp_enqueue_scripts', static function (): void {
+    if (! function_exists('is_product') || ! is_product()) {
+        return;
+    }
+    $script_path = WP_PLUGIN_DIR . '/ruwah-fresh-commerce-design/assets/pdp-dieux.js';
+    if (! is_readable($script_path)) {
+        return;
+    }
+    wp_dequeue_script('ruwah-dieux-pdp');
+    wp_deregister_script('ruwah-dieux-pdp');
+    wp_enqueue_script(
+        'ruwah-dieux-pdp',
+        plugins_url('ruwah-fresh-commerce-design/assets/pdp-dieux.js'),
+        ['jquery', 'wc-add-to-cart'],
+        (string) filemtime($script_path),
+        true
+    );
+    wp_script_add_data('ruwah-dieux-pdp', 'strategy', 'defer');
+}, 20000);
+
+/* Product-page ordering fix only: keep price in normal flow above Add to Cart on every viewport. */
+add_action('wp_head', static function (): void {
+    if (! function_exists('is_product') || ! is_product()) {
+        return;
+    }
+    ?>
+    <style id="rwb-pdp-buy-order-fix">
+    .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-buy{display:block!important;position:relative!important}
+    .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-buy-price{position:static!important;z-index:auto!important;display:block!important;width:100%!important;margin:0 0 12px!important;color:#111!important;line-height:1.25!important;pointer-events:auto!important}
+    .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-buy-price .price{display:flex!important;flex-wrap:wrap!important;align-items:baseline!important;gap:8px!important;margin:0!important;color:#111!important}
+    .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-buy-price del{margin-left:0!important}
+    .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-buy>form.cart{position:relative!important;clear:both!important;width:100%!important;margin:0!important}
+    .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-buy .single_add_to_cart_button{clear:both!important;padding-left:22px!important;padding-right:22px!important}
+    @media(max-width:720px){
+      .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-buy-price{margin-bottom:10px!important}
+      .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-buy-price .price{gap:7px!important}
+      .single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-buy .single_add_to_cart_button{padding-left:18px!important;padding-right:18px!important}
+    }
+    </style>
+    <?php
+}, 30000);
