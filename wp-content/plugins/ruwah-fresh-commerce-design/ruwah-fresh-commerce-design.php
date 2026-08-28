@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial commerce experience for Ruwah Beauty using live WooCommerce products, pricing, stock, media and reviews.
- * Version: 6.4.2
+ * Version: 6.4.3
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '6.4.2';
+    private const VERSION = '6.4.3';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
@@ -206,13 +206,13 @@ final class Ruwah_Fresh_Commerce_Design {
         $terms_url = ''; if (function_exists('wc_get_page_id')) { $terms_id = (int) wc_get_page_id('terms'); if ($terms_id > 0) $terms_url = get_permalink($terms_id); } ?>
         <footer class="rwb-dieux-footer" id="rwb-reference-footer">
             <div class="rwb-dieux-footer-main">
-                <section class="rwb-dieux-footer-signup" aria-labelledby="rwb-footer-signup-title"><h2 id="rwb-footer-signup-title">Get Ruwah-y</h2><form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"><input type="hidden" name="action" value="rwb_newsletter"><?php wp_nonce_field('rwb_newsletter', 'rwb_nonce'); ?><label class="screen-reader-text" for="rwb-dieux-footer-email">Email address</label><div class="rwb-dieux-footer-form"><input id="rwb-dieux-footer-email" type="email" name="email" required placeholder="My email address is"><button type="submit">Initiate Me</button></div></form><div class="rwb-dieux-footer-socials" aria-label="Ruwah social channels"><span aria-label="Facebook">f</span><span aria-label="Instagram">◎</span><span aria-label="TikTok">♪</span></div></section>
+                <section class="rwb-dieux-footer-signup" aria-labelledby="rwb-footer-signup-title"><h2 id="rwb-footer-signup-title">Join Ruwah Notes</h2><p>Skincare guidance, product updates and occasional offers. Unsubscribe any time.</p><form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"><input type="hidden" name="action" value="rwb_newsletter"><?php wp_nonce_field('rwb_newsletter', 'rwb_nonce'); ?><label class="screen-reader-text" for="rwb-dieux-footer-email">Email address</label><div class="rwb-dieux-footer-form"><input id="rwb-dieux-footer-email" type="email" name="email" required autocomplete="email" placeholder="Email address"><button type="submit">Subscribe</button></div></form><?php if ($privacy_url) : ?><small>By subscribing, you agree to receive Ruwah Notes by email. See our <a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a>.</small><?php endif; ?><div class="rwb-dieux-footer-socials" aria-label="Ruwah Beauty social channels"><a href="https://www.facebook.com/share/1BNAdjWpYW/" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on Facebook"><span aria-hidden="true">f</span></a><a href="https://www.instagram.com/rawah.beauty" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on Instagram"><span aria-hidden="true">◎</span></a><a href="https://vt.tiktok.com/ZSX6WqwS2/" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on TikTok"><span aria-hidden="true">♪</span></a></div></section>
                 <section class="rwb-dieux-footer-col"><h2>Shop</h2><?php foreach ($products as $product) : $copy = self::display_copy($product); ?><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($copy['name']); ?></a><?php endforeach; ?><a href="<?php echo esc_url($shop_url); ?>">Shop All</a></section>
                 <section class="rwb-dieux-footer-col"><h2>Learn</h2><a href="<?php echo esc_url(home_url('/#rwb-genesis')); ?>">Our Genesis</a><a href="<?php echo esc_url(home_url('/#rwb-standard')); ?>">The Ruwah Standard</a><a href="<?php echo esc_url(home_url('/#rituals')); ?>">Rituals</a><a href="<?php echo esc_url($shop_url); ?>">Formula Guide</a></section>
-                <section class="rwb-dieux-footer-col"><h2>Contact</h2><a href="<?php echo esc_url($contact_url); ?>">Contact Us</a><?php if ($privacy_url) : ?><a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a><?php endif; ?><a href="<?php echo esc_url($account_url); ?>">My Account</a><a href="<?php echo esc_url($shop_url); ?>">Shopping Bag</a></section>
-                <section class="rwb-dieux-footer-promise"><h2>Our Promise</h2><div class="rwb-dieux-promise-mark" aria-hidden="true"><span>◉</span><b>RUWAH<br>PROMISE</b></div><p>Exact pack details.<br>Live price &amp; stock.<br>No filler claims.</p></section>
+                <section class="rwb-dieux-footer-col"><h2>Contact</h2><a href="mailto:rawahbeauty783@gmail.com" aria-label="Email Ruwah Beauty support at rawahbeauty783@gmail.com">rawahbeauty783@gmail.com</a><a href="https://wa.me/923713923279" target="_blank" rel="noopener noreferrer" aria-label="Chat with Ruwah Beauty on WhatsApp">WhatsApp Support</a><a href="<?php echo esc_url($contact_url); ?>">Contact Us</a><?php if ($privacy_url) : ?><a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a><?php endif; ?><a href="<?php echo esc_url($account_url); ?>">My Account</a><small>Support replies are typically sent within 2 business days.</small></section>
+                <section class="rwb-dieux-footer-promise"><h2>Our Promise</h2><div class="rwb-dieux-promise-mark" aria-hidden="true"><span>◉</span><b>RUWAH<br>PROMISE</b></div><p>Clear product details.<br>Current price &amp; availability.<br>Measured skincare claims.</p></section>
             </div>
-            <div class="rwb-dieux-footer-bottom"><div class="rwb-dieux-footer-meta"><b>© <?php echo esc_html(wp_date('Y')); ?> Ruwah Beauty</b><span>Pakistan · Online skincare</span><div class="rwb-dieux-payments"><span>PAYFAST</span><span>SECURE</span></div></div><nav class="rwb-dieux-footer-legal" aria-label="Footer legal links"><?php if ($terms_url) : ?><a href="<?php echo esc_url($terms_url); ?>">Terms of Service</a><?php endif; ?><?php if ($privacy_url) : ?><a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a><?php endif; ?><a href="<?php echo esc_url($refund_url); ?>">Refund Policy</a><a href="<?php echo esc_url($contact_url); ?>">Contact</a></nav></div>
+            <div class="rwb-dieux-footer-bottom"><div class="rwb-dieux-footer-meta"><b>© <?php echo esc_html(wp_date('Y')); ?> Ruwah Beauty</b><span>Pakistan · Online skincare</span><div class="rwb-dieux-payments"><span>COD ONLY</span></div></div><nav class="rwb-dieux-footer-legal" aria-label="Footer legal links"><?php if ($terms_url) : ?><a href="<?php echo esc_url($terms_url); ?>">Terms of Service</a><?php endif; ?><?php if ($privacy_url) : ?><a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a><?php endif; ?><a href="<?php echo esc_url($refund_url); ?>">Refund Policy</a><a href="<?php echo esc_url($contact_url); ?>">Contact</a></nav></div>
             <a class="rwb-dieux-footer-promo" href="#rwb-dieux-footer-email">Join Ruwah Notes <span aria-hidden="true">×</span></a>
         </footer><?php
     }
