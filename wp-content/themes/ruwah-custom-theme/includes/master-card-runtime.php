@@ -76,6 +76,20 @@ add_filter('woocommerce_product_object_query_args', static function (array $args
     return $args;
 }, 50);
 
+/* Pair With: replace the Toner selection with Rice Glow Serum, while rendering all product details live from WooCommerce. */
+add_filter('woocommerce_related_products', static function (array $related, int $product_id, array $args): array {
+    $toner_id = 56;
+    $serum_id = 64;
+    if ($product_id === $serum_id) return array_values(array_filter(array_map('intval', $related), static fn(int $id): bool => $id !== $toner_id));
+    foreach ($related as $index => $id) {
+        if ((int) $id === $toner_id) {
+            $related[$index] = $serum_id;
+            break;
+        }
+    }
+    return array_values(array_unique(array_map('intval', $related)));
+}, 20, 3);
+
 /* Homepage already renders the exact Shop/footer markup through home-footer-dedup.php. */
 add_action('wp_enqueue_scripts', static function (): void {
     if (! is_front_page()) return;
