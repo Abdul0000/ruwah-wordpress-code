@@ -27,6 +27,23 @@ function rwb_remove_closure_at_priority(string $hook, int $priority, string $sou
     }
 }
 
+/* Checkout masthead must use the same approved homepage logo attachment. */
+add_filter('get_custom_logo', static function (string $html): string {
+    if (! function_exists('is_checkout') || ! is_checkout() || (function_exists('is_wc_endpoint_url') && is_wc_endpoint_url('order-received'))) {
+        return $html;
+    }
+    $image = wp_get_attachment_image(262, 'full', false, [
+        'class' => 'custom-logo',
+        'alt' => 'Ruwah Beauty',
+        'loading' => 'eager',
+        'decoding' => 'async',
+    ]);
+    if (! $image) {
+        return $html;
+    }
+    return '<a href="' . esc_url(home_url('/')) . '" class="custom-logo-link" rel="home" aria-label="Ruwah Beauty home">' . wp_kses_post($image) . '</a>';
+}, 30000);
+
 /* Remove only the older phone closures from home-footer-dedup.php so one implementation owns the field. */
 add_action('wp_loaded', static function (): void {
     $legacy = __DIR__ . '/home-footer-dedup.php';
