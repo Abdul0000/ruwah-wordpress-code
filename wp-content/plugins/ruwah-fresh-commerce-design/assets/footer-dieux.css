@@ -52,8 +52,8 @@ html body .rwb-ref-cart-paired{height:auto!important;min-height:0!important;marg
 html body .rwb-ref-cart-paired-row{height:auto!important;min-height:0!important;margin-bottom:0!important}
 @media(max-width:680px){html body .rwb-ref-cart-paired{padding-bottom:14px!important}}
 
-/* Homepage hero logo: keep original purple artwork, add clean separation from photography. */
-.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand{position:relative!important;isolation:isolate!important;padding:8px 18px!important;border:1px solid rgba(255,255,255,.62)!important;border-radius:16px!important;background:rgba(247,243,233,.88)!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;box-shadow:0 8px 28px rgba(28,18,36,.18)!important}
-.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand:before{display:none!important;content:none!important}
-.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{opacity:1!important;filter:drop-shadow(0 1px 0 rgba(255,255,255,.78)) drop-shadow(0 3px 9px rgba(38,22,48,.30))!important}
-@media(max-width:782px){.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand{padding:6px 12px!important;border-radius:13px!important}}
+/* Homepage hero logo: borderless premium halo; no sticker/card effect. */
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand{position:relative!important;isolation:isolate!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand:before{display:block!important;content:''!important;position:absolute!important;z-index:-1!important;left:50%!important;top:50%!important;width:190px!important;height:88px!important;transform:translate(-50%,-50%)!important;border-radius:50%!important;background:radial-gradient(ellipse at center,rgba(247,243,233,.78) 0%,rgba(247,243,233,.42) 43%,rgba(247,243,233,.12) 64%,rgba(247,243,233,0) 78%)!important;filter:blur(7px)!important;pointer-events:none!important}
+.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{opacity:1!important;filter:drop-shadow(0 1px 0 rgba(255,255,255,.70)) drop-shadow(0 4px 10px rgba(35,20,45,.34))!important}
+@media(max-width:782px){.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand:before{width:150px!important;height:70px!important;filter:blur(6px)!important}}
