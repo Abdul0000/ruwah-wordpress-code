@@ -68,3 +68,14 @@ add_action('wp_enqueue_scripts', static function (): void {
         }
     ');
 }, 40000);
+
+/* Product search: reuse the existing master-card search template. */
+add_filter('template_include', static function (string $template): string {
+    if (! is_search()) return $template;
+    $post_type = get_query_var('post_type');
+    $is_product_search = 'product' === $post_type || (is_array($post_type) && in_array('product', $post_type, true));
+    if (! $is_product_search) return $template;
+
+    $custom = WP_PLUGIN_DIR . '/ruwah-fresh-commerce-design/templates/product-search.php';
+    return is_readable($custom) ? $custom : $template;
+}, 500);
