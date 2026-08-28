@@ -34,6 +34,8 @@ add_action('template_redirect', static function (): void {
             $html
         ) ?: $html;
 
+        $html = preg_replace('~<footer class="rhp-footer"[^>]*>.*?</footer>~s', '', $html, 1) ?: $html;
+
         return $html;
     });
 }, 0);
@@ -67,7 +69,7 @@ add_action('wp_footer', static function (): void {
                     <?php wp_nonce_field('rwb_newsletter', 'rwb_nonce'); ?>
                     <label class="screen-reader-text" for="rwb-dieux-footer-email">Email address</label>
                     <div class="rwb-dieux-footer-form">
-                        <input id="rwb-dieux-footer-email" type="email" name="email" required autocomplete="email" placeholder="Email address">
+                        <input id="rwb-dieux-footer-email" type="email" name="email" autocomplete="email" placeholder="Email address">
                     </div>
                 </form>
                 <?php if ($privacy_url) : ?><small>Ruwah Notes signup is currently paused. See our <a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a>.</small><?php endif; ?>
@@ -79,8 +81,8 @@ add_action('wp_footer', static function (): void {
             </section>
 
             <section class="rwb-dieux-footer-col"><h2>Shop</h2>
-                <?php foreach ($products as $product) : if (! $product instanceof WC_Product) continue; $copy = Ruwah_Fresh_Commerce_Design::display_copy($product); ?>
-                    <a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($copy['name']); ?></a>
+                <?php foreach ($products as $product) : if (! $product instanceof WC_Product) continue; ?>
+                    <a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($product->get_name()); ?></a>
                 <?php endforeach; ?>
                 <a href="<?php echo esc_url($shop_url); ?>">Shop All</a>
             </section>
