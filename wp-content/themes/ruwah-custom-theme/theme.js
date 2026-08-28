@@ -104,7 +104,90 @@ const protectContactDock=()=>{
   }
 };
 
+const installCheckoutInlineErrors=()=>{
+  if(!b.classList.contains('rwb-reference-checkout-v1'))return;
+  if(!q('#rwb-checkout-inline-error-styles')){
+    const style=document.createElement('style');
+    style.id='rwb-checkout-inline-error-styles';
+    style.textContent=`
+      body.rwb-reference-checkout-v1 .form-row.rwb-field-has-error input.input-text,
+      body.rwb-reference-checkout-v1 .form-row.rwb-field-has-error textarea,
+      body.rwb-reference-checkout-v1 .form-row.rwb-field-has-error select{border-color:#a63f54!important;box-shadow:0 0 0 3px rgba(166,63,84,.08)!important}
+      body.rwb-reference-checkout-v1 .form-row.rwb-field-has-error .select2-selection--single{border-color:#a63f54!important;box-shadow:0 0 0 3px rgba(166,63,84,.08)!important}
+      body.rwb-reference-checkout-v1 .rwb-inline-field-error{display:block;margin:5px 3px 0;color:#9a2f3f;font-size:10px;font-weight:600;line-height:1.35;letter-spacing:.005em}
+      body.rwb-reference-checkout-v1 .woocommerce-NoticeGroup-checkout:empty,body.rwb-reference-checkout-v1 .woocommerce-notices-wrapper:empty{display:none!important}
+    `;
+    document.head.appendChild(style);
+  }
+  const messageField=text=>{
+    const t=String(text||'').toLowerCase().replace(/\s+/g,' ').trim();
+    if(!t)return'';
+    const shipping=t.includes('shipping');
+    const prefix=shipping?'shipping_':'billing_';
+    if(t.includes('email'))return'billing_email';
+    if(t.includes('first name'))return prefix+'first_name';
+    if(t.includes('last name'))return prefix+'last_name';
+    if(t.includes('phone')||t.includes('mobile'))return'billing_phone';
+    if(t.includes('state')||t.includes('county'))return prefix+'state';
+    if(t.includes('postcode')||t.includes('postal code')||t.includes('zip'))return prefix+'postcode';
+    if(t.includes('city'))return prefix+'city';
+    if(t.includes('address')||t.includes('street')||t.includes('area details'))return prefix+'address_1';
+    if(t.includes('country')||t.includes('region'))return prefix+'country';
+    return'';
+  };
+  const fieldControl=key=>{
+    const input=q('#'+CSS.escape(key));
+    if(!input)return null;
+    if(input.classList.contains('select2-hidden-accessible'))return q('.select2-selection',input.closest('.form-row'))||input;
+    return input;
+  };
+  const clearField=row=>{
+    if(!row)return;
+    row.classList.remove('rwb-field-has-error');
+    qa('.rwb-inline-field-error',row).forEach(el=>el.remove());
+    const input=q('input,select,textarea',row);
+    if(input){input.removeAttribute('aria-invalid');const described=(input.getAttribute('aria-describedby')||'').split(/\s+/).filter(Boolean).filter(id=>!id.startsWith('rwb-error-'));if(described.length)input.setAttribute('aria-describedby',described.join(' '));else input.removeAttribute('aria-describedby')}
+  };
+  const render=(focusFirst=false)=>{
+    qa('.rwb-ref-checkout-body .form-row.rwb-field-has-error').forEach(clearField);
+    const notices=qa('.rwb-ref-checkout-body .woocommerce-error li');
+    const byField=new Map();
+    notices.forEach(li=>{
+      const text=(li.textContent||'').trim();
+      const dataId=(li.getAttribute('data-id')||li.dataset?.id||'').replace(/_field$/,'');
+      const key=dataId||messageField(text);
+      if(!key||!q('#'+CSS.escape(key)+'_field'))return;
+      const current=byField.get(key);
+      if(!current||text.length>current.text.length)byField.set(key,{text,items:[...(current?.items||[]),li]});else current.items.push(li);
+    });
+    byField.forEach((entry,key)=>{
+      const row=q('#'+CSS.escape(key)+'_field');
+      const input=q('#'+CSS.escape(key));
+      if(!row||!input)return;
+      row.classList.add('rwb-field-has-error');
+      input.setAttribute('aria-invalid','true');
+      const id='rwb-error-'+key;
+      const error=document.createElement('span');
+      error.className='rwb-inline-field-error';error.id=id;error.setAttribute('role','alert');error.textContent=entry.text;
+      row.appendChild(error);
+      const described=(input.getAttribute('aria-describedby')||'').split(/\s+/).filter(Boolean);if(!described.includes(id))described.push(id);input.setAttribute('aria-describedby',described.join(' '));
+      entry.items.forEach(li=>li.remove());
+    });
+    qa('.rwb-ref-checkout-body .woocommerce-error').forEach(list=>{if(!q('li',list)){const group=list.closest('.woocommerce-NoticeGroup,.woocommerce-notices-wrapper');if(group&&group.children.length<=1)group.remove();else list.remove()}});
+    if(!focusFirst)return;
+    const first=q('.rwb-ref-checkout-body #customer_details .rwb-field-has-error,.rwb-ref-checkout-body #customer_details .woocommerce-invalid');
+    if(!first)return;
+    first.scrollIntoView({behavior:reduced?'auto':'smooth',block:'center'});
+    setTimeout(()=>{const key=(first.id||'').replace(/_field$/,'');const control=fieldControl(key)||q('input,select,textarea,.select2-selection',first);try{control?.focus({preventScroll:true})}catch(e){control?.focus?.()}},reduced?0:280);
+  };
+  document.addEventListener('input',e=>{const row=e.target?.closest?.('.form-row.rwb-field-has-error');if(row)clearField(row)},true);
+  document.addEventListener('change',e=>{const row=e.target?.closest?.('.form-row.rwb-field-has-error');if(row)clearField(row)},true);
+  if(window.jQuery)window.jQuery(document.body).on('checkout_error',()=>setTimeout(()=>render(true),0));
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>render(false),{once:true});else render(false);
+};
+
 wireFooterSocials();
 installContactDock();
 protectContactDock();
+installCheckoutInlineErrors();
 })();
