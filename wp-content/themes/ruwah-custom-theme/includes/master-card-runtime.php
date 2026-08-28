@@ -72,11 +72,28 @@ add_action('wp_enqueue_scripts', static function (): void {
     wp_add_inline_style('rwb-theme', 'body.rwb-home-premium .rwb-dieux-footer{display:block!important}');
 }, 10050);
 
+/* Compact only the approved card text area; image ratio/height remains unchanged. */
+add_action('wp_enqueue_scripts', static function (): void {
+    if (! is_front_page() && ! rwb_master_card_runtime_surface()) return;
+    $compact = '.rhp-product-copy{padding:10px 14px 12px!important}.rhp-product-copy h3{margin-top:6px!important}.rhp-product-copy>p{min-height:32px!important;margin-top:6px!important;line-height:1.4!important}.rhp-rating{margin-top:6px!important}.rhp-price{margin-top:8px!important;gap:5px!important}.rhp-price small{line-height:1.2!important}.rhp-card-actions{padding-top:10px!important;gap:7px!important}.rhp-add,.rhp-quick{min-height:42px!important}';
+    if (is_front_page()) {
+        wp_add_inline_style('rwb-theme', $compact);
+    } else {
+        wp_add_inline_style('rwb-master-card-safe', $compact);
+    }
+}, 10060);
+
+/* Match the homepage-approved logo crop and proportions across non-home headers. */
+add_action('wp_enqueue_scripts', static function (): void {
+    if (is_front_page()) return;
+    wp_add_inline_style('rwb-theme', '.rwb-brand{display:grid!important;place-items:center!important;overflow:hidden!important;height:58px!important}.rwb-brand .custom-logo-link{display:block!important;height:58px!important;overflow:hidden!important}.rwb-brand .custom-logo{width:auto!important;max-width:145px!important;height:82px!important;max-height:none!important;object-fit:contain!important;object-position:top center!important;transform:translateY(-1px)!important}@media(max-width:782px){.rwb-brand,.rwb-brand .custom-logo-link{height:52px!important}.rwb-brand .custom-logo{max-width:128px!important;height:72px!important}}');
+}, 10070);
+
 add_action('wp_enqueue_scripts', static function (): void {
     if (! rwb_master_card_runtime_surface()) return;
-    wp_enqueue_style('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/home-premium.css'), ['rwb-theme'], '20260828.8');
+    wp_enqueue_style('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/home-premium.css'), ['rwb-theme'], '20260828.9');
     wp_enqueue_script('wc-add-to-cart');
-    wp_enqueue_script('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/product-card.js'), [], '20260828.8', true);
+    wp_enqueue_script('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/product-card.js'), [], '20260828.9', true);
     wp_script_add_data('rwb-master-card-safe', 'strategy', 'defer');
     wp_add_inline_style('rwb-master-card-safe', 'body{--rhp-ink:#171419;--rhp-muted:#625d65;--rhp-cream:#f7f3e9;--rhp-paper:#fbfaf6;--rhp-lilac:#876cad;--rhp-lilac-dark:#665082;--rhp-blue:#dce9e9;--rhp-line:rgba(23,20,25,.16);--rhp-radius:2px}.rhp-product-grid{display:grid;grid-template-columns:1fr;gap:14px}.rhp-loop-item{list-style:none!important}.rhp-loop-item>.rhp-product-card{height:100%}.rhp-shop-feature-banner{position:relative;min-height:520px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid var(--rhp-line);background:#dfe8e9;color:#fff}.rhp-shop-feature-banner>a:first-child{position:absolute;inset:0}.rhp-shop-feature-banner img{width:100%!important;height:100%!important;object-fit:cover!important;margin:0!important}.rhp-shop-feature-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(17,14,18,.04) 35%,rgba(17,14,18,.76) 100%);pointer-events:none}.rhp-shop-feature-banner__copy{position:relative;z-index:2;padding:24px}.rhp-shop-feature-banner__copy small{display:block;margin-bottom:8px;font-size:9px;letter-spacing:.08em;text-transform:uppercase}.rhp-shop-feature-banner__copy h2{margin:0 0 14px!important;color:#fff!important;font-family:var(--serif,Georgia,serif)!important;font-size:36px!important;font-weight:400!important;line-height:1!important}.rhp-shop-feature-banner__copy a{display:inline-flex;min-height:44px;align-items:center;padding:0 16px;border:1px solid rgba(255,255,255,.8);color:#fff!important;font-size:10px;font-weight:700;letter-spacing:.05em;text-decoration:none;text-transform:uppercase}@media(min-width:600px){.rhp-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(min-width:1024px){.rhp-product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.rhp-shop-feature-banner{min-height:100%}}');
 }, 10005);

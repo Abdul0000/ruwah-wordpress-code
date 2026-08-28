@@ -19,8 +19,8 @@ wp_head();
 $rwb_logo_id = (int) get_theme_mod('custom_logo', 0);
 $rwb_logo_url = $rwb_logo_id ? wp_get_attachment_url($rwb_logo_id) : '';
 if ($rwb_logo_url) {
-    $rwb_favicon_url = add_query_arg('rwb-favicon', '20260820', $rwb_logo_url);
-    echo '<link rel="icon" href="' . esc_url($rwb_favicon_url) . '">';
+    $rwb_favicon_url = add_query_arg('rwb-favicon', '20260828-1', $rwb_logo_url);
+    echo '<link rel="icon" type="image/png" href="' . esc_url($rwb_favicon_url) . '">';
     echo '<link rel="shortcut icon" href="' . esc_url($rwb_favicon_url) . '">';
     echo '<link rel="apple-touch-icon" href="' . esc_url($rwb_favicon_url) . '">';
 }
