@@ -8,6 +8,7 @@ add_filter('site_icon_url', static function (string $url): string {
 }, 20000);
 
 require_once __DIR__ . '/checkout-quickview-fix.php';
+require_once __DIR__ . '/home-nav-links-fix.php';
 
 if (! function_exists('rwb_render_master_product_card')) {
     function rwb_render_master_product_card(WC_Product $product, int $rank = 0): void {
