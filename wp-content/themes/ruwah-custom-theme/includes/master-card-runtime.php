@@ -58,6 +58,15 @@ function rwb_master_card_runtime_surface(): bool {
     return false;
 }
 
+/* Keep the main Shop focused on the approved original range only.
+ * Toner (56) and Repair Mask (58) remain published and directly accessible. */
+add_filter('woocommerce_product_object_query_args', static function (array $args): array {
+    if (is_admin() || ! function_exists('is_shop') || ! is_shop()) return $args;
+    $existing = isset($args['exclude']) ? array_map('intval', (array) $args['exclude']) : [];
+    $args['exclude'] = array_values(array_unique(array_merge($existing, [56, 58])));
+    return $args;
+}, 100);
+
 /* Homepage already renders the exact Shop/footer markup through home-footer-dedup.php.
  * home-premium.css was hiding that footer, so only undo that hide rule. */
 add_action('wp_enqueue_scripts', static function (): void {
