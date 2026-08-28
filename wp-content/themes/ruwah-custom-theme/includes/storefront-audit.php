@@ -3,7 +3,7 @@ defined('ABSPATH') || exit;
 
 /**
  * Storefront audit hardening + the approved homepage product-card renderer.
- * No product names, images, prices, savings, stock or URLs are hardcoded here.
+ * Product names, images, prices, savings, stock and URLs come from WooCommerce.
  */
 
 function rwb_audit_card_surface(): bool {
@@ -21,12 +21,27 @@ function rwb_audit_card_surface(): bool {
 }
 
 function rwb_master_card_info(WC_Product $product): array {
-    if (class_exists('Ruwah_Fresh_Commerce_Design')) {
-        $info = Ruwah_Fresh_Commerce_Design::display_copy($product);
-        if (is_array($info)) return $info;
-    }
     $tagline = trim(wp_strip_all_tags((string) $product->get_short_description()));
-    return ['name' => $product->get_name(), 'tagline' => $tagline, 'benefits' => [], 'size' => ''];
+    if ('' === $tagline) $tagline = wp_trim_words(wp_strip_all_tags((string) $product->get_description()), 24, '…');
+    $benefits = [];
+    $description = (string) $product->get_description();
+    if ($description && preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $description, $matches)) {
+        foreach ($matches[1] as $item) {
+            $item = trim(wp_strip_all_tags((string) $item));
+            if ('' !== $item && ! in_array($item, $benefits, true)) $benefits[] = $item;
+        }
+    }
+    $size = '';
+    foreach (['pa_size', 'size', 'pa_volume', 'volume'] as $attribute) {
+        $value = trim(wp_strip_all_tags((string) $product->get_attribute($attribute)));
+        if ('' !== $value) { $size = $value; break; }
+    }
+    return [
+        'name' => (string) $product->get_name(),
+        'tagline' => $tagline,
+        'benefits' => array_slice($benefits, 0, 4),
+        'size' => $size,
+    ];
 }
 
 function rwb_render_master_product_card(WC_Product $product, int $rank = 0): void {
@@ -41,7 +56,7 @@ function rwb_render_master_product_card(WC_Product $product, int $rank = 0): voi
     $image_url = wp_get_attachment_image_url((int) $product->get_image_id(), 'woocommerce_single') ?: '';
     $benefit = ! empty($info['benefits'][0]) ? (string) $info['benefits'][0] : (string) ($info['tagline'] ?? '');
     $stock_text = $product->is_in_stock() ? 'In stock' : 'Out of stock';
-    $name = (string) ($info['name'] ?? $product->get_name());
+    $name = (string) $product->get_name();
     ?>
     <article class="rhp-product-card">
         <a class="rhp-product-image" href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="View <?php echo esc_attr($name); ?>">
@@ -78,9 +93,9 @@ function rwb_audit_home_bestsellers(): array {
 add_action('wp_enqueue_scripts', static function (): void {
     if (! rwb_audit_card_surface()) return;
     if (! is_front_page()) {
-        wp_enqueue_style('rwb-master-product-card', plugins_url('ruwah-fresh-commerce-design/assets/home-premium.css'), ['rwb-theme'], '20260828.2');
+        wp_enqueue_style('rwb-master-product-card', plugins_url('ruwah-fresh-commerce-design/assets/home-premium.css'), ['rwb-theme'], '20260828.3');
     }
-    wp_enqueue_script('rwb-master-product-card', plugins_url('ruwah-fresh-commerce-design/assets/product-card.js'), [], '20260828.2', true);
+    wp_enqueue_script('rwb-master-product-card', plugins_url('ruwah-fresh-commerce-design/assets/product-card.js'), [], '20260828.3', true);
     wp_script_add_data('rwb-master-product-card', 'strategy', 'defer');
     $css = <<<'CSS'
 .rhp-product-card,.rhp-quick-view{--rhp-ink:#171419;--rhp-muted:#625d65;--rhp-cream:#f7f3e9;--rhp-paper:#fbfaf6;--rhp-lilac:#876cad;--rhp-lilac-dark:#665082;--rhp-blue:#dce9e9;--rhp-line:rgba(23,20,25,.16);--rhp-radius:2px}
@@ -105,7 +120,6 @@ add_action('wp_footer', static function (): void {
     <?php
 }, 45);
 
-/* Homepage runtime now renders the approved card through the same shared component. */
 add_action('template_redirect', static function (): void {
     if (! is_front_page()) return;
     ob_start(static function (string $html): string {
@@ -134,11 +148,11 @@ add_action('template_redirect', static function (): void {
             $pattern = '~(<section class="rhp-section rhp-bestsellers"[^>]*>.*?<div class="rhp-product-grid">).*?(</div>\s*<div class="rhp-centered">)~s';
             $html = preg_replace($pattern, '$1' . $cards . '$2', $html, 1) ?: $html;
         }
+        $html = preg_replace('~<footer class="rwb-dieux-footer"[^>]*>.*?</footer>~s', '', $html) ?: $html;
         return $html;
     });
 }, 2);
 
-/* Pair With on product pages uses the same master component at runtime. */
 add_action('template_redirect', static function (): void {
     if (! function_exists('is_product') || ! is_product()) return;
     ob_start(static function (string $html): string {
@@ -152,14 +166,18 @@ add_action('template_redirect', static function (): void {
             $pattern = '~(<div class="rwb-commerce-pair-grid(?: rhp-product-grid)?">).*?(</div>\s*</div>\s*</section>)~s';
             $html = preg_replace($pattern, '<div class="rwb-commerce-pair-grid rhp-product-grid">' . $cards . '$2', $html, 1) ?: $html;
         }
-        if (64 === (int) $product->get_id() && 'NUB-EYE-01' === $product->get_sku()) {
-            $html = str_replace('<li>SKU: NUB-EYE-01</li>', '', $html);
+        if (64 === (int) $product->get_id() && 'NUB-EYE-01' === $product->get_sku()) $html = str_replace('<li>SKU: NUB-EYE-01</li>', '', $html);
+        if (68 === (int) $product->get_id()) {
+            $html = str_replace(
+                'A lightweight daily sun lotion designed to protect while keeping skin comfortable and radiant-looking.',
+                'A lightweight daily sun-care lotion for comfortable everyday routines and a radiant-looking finish. Check the packaging for verified protection claims and directions.',
+                $html
+            );
         }
         return $html;
     });
 }, 3);
 
-/* Permanent redirects for duplicate/empty public destinations. */
 add_action('template_redirect', static function (): void {
     if (is_admin()) return;
     $path = isset($_SERVER['REQUEST_URI']) ? (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI']), PHP_URL_PATH) : '';
@@ -171,21 +189,16 @@ add_action('template_redirect', static function (): void {
         '/bundles' => function_exists('wc_get_page_permalink') ? wc_get_page_permalink('shop') : home_url('/shop/'),
         '/quality-testing' => home_url('/quality-safety/'),
     ];
-    if (isset($redirects[$path])) {
-        wp_safe_redirect($redirects[$path], 301, 'Ruwah Storefront');
+    if (isset($redirects[$path])) { wp_safe_redirect($redirects[$path], 301, 'Ruwah Storefront'); exit; }
+    if (function_exists('is_product_category') && is_product_category('eye-care')) {
+        $serums = get_term_by('slug', 'serums', 'product_cat');
+        $target = $serums instanceof WP_Term ? get_term_link($serums) : false;
+        wp_safe_redirect(! is_wp_error($target) && $target ? $target : home_url('/shop/'), 301, 'Ruwah Storefront');
         exit;
     }
-    if (is_author()) {
-        wp_safe_redirect(home_url('/'), 301, 'Ruwah Storefront');
-        exit;
-    }
-    if (is_category('uncategorized')) {
-        wp_safe_redirect(home_url('/'), 301, 'Ruwah Storefront');
-        exit;
-    }
+    if (is_author() || is_category('uncategorized')) { wp_safe_redirect(home_url('/'), 301, 'Ruwah Storefront'); exit; }
 }, 0);
 
-/* Empty linked pages get useful, factual customer content without inventing operational promises. */
 add_filter('the_content', static function (string $content): string {
     if (is_admin() || ! is_main_query() || ! in_the_loop() || '' !== trim(wp_strip_all_tags($content))) return $content;
     $id = get_the_ID();
@@ -198,14 +211,9 @@ add_filter('the_content', static function (string $content): string {
     return $pages[$id] ?? $content;
 }, 50);
 
-/* Remove redirect-only and personal archive URLs from core sitemaps. */
-add_filter('wp_sitemaps_add_provider', static function ($provider, string $name) {
-    return 'users' === $name ? false : $provider;
-}, 10, 2);
+add_filter('wp_sitemaps_add_provider', static function ($provider, string $name) { return 'users' === $name ? false : $provider; }, 10, 2);
 add_filter('wp_sitemaps_posts_query_args', static function (array $args, string $post_type): array {
-    if ('page' === $post_type) {
-        $args['post__not_in'] = array_values(array_unique(array_merge((array) ($args['post__not_in'] ?? []), [81, 83, 79, 80, 26])));
-    }
+    if ('page' === $post_type) $args['post__not_in'] = array_values(array_unique(array_merge((array) ($args['post__not_in'] ?? []), [81, 83, 79, 80, 26])));
     return $args;
 }, 10, 2);
 add_filter('wp_sitemaps_taxonomies_query_args', static function (array $args, string $taxonomy): array {
@@ -213,15 +221,19 @@ add_filter('wp_sitemaps_taxonomies_query_args', static function (array $args, st
         $term = get_term_by('slug', 'uncategorized', 'category');
         if ($term instanceof WP_Term) $args['exclude'] = array_values(array_unique(array_merge((array) ($args['exclude'] ?? []), [(int) $term->term_id])));
     }
+    if ('product_cat' === $taxonomy) {
+        $term = get_term_by('slug', 'eye-care', 'product_cat');
+        if ($term instanceof WP_Term && 0 === (int) $term->count) $args['exclude'] = array_values(array_unique(array_merge((array) ($args['exclude'] ?? []), [(int) $term->term_id])));
+    }
     return $args;
 }, 10, 2);
 
-/* SEO metadata and archive canonicals. */
 function rwb_audit_meta_description(): string {
     if (is_front_page()) return '';
     if (function_exists('is_product') && is_product() && function_exists('wc_get_product')) {
         $product = wc_get_product(get_queried_object_id());
         if ($product instanceof WC_Product) {
+            if (68 === (int) $product->get_id()) return 'Shop Rice Glow Sun Lotion from Ruwah Beauty Pakistan for an everyday sun-care routine. Check the packaging for verified protection claims and directions. Cash on delivery.';
             $info = rwb_master_card_info($product);
             $copy = trim((string) ($info['tagline'] ?? ''));
             if ('' === $copy) $copy = trim(wp_strip_all_tags((string) $product->get_short_description()));
@@ -256,31 +268,24 @@ function rwb_audit_meta_description(): string {
 add_action('wp_head', static function (): void {
     $description = rwb_audit_meta_description();
     if ('' !== $description) echo '<meta name="description" content="' . esc_attr($description) . '">' . "\n";
-    if (function_exists('is_shop') && is_shop()) {
-        echo '<link rel="canonical" href="' . esc_url(wc_get_page_permalink('shop')) . '">' . "\n";
-    } elseif (function_exists('is_product_taxonomy') && is_product_taxonomy()) {
+    if (function_exists('is_shop') && is_shop()) echo '<link rel="canonical" href="' . esc_url(wc_get_page_permalink('shop')) . '">' . "\n";
+    elseif (function_exists('is_product_taxonomy') && is_product_taxonomy()) {
         $term = get_queried_object();
-        if ($term instanceof WP_Term) {
-            $url = get_term_link($term);
-            if (! is_wp_error($url)) echo '<link rel="canonical" href="' . esc_url($url) . '">' . "\n";
-        }
+        if ($term instanceof WP_Term) { $url = get_term_link($term); if (! is_wp_error($url)) echo '<link rel="canonical" href="' . esc_url($url) . '">' . "\n"; }
     }
 }, 2);
 
-/* One visible archive H1: keep the theme/archive title and suppress WooCommerce's duplicate. */
 add_filter('woocommerce_show_page_title', static function (bool $show): bool {
     return (function_exists('is_product_taxonomy') && is_product_taxonomy()) ? false : $show;
 }, 100);
 
-/* Give thin product categories useful selection context without inventing claims. */
-add_filter('term_description', static function (string $description, int $term_id, string $taxonomy): string {
-    if ('product_cat' !== $taxonomy || '' !== trim(wp_strip_all_tags($description))) return $description;
-    $term = get_term($term_id, $taxonomy);
-    if (! $term instanceof WP_Term) return $description;
+add_filter('term_description', static function (string $description, int $term_id = 0, string $taxonomy = ''): string {
+    if ('' !== trim(wp_strip_all_tags($description))) return $description;
+    $term = $term_id > 0 ? get_term($term_id, $taxonomy ?: 'product_cat') : get_queried_object();
+    if (! $term instanceof WP_Term || 'product_cat' !== $term->taxonomy) return $description;
     return '<p>Browse Ruwah Beauty ' . esc_html($term->name) . ' products with current price, availability and product-specific cosmetic information. Choose by your routine needs and review the product page before ordering.</p>';
 }, 20, 3);
 
-/* Product structured data is generated even though the custom PDP does not fire the default summary hook. */
 add_action('wp', static function (): void {
     if (! function_exists('is_product') || ! is_product() || ! function_exists('WC') || ! WC()->structured_data || ! function_exists('wc_get_product')) return;
     $product = wc_get_product(get_queried_object_id());
@@ -288,16 +293,14 @@ add_action('wp', static function (): void {
 }, 40);
 add_filter('woocommerce_structured_data_product', static function (array $markup, WC_Product $product): array {
     if (64 === (int) $product->get_id() && 'NUB-EYE-01' === $product->get_sku()) unset($markup['sku']);
+    if (68 === (int) $product->get_id() && isset($markup['description'])) $markup['description'] = 'A lightweight daily sun-care lotion for comfortable everyday routines. Check the packaging for verified protection claims and directions.';
     return $markup;
 }, 50, 2);
 
-/* Do not publish exact inventory counts to customers. */
 add_filter('woocommerce_get_stock_html', static function (string $html, WC_Product $product): string {
-    if ($product->is_in_stock()) return '<p class="stock in-stock">In stock</p>';
-    return '<p class="stock out-of-stock">Out of stock</p>';
+    return $product->is_in_stock() ? '<p class="stock in-stock">In stock</p>' : '<p class="stock out-of-stock">Out of stock</p>';
 }, 100, 2);
 
-/* Correct Rice Glow Serum's category without inventing a replacement SKU. */
 add_action('init', static function (): void {
     if ('20260828-v1' === get_option('rwb_rice_glow_category_fix')) return;
     if (! taxonomy_exists('product_cat') || 'product' !== get_post_type(64)) return;
@@ -308,7 +311,6 @@ add_action('init', static function (): void {
     update_option('rwb_rice_glow_category_fix', '20260828-v1', false);
 }, 80);
 
-/* Product searches use the same product-card component as every Woo grid. */
 add_filter('template_include', static function (string $template): string {
     if (! is_search()) return $template;
     $post_type = get_query_var('post_type');
