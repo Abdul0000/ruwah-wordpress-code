@@ -7,7 +7,7 @@ if (is_readable($ruwah_product_cleanup)) {
     }
 }
 
-/* One footer system sitewide: remove the plugin legacy footer before wp_footer runs. */
+/* Keep one footer renderer visible: suppress the plugin legacy footer. */
 if (class_exists('Ruwah_Fresh_Commerce_Design')) {
     remove_action('wp_footer', [Ruwah_Fresh_Commerce_Design::class, 'reference_footer'], 5);
 }
@@ -44,40 +44,28 @@ if (function_exists('wc_get_page_id')) {
             <?php if ($privacy_url) : ?>
                 <small>Ruwah Notes signup is currently paused. See our <a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a>.</small>
             <?php endif; ?>
-            <div class="rwb-dieux-footer-socials rwb-unified-socials" aria-label="Ruwah Beauty social channels">
-                <a class="rwb-social-link" href="https://www.facebook.com/share/1BNAdjWpYW/" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on Facebook" title="Facebook">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.9.3-1.6 1.7-1.6h1.5V4.8c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 4v2.3H8v3h2.6v8z"/></svg>
-                    <span class="screen-reader-text">Facebook</span>
-                </a>
-                <a class="rwb-social-link" href="https://www.instagram.com/rawah.beauty" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on Instagram" title="Instagram">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2.2A2.8 2.8 0 0 0 4.2 7v10A2.8 2.8 0 0 0 7 19.8h10a2.8 2.8 0 0 0 2.8-2.8V7A2.8 2.8 0 0 0 17 4.2H7zm5 3.3A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5zm0 2.2A2.3 2.3 0 1 0 14.3 12 2.3 2.3 0 0 0 12 9.7zm4.9-3.4a1.1 1.1 0 1 1-1.1 1.1 1.1 1.1 0 0 1 1.1-1.1z"/></svg>
-                    <span class="screen-reader-text">Instagram</span>
-                </a>
-                <a class="rwb-social-link" href="https://vt.tiktok.com/ZSX6WqwS2/" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on TikTok" title="TikTok">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M14.8 3c.3 1.8 1.4 3 3.2 3.3v2.6c-1.1 0-2.1-.3-3-.8v5.5a5.3 5.3 0 1 1-5.3-5.2c.3 0 .6 0 .9.1v2.7a2.6 2.6 0 1 0 1.8 2.5V3z"/></svg>
-                    <span class="screen-reader-text">TikTok</span>
-                </a>
+            <div class="rwb-dieux-footer-socials" aria-label="Ruwah Beauty social channels">
+                <a href="https://www.facebook.com/share/1BNAdjWpYW/" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on Facebook">Facebook</a>
+                <a href="https://www.instagram.com/rawah.beauty" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on Instagram">Instagram</a>
+                <a href="https://vt.tiktok.com/ZSX6WqwS2/" target="_blank" rel="noopener noreferrer" aria-label="Ruwah Beauty on TikTok">TikTok</a>
             </div>
         </section>
 
-        <section class="rwb-dieux-footer-col">
-            <h2>Shop</h2>
+        <section class="rwb-dieux-footer-col"><h2>Shop</h2>
             <?php foreach ($products as $product) : if (! $product instanceof WC_Product) continue; ?>
                 <a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($product->get_name()); ?></a>
             <?php endforeach; ?>
             <a href="<?php echo esc_url($shop_url); ?>">Shop All</a>
         </section>
 
-        <section class="rwb-dieux-footer-col">
-            <h2>Learn</h2>
+        <section class="rwb-dieux-footer-col"><h2>Learn</h2>
             <a href="<?php echo esc_url(home_url('/#rwb-genesis')); ?>">Our Genesis</a>
             <a href="<?php echo esc_url(home_url('/#rwb-standard')); ?>">The Ruwah Standard</a>
             <a href="<?php echo esc_url(home_url('/#rituals')); ?>">Rituals</a>
             <a href="<?php echo esc_url($shop_url); ?>">Formula Guide</a>
         </section>
 
-        <section class="rwb-dieux-footer-col">
-            <h2>Contact</h2>
+        <section class="rwb-dieux-footer-col"><h2>Contact</h2>
             <a href="mailto:rawahbeauty783@gmail.com" aria-label="Email Ruwah Beauty support at rawahbeauty783@gmail.com">rawahbeauty783@gmail.com</a>
             <a href="https://wa.me/923713923279" target="_blank" rel="noopener noreferrer" aria-label="Chat with Ruwah Beauty on WhatsApp">WhatsApp Support</a>
             <a href="<?php echo esc_url($contact_url); ?>">Contact Us</a>
@@ -86,8 +74,7 @@ if (function_exists('wc_get_page_id')) {
             <small>Support replies are typically sent within 2 business days.</small>
         </section>
 
-        <section class="rwb-dieux-footer-promise">
-            <h2>Our Promise</h2>
+        <section class="rwb-dieux-footer-promise"><h2>Our Promise</h2>
             <div class="rwb-dieux-promise-mark" aria-hidden="true"><span>◉</span><b>RUWAH<br>PROMISE</b></div>
             <p>Clear product details.<br>Current price &amp; availability.<br>Measured skincare claims.</p>
         </section>
@@ -108,18 +95,9 @@ if (function_exists('wc_get_page_id')) {
     </div>
 </footer>
 
-<style id="rwb-unified-footer-runtime-styles">
+<style id="rwb-contact-dock-server-styles">
 .rwb-dieux-footer-promo{display:none!important}
-.rwb-unified-socials{display:flex!important;gap:18px!important;margin-top:32px!important;align-items:center!important;flex-wrap:wrap!important}
-.rwb-unified-socials .rwb-social-link{width:54px!important;height:54px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;border-radius:50%!important;background:#fff!important;color:#050505!important;text-decoration:none!important;line-height:0!important;transition:transform .18s ease,opacity .18s ease!important}
-.rwb-unified-socials .rwb-social-link:hover,.rwb-unified-socials .rwb-social-link:focus-visible{transform:translateY(-2px)!important;opacity:.92!important}
-.rwb-unified-socials .rwb-social-link svg{width:26px!important;height:26px!important;display:block!important;fill:currentColor!important}
 .rwb-dieux-footer-form button{display:none!important}
-.rwb-dieux-footer-bottom{display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:24px!important;flex-wrap:wrap!important}
-.rwb-dieux-footer-meta{flex:1 1 680px!important;width:auto!important;max-width:none!important;min-width:0!important}
-.rwb-dieux-footer-legal{flex:0 1 auto!important;margin-left:auto!important}
-@media(max-width:899px){.rwb-dieux-footer-bottom{align-items:flex-start!important}.rwb-dieux-footer-meta{flex-basis:100%!important}.rwb-dieux-footer-legal{margin-left:0!important}}
-@media(max-width:560px){.rwb-unified-socials .rwb-social-link{width:48px!important;height:48px!important}.rwb-unified-socials .rwb-social-link svg{width:23px!important;height:23px!important}}
 .rwb-contact-dock{position:fixed;right:22px;bottom:max(22px,env(safe-area-inset-bottom));z-index:125;display:flex;flex-direction:column;align-items:flex-end;font-family:Inter,Arial,sans-serif}
 .rwb-contact-dock-item{position:relative;width:56px;height:56px;display:grid;place-items:center;border-radius:50%;box-shadow:0 7px 24px rgba(0,0,0,.18);transition:transform .18s ease,box-shadow .18s ease;text-decoration:none!important}
 .rwb-contact-dock-item:hover,.rwb-contact-dock-item:focus-visible{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.24)}
