@@ -7,6 +7,8 @@ add_filter('site_icon_url', static function (string $url): string {
     return $url ? add_query_arg('rwb-icon', '20260828-2', $url) : $url;
 }, 20000);
 
+require_once __DIR__ . '/checkout-quickview-fix.php';
+
 if (! function_exists('rwb_render_master_product_card')) {
     function rwb_render_master_product_card(WC_Product $product, int $rank = 0): void {
         if (! $product->is_visible()) return;
