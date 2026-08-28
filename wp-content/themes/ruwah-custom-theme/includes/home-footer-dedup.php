@@ -59,6 +59,9 @@ add_action('wp_footer', static function (): void {
         }
     }
     ?>
+    <style id="rwb-home-shop-footer-visibility-fix">
+        html body.rwb-home-premium footer#rwb-reference-footer.rwb-dieux-footer{display:block!important;visibility:visible!important;opacity:1!important}
+    </style>
     <footer class="rwb-dieux-footer" id="rwb-reference-footer">
         <div class="rwb-dieux-footer-main">
             <section class="rwb-dieux-footer-signup" aria-labelledby="rwb-footer-signup-title">
