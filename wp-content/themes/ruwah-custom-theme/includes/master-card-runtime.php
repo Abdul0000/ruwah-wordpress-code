@@ -8,6 +8,7 @@ add_filter('site_icon_url', static function (string $url): string {
 }, 20000);
 
 require_once __DIR__ . '/checkout-quickview-fix.php';
+require_once __DIR__ . '/quick-view-functional.php';
 require_once __DIR__ . '/home-nav-links-fix.php';
 
 if (! function_exists('rwb_render_master_product_card')) {
@@ -47,7 +48,7 @@ if (! function_exists('rwb_render_master_product_card')) {
                 <div class="rhp-price"><?php if ($saving > 0) : ?><del><?php echo wp_kses_post(wc_price($regular, ['decimals' => 0])); ?></del><?php endif; ?><strong><?php echo wp_kses_post(wc_price($price, ['decimals' => 0])); ?></strong><?php if ($saving > 0) : ?><small>You save <?php echo wp_kses_post(wc_price($saving, ['decimals' => 0])); ?></small><?php endif; ?></div>
                 <div class="rhp-card-actions">
                     <?php if ($can_cart) : ?><a class="rhp-add add_to_cart_button ajax_add_to_cart" rel="nofollow" aria-label="Add <?php echo esc_attr($name); ?> to cart" data-product_id="<?php echo esc_attr((string) $product->get_id()); ?>" data-product_sku="<?php echo esc_attr($product->get_sku()); ?>" data-quantity="1" href="<?php echo esc_url($product->add_to_cart_url()); ?>">Add to cart</a><?php else : ?><a class="rhp-add" href="<?php echo esc_url($product->get_permalink()); ?>">View product</a><?php endif; ?>
-                    <button class="rhp-quick" type="button" data-quick-view data-qv-name="<?php echo esc_attr($name); ?>" data-qv-image="<?php echo esc_url($image_url); ?>" data-qv-copy="<?php echo esc_attr($benefit); ?>" data-qv-price="<?php echo esc_attr(wp_strip_all_tags(wc_price($price, ['decimals' => 0]))); ?>" data-qv-stock="<?php echo esc_attr($stock_text); ?>" data-qv-url="<?php echo esc_url($product->get_permalink()); ?>" data-qv-add="<?php echo esc_url($can_cart ? $product->add_to_cart_url() : $product->get_permalink()); ?>" data-qv-can-cart="<?php echo $can_cart ? '1' : '0'; ?>">Quick view</button>
+                    <button class="rhp-quick" type="button" data-quick-view data-qv-product-id="<?php echo esc_attr((string) $product->get_id()); ?>" data-qv-name="<?php echo esc_attr($name); ?>" data-qv-image="<?php echo esc_url($image_url); ?>" data-qv-copy="<?php echo esc_attr($benefit); ?>" data-qv-price="<?php echo esc_attr(wp_strip_all_tags(wc_price($price, ['decimals' => 0]))); ?>" data-qv-stock="<?php echo esc_attr($stock_text); ?>" data-qv-url="<?php echo esc_url($product->get_permalink()); ?>" data-qv-add="<?php echo esc_url($can_cart ? $product->add_to_cart_url() : $product->get_permalink()); ?>" data-qv-can-cart="<?php echo $can_cart ? '1' : '0'; ?>">Quick view</button>
                 </div>
             </div>
         </article>
