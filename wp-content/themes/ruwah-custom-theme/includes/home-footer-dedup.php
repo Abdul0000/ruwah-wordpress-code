@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') || exit;
+require_once __DIR__ . '/master-card-runtime.php';
 
 /*
  * The active homepage is supplied by the commerce plugin, which also attaches
