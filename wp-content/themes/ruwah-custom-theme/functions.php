@@ -80,7 +80,6 @@ function ruwah_product_card($product, $badge = '') {
     echo '</div></article>';
 }
 
-/* Compatibility layer used by the reference commerce templates. */
 if (!function_exists('rwb_product')) {
     function rwb_product($product_id) {
         if (!function_exists('wc_get_product')) return null;
@@ -91,17 +90,15 @@ if (!function_exists('rwb_product')) {
 
 if (!function_exists('rwb_products')) {
     function rwb_products($limit = 5) {
-        if (!function_exists('wc_get_product')) return [];
-        $ids = [54, 62, 64, 60, 68];
-        $products = [];
-        foreach ($ids as $id) {
-            $product = wc_get_product($id);
-            if (!$product instanceof WC_Product) continue;
-            if ('publish' !== get_post_status($id) || !$product->is_visible()) continue;
-            $products[] = $product;
-        }
+        if (!function_exists('wc_get_products')) return [];
         $limit = (int) $limit;
-        return $limit > 0 ? array_slice($products, 0, $limit) : $products;
+        $products = wc_get_products([
+            'status' => 'publish',
+            'limit' => $limit > 0 ? $limit : -1,
+            'orderby' => 'menu_order',
+            'order' => 'ASC',
+        ]);
+        return array_values(array_filter($products, static fn($product) => $product instanceof WC_Product && $product->is_visible()));
     }
 }
 
@@ -167,7 +164,6 @@ require_once __DIR__ . '/includes/cart-drawer.php';
 require_once __DIR__ . '/includes/reference-checkout.php';
 require_once __DIR__ . '/includes/home-footer-dedup.php';
 
-/* Keep the cached homepage cart UI in sync with the live WooCommerce session. */
 add_action('wp_enqueue_scripts', function () {
     if (!is_front_page() || !function_exists('WC')) {
         return;
@@ -184,53 +180,6 @@ JS;
     wp_add_inline_script('rwb-theme', $js, 'after');
 }, 80);
 
-/* Official Ruwah pricing sheet v3: live/current price + struck-through website price. */
-function ruwah_official_price_sheet_v3() {
-    return [
-        60 => ['current' => '1500', 'regular' => '1800'],
-        68 => ['current' => '1600', 'regular' => '1920'],
-        62 => ['current' => '1999', 'regular' => '2399'],
-        64 => ['current' => '2200', 'regular' => '2640'],
-        54 => ['current' => '2200', 'regular' => '2640'],
-    ];
-}
-
-function ruwah_official_price_for_product($product) {
-    if (!$product instanceof WC_Product) return null;
-    $id = (int) $product->get_id();
-    if ($product->is_type('variation')) {
-        $id = (int) $product->get_parent_id();
-    }
-    $sheet = ruwah_official_price_sheet_v3();
-    return $sheet[$id] ?? null;
-}
-
-add_filter('woocommerce_product_get_regular_price', function ($price, $product) {
-    $row = ruwah_official_price_for_product($product);
-    return $row ? $row['regular'] : $price;
-}, 50, 2);
-add_filter('woocommerce_product_get_sale_price', function ($price, $product) {
-    $row = ruwah_official_price_for_product($product);
-    return $row ? $row['current'] : $price;
-}, 50, 2);
-add_filter('woocommerce_product_get_price', function ($price, $product) {
-    $row = ruwah_official_price_for_product($product);
-    return $row ? $row['current'] : $price;
-}, 50, 2);
-add_filter('woocommerce_product_variation_get_regular_price', function ($price, $product) {
-    $row = ruwah_official_price_for_product($product);
-    return $row ? $row['regular'] : $price;
-}, 50, 2);
-add_filter('woocommerce_product_variation_get_sale_price', function ($price, $product) {
-    $row = ruwah_official_price_for_product($product);
-    return $row ? $row['current'] : $price;
-}, 50, 2);
-add_filter('woocommerce_product_variation_get_price', function ($price, $product) {
-    $row = ruwah_official_price_for_product($product);
-    return $row ? $row['current'] : $price;
-}, 50, 2);
-
-/* Use the authoritative current Ruwah logo as the browser/site icon too. */
 add_action('wp_head', function () {
     $logo_url = wp_get_attachment_image_url(262, 'full');
     if (!$logo_url) return;
@@ -238,7 +187,6 @@ add_action('wp_head', function () {
     echo '<link rel="shortcut icon" href="' . esc_url($logo_url) . '">' . "\n";
 }, 100);
 
-/* Home hero: keep the original purple logo while improving contrast over photography. */
 add_action('wp_head', function () {
     if (! is_front_page()) return;
     ?>
@@ -254,7 +202,6 @@ add_action('wp_head', function () {
     <?php
 }, 999);
 
-/* Standalone Home bypasses footer.php, so render the contact dock/social links on wp_footer directly. */
 add_action('wp_footer', function () {
     if (! is_front_page()) return;
     ?>
@@ -277,7 +224,6 @@ add_action('wp_footer', function () {
     <?php
 }, 8);
 
-/* Checkout payment policy: COD now; online payments preserved for future re-enable. */
 add_filter('pre_option_woocommerce_cod_settings', function ($pre_option) {
     return [
         'enabled' => 'yes',
