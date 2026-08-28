@@ -14,11 +14,11 @@ final class Ruwah_Product_Images_V3 {
     const STATE_OPTION = 'ruwah_product_images_v3_state';
     const SNAPSHOT_OPTION = 'ruwah_product_images_v3_snapshot';
     const PRODUCT_2_HOTFIX_OPTION = 'ruwah_product_images_product_2_hotfix_20260828';
-    const TONER_ORIGINAL_RESTORE_OPTION = 'ruwah_toner_original_featured_57_20260828_v1';
+    const TONER_ORIGINAL_RESTORE_OPTION = 'ruwah_toner_original_featured_57_20260828_v2';
 
     public static function init() {
-        add_action('init', [__CLASS__, 'restore_original_toner_featured'], 0);
         add_action('init', [__CLASS__, 'apply_product_2_hotfix'], 1);
+        add_action('wp_loaded', [__CLASS__, 'restore_original_toner_featured'], 99999);
         add_action('admin_notices', [__CLASS__, 'admin_notice']);
         if (defined('WP_CLI') && WP_CLI) {
             WP_CLI::add_command('ruwah product-images', 'Ruwah_Product_Images_V3_CLI');
