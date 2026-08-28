@@ -43,3 +43,12 @@ html body .rwb-ref-cart-checkout{height:52px!important;font-size:17px!important}
 .single-product.rwb-reference-commerce-v6 .rwb-commerce-pdp-views .rwb-commerce-section-head{max-width:none!important;width:100%!important}
 .single-product.rwb-reference-commerce-v6 .rwb-commerce-pdp-views .rwb-commerce-section-head h2{max-width:none!important;white-space:nowrap!important;font-size:clamp(42px,4.2vw,60px)!important;letter-spacing:-.04em!important}
 }
+
+/* Paired product drawer: collapse structural bottom gap. */
+html body .rwb-ref-cart-paired{height:auto!important;min-height:0!important;padding-bottom:0!important;margin-bottom:0!important}
+html body .rwb-ref-cart-paired-row{height:auto!important;min-height:0!important;align-items:center!important;margin:0!important;padding:0!important}
+html body .rwb-ref-cart-paired-row>*{margin-bottom:0!important}
+html body .rwb-ref-cart-paired-media{min-height:0!important;max-height:96px!important;margin:0!important;align-self:center!important}
+html body .rwb-ref-cart-paired-copy{align-self:center!important;margin:0!important;padding:0!important}
+html body .rwb-ref-cart-paired-add{align-self:center!important;margin:0!important}
+@media(max-width:680px){html body .rwb-ref-cart-paired{padding-bottom:0!important}html body .rwb-ref-cart-paired-row{min-height:0!important;height:auto!important}}
