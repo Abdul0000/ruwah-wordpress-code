@@ -58,34 +58,21 @@ function rwb_master_card_runtime_surface(): bool {
     return false;
 }
 
+/* Homepage already renders the exact Shop/footer markup through home-footer-dedup.php.
+ * home-premium.css was hiding that footer, so only undo that hide rule. */
+add_action('wp_enqueue_scripts', static function (): void {
+    if (! is_front_page()) return;
+    wp_add_inline_style('rwb-theme', 'body.rwb-home-premium .rwb-dieux-footer{display:block!important}');
+}, 10050);
+
 add_action('wp_enqueue_scripts', static function (): void {
     if (! rwb_master_card_runtime_surface()) return;
-    wp_enqueue_style('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/home-premium.css'), ['rwb-theme'], '20260828.5');
+    wp_enqueue_style('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/home-premium.css'), ['rwb-theme'], '20260828.6');
     wp_enqueue_script('wc-add-to-cart');
-    wp_enqueue_script('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/product-card.js'), [], '20260828.5', true);
+    wp_enqueue_script('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/product-card.js'), [], '20260828.6', true);
     wp_script_add_data('rwb-master-card-safe', 'strategy', 'defer');
-    wp_add_inline_style('rwb-master-card-safe', '.rhp-product-grid{display:grid;grid-template-columns:1fr;gap:14px}.rhp-loop-item{list-style:none!important}.rhp-loop-item>.rhp-product-card{height:100%}@media(min-width:600px){.rhp-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(min-width:1024px){.rhp-product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}}');
+    wp_add_inline_style('rwb-master-card-safe', 'body{--rhp-ink:#171419;--rhp-muted:#625d65;--rhp-cream:#f7f3e9;--rhp-paper:#fbfaf6;--rhp-lilac:#876cad;--rhp-lilac-dark:#665082;--rhp-blue:#dce9e9;--rhp-line:rgba(23,20,25,.16);--rhp-radius:2px}.rhp-product-grid{display:grid;grid-template-columns:1fr;gap:14px}.rhp-loop-item{list-style:none!important}.rhp-loop-item>.rhp-product-card{height:100%}@media(min-width:600px){.rhp-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(min-width:1024px){.rhp-product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}}');
 }, 10005);
-
-add_action('template_redirect', static function (): void {
-    if (! function_exists('is_product') || ! is_product()) return;
-    ob_start(static function (string $html): string {
-        if (! function_exists('rwb_render_master_product_card') || ! class_exists('Ruwah_Fresh_Commerce_Design') || ! function_exists('wc_get_product')) return $html;
-        $current = wc_get_product(get_queried_object_id());
-        if (! $current instanceof WC_Product) return $html;
-        $related = Ruwah_Fresh_Commerce_Design::related_products($current);
-        if (! $related) return $html;
-        ob_start();
-        foreach ($related as $rank => $candidate) {
-            if ($candidate instanceof WC_Product) rwb_render_master_product_card($candidate, (int) $rank);
-        }
-        $cards = (string) ob_get_clean();
-        if ('' === $cards) return $html;
-        $pattern = '~<div class="rwb-commerce-pair-grid">.*?</div>\s*</div>\s*</section>~s';
-        $replacement = '<div class="rwb-commerce-pair-grid rhp-product-grid">' . $cards . '</div></div></section>';
-        return preg_replace($pattern, $replacement, $html, 1) ?: $html;
-    });
-}, 5);
 
 add_action('wp_footer', static function (): void {
     if (! rwb_master_card_runtime_surface()) return;
