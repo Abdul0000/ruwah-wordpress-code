@@ -105,6 +105,16 @@ body.rwb-reference-checkout-v1 .rwb-ref-checkout-body #order_review{border-radiu
 body.rwb-reference-checkout-v1 .rwb-checkout-product-thumb{border-radius:0!important}
 body.rwb-reference-checkout-v1 .rwb-ref-checkout-body .woocommerce-error,body.rwb-reference-checkout-v1 .rwb-ref-checkout-body .woocommerce-message,body.rwb-reference-checkout-v1 .rwb-ref-checkout-body .woocommerce-info{border-radius:0!important}
 @media(max-width:560px){body.rwb-reference-checkout-v1 .rwb-ref-checkout-body #order_review{border-radius:0!important}}
+
+/* Checkout alignment + first-error UX. */
+@media(min-width:901px){
+body.rwb-reference-checkout-v1 .rwb-ref-checkout-body form.checkout{grid-template-rows:auto!important}
+body.rwb-reference-checkout-v1 .rwb-ref-checkout-body #customer_details{grid-column:1!important;grid-row:1!important;align-self:start!important}
+body.rwb-reference-checkout-v1 .rwb-ref-checkout-body #order_review{grid-column:2!important;grid-row:1!important;align-self:start!important}
+}
+body.rwb-reference-checkout-v1 .rwb-checkout-first-error{display:flex;align-items:center;gap:6px;margin:6px 2px 0;color:#942f3f;font-size:11px;font-weight:600;line-height:1.35}
+body.rwb-reference-checkout-v1 .rwb-checkout-first-error:before{content:'!';width:16px;height:16px;flex:0 0 16px;display:grid;place-items:center;border-radius:50%;background:#942f3f;color:#fff;font-size:10px;font-weight:800}
+body.rwb-reference-checkout-v1 .form-row.rwb-checkout-first-invalid input.input-text,body.rwb-reference-checkout-v1 .form-row.rwb-checkout-first-invalid textarea,body.rwb-reference-checkout-v1 .form-row.rwb-checkout-first-invalid select,body.rwb-reference-checkout-v1 .form-row.rwb-checkout-first-invalid .select2-selection--single{border-color:#a63f54!important;box-shadow:0 0 0 2px rgba(166,63,84,.10)!important}
 CSS;
     wp_add_inline_style('rwb-theme', $css);
 }, 9999);
@@ -157,4 +167,67 @@ $legal_pages = [
         </div>
     </div>
 </section>
+<script id="rwb-checkout-first-error-ux">
+(()=>{'use strict';
+  if(!document.body.classList.contains('rwb-reference-checkout-v1'))return;
+  const q=(s,c=document)=>c.querySelector(s),qa=(s,c=document)=>[...c.querySelectorAll(s)];
+  const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fieldFromMessage=text=>{
+    const t=String(text||'').toLowerCase().replace(/\s+/g,' ').trim();
+    const shipping=t.includes('shipping');
+    const p=shipping?'shipping_':'billing_';
+    if(t.includes('email'))return'billing_email';
+    if(t.includes('first name'))return p+'first_name';
+    if(t.includes('last name'))return p+'last_name';
+    if(t.includes('phone')||t.includes('mobile'))return'billing_phone';
+    if(t.includes('state')||t.includes('county'))return p+'state';
+    if(t.includes('postcode')||t.includes('postal code')||t.includes('zip'))return p+'postcode';
+    if(t.includes('city'))return p+'city';
+    if(t.includes('address')||t.includes('street')||t.includes('area details'))return p+'address_1';
+    if(t.includes('country')||t.includes('region'))return p+'country';
+    return'';
+  };
+  const friendly=key=>({
+    billing_first_name:'Enter your first name.',billing_last_name:'Enter your last name.',billing_email:'Enter a valid email address.',billing_country:'Select your country.',billing_state:'Select your state / province.',billing_address_1:'Enter street + area.',billing_city:'Enter your city.',billing_postcode:'Enter a 5-digit postal code.',billing_phone:'Enter a 10-digit Pakistan mobile number.',shipping_first_name:'Enter the first name.',shipping_last_name:'Enter the last name.',shipping_country:'Select the country.',shipping_state:'Select the state / province.',shipping_address_1:'Enter street + area.',shipping_city:'Enter the city.',shipping_postcode:'Enter a 5-digit postal code.'
+  })[key]||'Please check this field.';
+  const clear=()=>{
+    qa('#customer_details .rwb-checkout-first-error').forEach(el=>el.remove());
+    qa('#customer_details .rwb-checkout-first-invalid').forEach(row=>row.classList.remove('rwb-checkout-first-invalid'));
+    qa('#customer_details .rwb-field-has-error').forEach(row=>row.classList.remove('rwb-field-has-error'));
+    qa('#customer_details .rwb-inline-field-error').forEach(el=>el.remove());
+  };
+  const removeEmptyNoticeGroups=()=>{
+    qa('.rwb-ref-checkout-body .woocommerce-error').forEach(list=>{
+      if(!q('li',list)){const group=list.closest('.woocommerce-NoticeGroup,.woocommerce-notices-wrapper');if(group&&group.children.length<=1)group.remove();else list.remove();}
+    });
+  };
+  const render=()=>{
+    clear();
+    const mapped=[];
+    qa('.rwb-ref-checkout-body .woocommerce-error li').forEach(li=>{
+      const raw=(li.getAttribute('data-id')||li.dataset?.id||'').replace(/_field$/,'');
+      const key=raw||fieldFromMessage(li.textContent||'');
+      if(key&&q('#'+CSS.escape(key)+'_field')){mapped.push({key,li});li.remove();}
+    });
+    removeEmptyNoticeGroups();
+    const keys=[...new Set(mapped.map(x=>x.key))];
+    const rows=qa('#customer_details .form-row');
+    const key=keys.sort((a,b)=>rows.indexOf(q('#'+CSS.escape(a)+'_field'))-rows.indexOf(q('#'+CSS.escape(b)+'_field')))[0];
+    let row=key?q('#'+CSS.escape(key)+'_field'):q('#customer_details .woocommerce-invalid');
+    if(!row)return;
+    qa('#customer_details .woocommerce-invalid').forEach(r=>r.classList.remove('woocommerce-invalid','woocommerce-invalid-required-field'));
+    const resolvedKey=key||(row.id||'').replace(/_field$/,'');
+    row.classList.add('rwb-checkout-first-invalid');
+    const error=document.createElement('span');
+    error.className='rwb-checkout-first-error';error.setAttribute('role','alert');error.textContent=friendly(resolvedKey);row.appendChild(error);
+    const control=q('#'+CSS.escape(resolvedKey))||q('input,select,textarea,.select2-selection',row);
+    if(control&&control.setAttribute){control.setAttribute('aria-invalid','true');}
+    row.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
+    setTimeout(()=>{try{control?.focus({preventScroll:true})}catch(e){control?.focus?.()}},reduceMotion?0:260);
+  };
+  const clearRow=e=>{const row=e.target?.closest?.('.form-row');if(!row||!row.classList.contains('rwb-checkout-first-invalid'))return;row.classList.remove('rwb-checkout-first-invalid');qa('.rwb-checkout-first-error',row).forEach(el=>el.remove());e.target?.removeAttribute?.('aria-invalid');};
+  document.addEventListener('input',clearRow,true);document.addEventListener('change',clearRow,true);
+  if(window.jQuery)window.jQuery(document.body).on('checkout_error',()=>setTimeout(render,60));
+})();
+</script>
 <?php get_footer();
