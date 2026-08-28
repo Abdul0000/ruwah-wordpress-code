@@ -59,10 +59,10 @@ $contact_url = home_url('/contact/');
             </div>
 
             <div class="rwb-dieux-pdp-trust" role="note" aria-label="Delivery and payment information">
-                <p><strong>Cash on Delivery</strong><span>Available for current orders.</span></p>
-                <p><strong>Online payment</strong><span>Coming soon.</span></p>
-                <p><strong>Pakistan-wide delivery</strong><span>Delivery availability, charge and any estimate are confirmed for your address during checkout.</span></p>
-                <p><strong>Order support</strong><span>Use your order number on the <a href="<?php echo esc_url($contact_url); ?>">Contact page</a> for delivery or tracking help.</span></p>
+                <div class="rwb-dieux-pdp-trust-item"><strong>Cash on Delivery</strong><span>Available for current orders.</span></div>
+                <div class="rwb-dieux-pdp-trust-item"><strong>Pakistan-wide delivery</strong><span>Charge and availability are confirmed at checkout.</span></div>
+                <div class="rwb-dieux-pdp-trust-item"><strong>Order support</strong><span>Use your order number on the <a href="<?php echo esc_url($contact_url); ?>">Contact page</a>.</span></div>
+                <div class="rwb-dieux-pdp-trust-item rwb-dieux-pdp-trust-item--muted"><strong>Online payment</strong><span>Coming soon.</span></div>
             </div>
 
             <div class="rwb-commerce-pdp-accordions rwb-dieux-pdp-accordions">
@@ -71,8 +71,6 @@ $contact_url = home_url('/contact/');
                 <details><summary><span>SAFETY &amp; CARE:</span><b aria-hidden="true">+</b></summary><div><p>For external cosmetic use only. Patch test before first use when appropriate for your skin. Avoid direct eye contact and stop use if persistent irritation occurs. Keep product packaging so you can follow the complete ingredient list, warnings, batch and expiry information printed by the manufacturer.</p><?php if (68 === (int) $product->get_id()) : ?><p>For sun-care performance, follow the amount, application and reapplication directions printed on the pack. This website does not add an SPF, broad-spectrum or test claim unless that information is verified from the product source.</p><?php endif; ?></div></details>
                 <details><summary><span>DELIVERY &amp; RETURNS:</span><b aria-hidden="true">+</b></summary><div><p>Current checkout is Cash on Delivery. Delivery availability and charges are shown for the address entered at checkout. For damaged, incorrect, return or refund requests, review the <a href="<?php echo esc_url($refund_url); ?>">Refund Policy</a> and contact us with your order number.</p></div></details>
             </div>
-
-            <?php if ($gallery_ids) : ?><div class="rwb-dieux-pdp-action" aria-label="Product gallery quick views"><p>SEE IT IN ACTION:</p><div class="rwb-dieux-pdp-action-strip"><?php foreach (array_slice($gallery_ids, 0, 8) as $index => $image_id) : ?><button type="button" data-rwb-gallery-index="<?php echo esc_attr((string) $index); ?>" aria-label="View product image <?php echo esc_attr((string) ($index + 1)); ?>"><?php echo wp_kses_post(wp_get_attachment_image((int) $image_id, 'woocommerce_thumbnail', false, ['loading' => 'lazy', 'decoding' => 'async'])); ?></button><?php endforeach; ?></div></div><?php endif; ?>
         </div>
     </section>
 
