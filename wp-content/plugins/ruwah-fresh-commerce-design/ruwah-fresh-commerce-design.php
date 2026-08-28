@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Ruwah Fresh Commerce Design
  * Description: Reference-led editorial commerce experience for Ruwah Beauty using live WooCommerce products, pricing, stock, media and reviews.
- * Version: 6.4.1
+ * Version: 6.4.2
  * Author: Ruwah Beauty
  * Requires PHP: 8.1
  */
@@ -10,7 +10,7 @@
 defined('ABSPATH') || exit;
 
 final class Ruwah_Fresh_Commerce_Design {
-    private const VERSION = '6.4.1';
+    private const VERSION = '6.4.2';
 
     public static function boot(): void {
         add_filter('template_include', [self::class, 'front_page_template'], 99);
@@ -145,18 +145,10 @@ final class Ruwah_Fresh_Commerce_Design {
 
     public static function display_copy(WC_Product $product): array {
         $info = self::product_info($product);
-        $map = [
-            54 => ['name' => 'Triple Action Serum', 'tagline' => 'A brightening and hydrating serum with Vitamin C, Niacinamide and Hyaluronic Acid.', 'benefits' => ['Vitamin C for visible radiance', 'Niacinamide for tone and barrier support', 'Hyaluronic Acid for deep hydration']],
-            62 => ['name' => 'Rice Whitening Cream', 'tagline' => 'A brightening rice cream with Rice Extract, Glutathione, Vitamin C, Niacinamide and Alpha Arbutin.', 'benefits' => ['Rice Extract for brightening care', 'Glutathione and Vitamin C for radiance', 'Niacinamide and Alpha Arbutin for even-looking tone']],
-            64 => ['name' => 'Rice Glow Serum', 'tagline' => 'A lightweight glow serum with Vitamin C, Niacinamide and Hyaluronic Acid for brighter-looking, hydrated skin.', 'benefits' => ['Vitamin C for visible radiance', 'Niacinamide for tone support', 'Hyaluronic Acid for hydration']],
-            60 => ['name' => 'Rice Brightening Face Wash', 'tagline' => 'A gentle rice-based face wash for daily cleansing and a brighter, refreshed-looking complexion.', 'benefits' => ['Rice-based daily cleansing', 'Helps remove daily buildup', 'Leaves skin feeling fresh and comfortable']],
-            68 => ['name' => 'Rice Glow Sun Lotion', 'tagline' => 'A lightweight daily sun lotion designed to protect while keeping skin comfortable and radiant-looking.', 'benefits' => ['Lightweight daily sun care', 'Comfortable skin feel', 'Radiant-looking finish']],
-        ];
-        $override = $map[(int) $product->get_id()] ?? [];
         return [
-            'name' => (string) ($override['name'] ?? $product->get_name()),
-            'tagline' => (string) ($override['tagline'] ?? ($info['tagline'] ?? '')),
-            'benefits' => (array) ($override['benefits'] ?? ($info['benefits'] ?? [])),
+            'name' => (string) $product->get_name(),
+            'tagline' => (string) ($info['tagline'] ?? ''),
+            'benefits' => (array) ($info['benefits'] ?? []),
             'size' => (string) ($info['size'] ?? ''),
             'facts' => (array) ($info['facts'] ?? []),
         ];
@@ -188,15 +180,22 @@ final class Ruwah_Fresh_Commerce_Design {
     }
 
     public static function gallery_ids(WC_Product $product): array { return array_values(array_unique(array_filter(array_merge([(int) $product->get_image_id()], array_map('intval', $product->get_gallery_image_ids()))))); }
+
     public static function related_products(WC_Product $product): array {
+        if (! function_exists('wc_get_related_products') || ! function_exists('wc_get_product')) return [];
+        $ids = wc_get_related_products($product->get_id(), 4, []);
         $items = [];
-        if (function_exists('rwb_products')) foreach (rwb_products() as $candidate) if ($candidate instanceof WC_Product && $candidate->get_id() !== $product->get_id()) $items[] = $candidate;
-        return array_slice($items, 0, 4);
+        foreach ($ids as $id) {
+            $candidate = wc_get_product((int) $id);
+            if ($candidate instanceof WC_Product && $candidate->is_visible()) $items[] = $candidate;
+        }
+        return $items;
     }
+
     private static function footer_products(): array {
-        if (function_exists('rwb_products')) return array_slice(array_values(array_filter(rwb_products(), static fn($item) => $item instanceof WC_Product && $item->is_visible())), 0, 5);
-        if (function_exists('wc_get_products')) return wc_get_products(['status' => 'publish', 'limit' => 5, 'orderby' => 'menu_order', 'order' => 'ASC']);
-        return [];
+        if (! function_exists('wc_get_products')) return [];
+        $products = wc_get_products(['status' => 'publish', 'limit' => 5, 'orderby' => 'menu_order', 'order' => 'ASC']);
+        return array_values(array_filter($products, static fn($item) => $item instanceof WC_Product && $item->is_visible()));
     }
 
     public static function reference_footer(): void {
