@@ -1,43 +1,363 @@
 <?php
 defined('ABSPATH') || exit;
 
-$products = function_exists('rwb_products') ? rwb_products() : [];
-$hero = $products[0] ?? null;
-$hero_info = $hero ? Ruwah_Fresh_Commerce_Design::display_copy($hero) : null;
-$reviews = function_exists('rwb_reviews') ? rwb_reviews(5) : get_comments(['post_type' => 'product','status' => 'approve','number' => 5]);
-$count = function_exists('WC') && WC()->cart ? (int) WC()->cart->get_cart_contents_count() : 0;
-$sun_product = function_exists('rwb_product') ? rwb_product(68) : (function_exists('wc_get_product') ? wc_get_product(68) : null);
+$products = function_exists('rwb_products') ? array_values(array_filter(rwb_products(), static fn($item) => $item instanceof WC_Product && $item->is_visible())) : [];
+$by_id = [];
+foreach ($products as $item) $by_id[(int) $item->get_id()] = $item;
+$get_product = static function (int $id) use ($by_id) {
+    if (isset($by_id[$id])) return $by_id[$id];
+    if (function_exists('rwb_product')) { $p = rwb_product($id); if ($p instanceof WC_Product) return $p; }
+    return function_exists('wc_get_product') ? wc_get_product($id) : null;
+};
+
+$hero = $get_product(54) ?: ($products[0] ?? null);
+$hero_info = $hero ? Ruwah_Fresh_Commerce_Design::display_copy($hero) : ['name' => 'Ruwah Beauty', 'tagline' => '', 'benefits' => [], 'size' => ''];
 $shop_url = function_exists('rwb_shop_url') ? rwb_shop_url() : home_url('/shop/');
 $account_url = function_exists('rwb_account_url') ? rwb_account_url() : home_url('/my-account/');
 $cart_url = function_exists('rwb_cart_url') ? rwb_cart_url() : home_url('/cart/');
-$newsletter = isset($_GET['newsletter']) ? sanitize_key(wp_unslash($_GET['newsletter'])) : '';
+$checkout_url = function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/');
+$shipping_url = home_url('/shipping-delivery/');
+$refund_url = home_url('/returns-refunds/');
 $privacy_url = get_privacy_policy_url();
-$refund_url = home_url('/refund-policy/');
-$contact_url = home_url('/contact/');
+$contact_url = home_url('/contact-us/');
+$learn_url = home_url('/beauty-guide/');
+$quality_url = home_url('/quality-safety/');
+$count = function_exists('WC') && WC()->cart ? (int) WC()->cart->get_cart_contents_count() : 0;
+$whatsapp_number = '923713923279';
+$whatsapp_url = 'https://wa.me/' . $whatsapp_number;
+$admin_email = sanitize_email((string) get_option('admin_email'));
+$branded_email = str_ends_with(strtolower($admin_email), '@ruwahbeauty.com') ? $admin_email : '';
+
 $hero_image_id = 0;
-if ($hero) { $gallery = $hero->get_gallery_image_ids(); $hero_image_id = (int) ($gallery[1] ?? $gallery[0] ?? $hero->get_image_id()); }
-$hero_image_html = $hero_image_id ? wp_get_attachment_image($hero_image_id, 'full', false, ['loading'=>'eager','fetchpriority'=>'high','decoding'=>'async']) : ($hero ? $hero->get_image('full', ['loading'=>'eager','fetchpriority'=>'high']) : '');
-$hero_descriptor = ''; $hero_ingredient_line = '';
-if (is_array($hero_info)) {
-    $tagline = trim((string) ($hero_info['tagline'] ?? ''));
-    if ($tagline && preg_match('/^A\s+(.+?)\s+with\b/i', $tagline, $descriptor_match)) { $descriptor = trim((string) $descriptor_match[1]); $descriptor = preg_replace('/\s+and\s+/i', ' + ', $descriptor); $hero_descriptor = ucwords((string) $descriptor); }
-    if (! $hero_descriptor && $tagline) $hero_descriptor = wp_trim_words($tagline, 7, '');
-    $ingredient_labels = [];
-    foreach ((array) ($hero_info['benefits'] ?? []) as $benefit) { $parts = preg_split('/\s+for\s+/i', trim((string) $benefit), 2); $label = trim((string) ($parts[0] ?? '')); if ($label && ! in_array($label, $ingredient_labels, true)) $ingredient_labels[] = $label; }
-    $hero_ingredient_line = implode(' · ', array_slice($ingredient_labels, 0, 3));
+if ($hero) {
+    $gallery = $hero->get_gallery_image_ids();
+    $hero_image_id = (int) ($gallery[1] ?? $gallery[0] ?? $hero->get_image_id());
 }
-if (! $hero_descriptor) $hero_descriptor = 'Luxury Care For Everyday Skin';
-if (! $hero_ingredient_line && is_array($hero_info) && ! empty($hero_info['tagline'])) $hero_ingredient_line = (string) $hero_info['tagline'];
-$total_reviews = 0; $best_sales = -1; $best_id = 0;
-foreach ($products as $product) { $total_reviews += (int) $product->get_review_count(); $sales = (int) $product->get_total_sales(); if ($sales > $best_sales) { $best_sales = $sales; $best_id = $sales > 0 ? (int) $product->get_id() : 0; } }
-$community_heading = $total_reviews > 0 ? 'Community Favorites' : 'Ruwah Favorites';
+$hero_image = $hero_image_id ? wp_get_attachment_image($hero_image_id, 'full', false, ['loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'async', 'sizes' => '100vw']) : ($hero ? $hero->get_image('full', ['loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'async']) : '');
+
+$best = $products;
+usort($best, static fn($a, $b) => (int) $b->get_total_sales() <=> (int) $a->get_total_sales());
+$best = array_slice($best, 0, 4);
+
+$verified_reviews = [];
+$raw_reviews = function_exists('rwb_reviews') ? rwb_reviews(30) : get_comments(['post_type' => 'product', 'status' => 'approve', 'number' => 30]);
+foreach ((array) $raw_reviews as $review) {
+    if (! $review instanceof WP_Comment) continue;
+    if (function_exists('wc_review_is_from_verified_owner') && ! wc_review_is_from_verified_owner($review->comment_ID)) continue;
+    $review_product = $get_product((int) $review->comment_post_ID);
+    if (! $review_product) continue;
+    $rating = (int) get_comment_meta($review->comment_ID, 'rating', true);
+    if ($rating < 1 || $rating > 5) continue;
+    $verified_reviews[] = [$review, $review_product, $rating];
+}
+$review_count = count($verified_reviews);
+$review_avg = 0.0;
+$review_dist = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+if ($review_count) {
+    $sum = 0;
+    foreach ($verified_reviews as $row) { $sum += $row[2]; $review_dist[$row[2]]++; }
+    $review_avg = $sum / $review_count;
+}
+
+$routine = [
+    ['step' => '01', 'label' => 'Cleanse', 'product' => $get_product(60)],
+    ['step' => '02', 'label' => 'Treat', 'product' => $get_product(54)],
+    ['step' => '03', 'label' => 'Moisturize', 'product' => $get_product(62)],
+    ['step' => '04', 'label' => 'Protect', 'product' => $get_product(68)],
+];
+$concerns = [
+    ['title' => 'Dullness & uneven-looking tone', 'copy' => 'Explore products positioned around visible radiance and brighter-looking skin.', 'product' => $get_product(54)],
+    ['title' => 'Dehydration', 'copy' => 'Find lightweight hydration-focused serum options for everyday routines.', 'product' => $get_product(64) ?: $get_product(54)],
+    ['title' => 'Daily cleansing', 'copy' => 'A straightforward daily cleansing step designed to remove everyday buildup.', 'product' => $get_product(60)],
+    ['title' => 'Everyday sun care', 'copy' => 'A dedicated daily sun-care step with product directions kept on-pack.', 'product' => $get_product(68)],
+];
+
+$usage = '';
+$verified_fields = [];
+if ($hero) {
+    foreach (['pa_how-to-use', 'how-to-use', 'how_to_use', 'pa_usage', 'usage', 'directions'] as $attribute) {
+        $value = trim(wp_strip_all_tags((string) $hero->get_attribute($attribute)));
+        if ($value !== '') { $usage = $value; break; }
+    }
+    if ($usage === '') {
+        foreach (['_how_to_use', 'how_to_use', '_usage', 'usage', '_directions', 'directions'] as $meta_key) {
+            $value = trim(wp_strip_all_tags((string) get_post_meta($hero->get_id(), $meta_key, true)));
+            if ($value !== '') { $usage = $value; break; }
+        }
+    }
+    $field_sources = [
+        'Complete ingredients / INCI' => ['pa_ingredients', 'ingredients', 'inci'],
+        'Skin type' => ['pa_skin-type', 'skin-type', 'skin_type'],
+        'Net quantity' => ['pa_size', 'size', 'pa_volume', 'volume'],
+    ];
+    foreach ($field_sources as $label => $keys) {
+        foreach ($keys as $key) {
+            $value = trim(wp_strip_all_tags((string) $hero->get_attribute($key)));
+            if ($value === '') $value = trim(wp_strip_all_tags((string) get_post_meta($hero->get_id(), $key, true)));
+            if ($value !== '') { $verified_fields[$label] = $value; break; }
+        }
+    }
+    if (! empty($hero_info['size']) && empty($verified_fields['Net quantity'])) $verified_fields['Net quantity'] = trim((string) $hero_info['size']);
+}
+if ($usage === '') $usage = 'Follow the directions printed on the product packaging.';
+
+$logo_id = (int) get_theme_mod('custom_logo', 0);
+$logo_url = $logo_id ? wp_get_attachment_url($logo_id) : '';
+$site_url = home_url('/');
+$schema = [
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        [
+            '@type' => 'Organization',
+            '@id' => $site_url . '#organization',
+            'name' => 'Ruwah Beauty',
+            'url' => $site_url,
+            'logo' => $logo_url ?: null,
+            'sameAs' => [
+                'https://www.facebook.com/share/1BNAdjWpYW/',
+                'https://www.instagram.com/rawah.beauty',
+                'https://www.tiktok.com/',
+            ],
+        ],
+        [
+            '@type' => 'WebSite',
+            '@id' => $site_url . '#website',
+            'url' => $site_url,
+            'name' => 'Ruwah Beauty',
+            'publisher' => ['@id' => $site_url . '#organization'],
+            'potentialAction' => [
+                '@type' => 'SearchAction',
+                'target' => home_url('/?s={search_term_string}&post_type=product'),
+                'query-input' => 'required name=search_term_string',
+            ],
+        ],
+    ],
+];
+$schema['@graph'][0] = array_filter($schema['@graph'][0], static fn($value) => null !== $value && [] !== $value);
+
+add_filter('pre_get_document_title', static fn() => 'Ruwah Beauty Pakistan | Brightening & Hydrating Skincare', 999);
+$premium_css_path = dirname(__DIR__) . '/assets/home-premium.css';
+$premium_css = is_readable($premium_css_path) ? (string) file_get_contents($premium_css_path) : '';
 ?>
-<!doctype html><html <?php language_attributes(); ?>><head><meta charset="<?php bloginfo('charset'); ?>"><meta name="viewport" content="width=device-width,initial-scale=1"><?php remove_action('wp_head','wp_site_icon',99); wp_head(); $rwb_home_logo_id=(int)get_theme_mod('custom_logo',0); $rwb_home_logo_url=$rwb_home_logo_id?wp_get_attachment_url($rwb_home_logo_id):''; if($rwb_home_logo_url){$rwb_home_favicon_url=add_query_arg('rwb-favicon','20260820-home2',$rwb_home_logo_url); echo '<link rel="icon" type="image/png" href="'.esc_url($rwb_home_favicon_url).'">' . "\n"; echo '<link rel="shortcut icon" type="image/png" href="'.esc_url($rwb_home_favicon_url).'">' . "\n"; echo '<link rel="apple-touch-icon" href="'.esc_url($rwb_home_favicon_url).'">' . "\n";} ?><style id="rwb-dieux-home-hero-menu-v65">
-.rwb-reference-home-v5 .rwb-ref-utility{position:relative;height:40px;min-height:40px;background:#2d2d2d;color:#fff}.rwb-reference-home-v5 .rwb-ref-utility a{height:40px;min-height:40px;padding:0 70px;color:#fff;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;font-weight:500;line-height:1;letter-spacing:.035em;text-transform:uppercase}.rwb-reference-home-v5 .rwb-ref-utility-pause{position:absolute;right:24px;top:50%;transform:translateY(-50%);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;letter-spacing:-.15em}.rwb-reference-home-v5 .rwb-ref-header:not(.compact){position:absolute;left:0;right:0;top:40px;border:0;background:transparent;color:#fff;backdrop-filter:none}.admin-bar.rwb-reference-home-v5 .rwb-ref-header:not(.compact){top:72px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-shell{width:calc(100% - 112px);max-width:none}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-header-row{min-height:112px;grid-template-columns:1fr auto 1fr}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav{gap:56px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav a,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-account-link,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link{color:#fff;font-size:16px;font-weight:500;line-height:1;letter-spacing:.015em;text-transform:uppercase;text-shadow:0 1px 12px rgba(0,0,0,.18)}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-account-link{margin:0}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-tools{gap:30px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{width:auto;max-width:205px;max-height:92px;filter:none!important;object-fit:contain}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo-link{filter:drop-shadow(0 1px 8px rgba(247,243,233,.52))}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-icon{width:52px;height:52px;color:#fff}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-icon svg{width:30px;height:30px;stroke-width:1.7}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link{display:flex;align-items:center;gap:0;min-height:52px;padding:0;border:0;background:transparent}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link .rwb-cart-count{position:static;width:auto;height:auto;display:inline;background:transparent;color:inherit;font-size:16px;font-weight:500}.rwb-reference-home-v5 .rwb-ref-header.compact .rwb-header-row{min-height:64px}.rwb-reference-home-v5 .rwb-ref-header.compact .rwb-brand .custom-logo{max-width:118px;max-height:50px}.rwb-reference-home-v5 .rwb-ref-hero{height:calc(100vh - 40px);min-height:720px;display:grid;place-items:center;background:#514645;color:#f7f3e9}.rwb-reference-home-v5 .rwb-ref-hero-wash{background:radial-gradient(ellipse at 50% 49%,rgba(32,23,35,.52) 0 18%,rgba(32,23,35,.34) 38%,rgba(32,23,35,.12) 62%,transparent 80%),linear-gradient(90deg,rgba(18,14,19,.28),rgba(18,14,19,.10) 45%,rgba(18,14,19,.30)),linear-gradient(0deg,rgba(8,7,9,.26),transparent 52%,rgba(8,7,9,.12))!important}.rwb-reference-home-v5 .rwb-ref-hero-copy{width:940px;max-width:90vw;padding:122px 24px 0;text-align:center;color:#f7f3e9!important;text-shadow:0 2px 24px rgba(8,6,8,.48)!important}.rwb-reference-home-v5 .rwb-ref-hero-copy .rwb-ref-kicker{display:inline-flex!important;align-items:center;justify-content:center;width:max-content;margin:0 auto!important;padding:7px 11px;border:1px solid rgba(255,255,255,.48);background:rgba(247,243,233,.92);color:#735790!important;font-size:13px;font-weight:700;line-height:1;letter-spacing:.10em;text-shadow:none!important;text-transform:uppercase}.rwb-reference-home-v5 .rwb-ref-hero-copy h1{margin:20px 0 0;color:#fbf8f0!important;font-family:var(--serif,'DM Serif Display',Georgia,serif)!important;font-size:clamp(62px,4vw,78px);font-weight:400!important;line-height:.95;letter-spacing:-.032em!important}.rwb-reference-home-v5 .rwb-ref-hero-copy h2{max-width:900px;margin:12px auto 0;color:#eee5f7!important;font-family:var(--sans,Inter,Arial,sans-serif);font-size:clamp(36px,2.8vw,52px);font-weight:500;line-height:1.02;letter-spacing:-.035em}.rwb-reference-home-v5 .rwb-ref-hero-copy>p:not(.rwb-ref-kicker){margin:22px auto 0;color:#fffaf2!important;font-size:23px;font-weight:500;line-height:1.25;letter-spacing:-.015em}.rwb-reference-home-v5 .rwb-ref-hero-btn{width:228px;min-width:228px;height:64px;min-height:64px;margin-top:34px;padding:0 24px;border:1px solid rgba(255,255,255,.42)!important;background:#876cad!important;color:#fff!important;font-family:var(--sans,Inter,Arial,sans-serif)!important;font-size:13px!important;font-weight:700!important;line-height:1;text-shadow:none;text-transform:uppercase!important;letter-spacing:.08em!important}.rwb-reference-home-v5 .rwb-ref-hero-btn:hover{background:#70578f!important;color:#fff!important}.rwb-home-trust{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid rgba(17,17,17,.18);border-bottom:1px solid rgba(17,17,17,.18);background:#f7f3e9}.rwb-home-trust>div{padding:24px 26px}.rwb-home-trust>div+div{border-left:1px solid rgba(17,17,17,.18)}.rwb-home-trust strong{display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase}.rwb-home-trust span{display:block;margin-top:7px;color:#55514c;font-size:11px;line-height:1.45}.rwb-home-trust a{text-decoration:underline;text-underline-offset:3px}@media(min-width:783px){.rwb-reference-home-v5 .rwb-ref-hero-media{inset:0!important;overflow:hidden!important;background:transparent!important}.rwb-reference-home-v5 .rwb-ref-hero-bg,.rwb-reference-home-v5 .rwb-ref-hero-focus{position:absolute;inset:0;overflow:hidden}.rwb-reference-home-v5 .rwb-ref-hero-bg{z-index:0}.rwb-reference-home-v5 .rwb-ref-hero-bg img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;transform:scale(1.012)!important;filter:saturate(.92) contrast(1.04) brightness(.78)!important}.rwb-reference-home-v5 .rwb-ref-hero-focus{z-index:1;display:grid;place-items:center;pointer-events:none}.rwb-reference-home-v5 .rwb-ref-hero-focus img{width:88%!important;height:88%!important;object-fit:contain!important;object-position:center center!important;transform:scale(.86)!important;background:transparent!important;filter:saturate(.94) contrast(1.035) brightness(.80)!important;-webkit-mask-image:radial-gradient(ellipse 24% 72% at 50% 53%,#000 0 46%,rgba(0,0,0,.88) 55%,rgba(0,0,0,.40) 63%,transparent 74%);mask-image:radial-gradient(ellipse 24% 72% at 50% 53%,#000 0 46%,rgba(0,0,0,.88) 55%,rgba(0,0,0,.40) 63%,transparent 74%)}.rwb-reference-home-v5 .rwb-ref-hero-wash{z-index:2!important}.rwb-reference-home-v5 .rwb-ref-hero-copy{z-index:3!important}}@media(max-width:1200px) and (min-width:783px){.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-shell{width:calc(100% - 64px)}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav{gap:30px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-nav a,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-account-link,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link,.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link .rwb-cart-count{font-size:12px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{max-width:160px;max-height:78px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-tools{gap:16px}.rwb-reference-home-v5 .rwb-ref-hero-focus img{transform:scale(.90)!important}.rwb-reference-home-v5 .rwb-ref-hero-copy{padding-top:105px}.rwb-reference-home-v5 .rwb-ref-hero-copy>p:not(.rwb-ref-kicker){font-size:18px}}@media(max-width:782px){.rwb-reference-home-v5 .rwb-ref-utility{height:30px;min-height:30px}.rwb-reference-home-v5 .rwb-ref-utility a{height:30px;min-height:30px;padding:0 38px 0 12px;font-size:8px;letter-spacing:.05em}.rwb-reference-home-v5 .rwb-ref-utility-pause{right:10px;font-size:9px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact){top:30px}.admin-bar.rwb-reference-home-v5 .rwb-ref-header:not(.compact){top:76px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-shell{width:calc(100% - 24px)}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-header-row{min-height:68px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-brand .custom-logo{max-width:108px;max-height:56px;filter:none!important}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-icon{width:42px;height:42px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-icon svg{width:23px;height:23px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link{font-size:0}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link:before{content:'BAG (';font-size:9px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link:after{content:')';font-size:9px}.rwb-reference-home-v5 .rwb-ref-header:not(.compact) .rwb-ref-cart-link .rwb-cart-count{font-size:9px}.rwb-reference-home-v5 .rwb-ref-hero{height:auto;min-height:calc(100svh - 30px)}.rwb-reference-home-v5 .rwb-ref-hero-focus{display:none!important}.rwb-reference-home-v5 .rwb-ref-hero-bg{position:absolute;inset:0}.rwb-reference-home-v5 .rwb-ref-hero-bg img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;transform:scale(1.012)!important;filter:saturate(.92) contrast(1.04) brightness(.78)!important}.rwb-reference-home-v5 .rwb-ref-hero-copy{width:100%;max-width:94vw;padding:94px 16px 30px}.rwb-reference-home-v5 .rwb-ref-hero-copy .rwb-ref-kicker{font-size:10px!important;padding:6px 9px!important}.rwb-reference-home-v5 .rwb-ref-hero-copy h1{margin-top:14px;font-size:clamp(46px,12vw,62px)}.rwb-reference-home-v5 .rwb-ref-hero-copy h2{margin-top:10px;font-size:clamp(26px,7.6vw,38px)}.rwb-reference-home-v5 .rwb-ref-hero-copy>p:not(.rwb-ref-kicker){margin-top:17px;font-size:14px}.rwb-reference-home-v5 .rwb-ref-hero-btn{width:168px;min-width:168px;height:50px;min-height:50px;margin-top:25px;font-size:11px!important}.rwb-home-trust{grid-template-columns:1fr 1fr}.rwb-home-trust>div:nth-child(3){border-left:0;border-top:1px solid rgba(17,17,17,.18)}.rwb-home-trust>div:nth-child(4){border-top:1px solid rgba(17,17,17,.18)}}@media(max-width:520px){.rwb-home-trust{grid-template-columns:1fr}.rwb-home-trust>div+div{border-left:0;border-top:1px solid rgba(17,17,17,.18)}}
-</style></head>
-<body <?php body_class(); ?>><?php wp_body_open(); ?><a class="screen-reader-text" href="#main">Skip to content</a><div class="rwb-announcement rwb-ref-utility"><a href="<?php echo esc_url($shop_url); ?>"><span class="rwb-ref-utility-copy">PAKISTAN-WIDE DELIVERY · CASH ON DELIVERY · ONLINE PAYMENT COMING SOON</span></a><span class="rwb-ref-utility-pause" aria-hidden="true">Ⅱ</span></div><header class="rwb-header rwb-ref-header" data-header><div class="rwb-shell rwb-header-row"><div class="rwb-nav-side"><button class="rwb-icon rwb-menu-btn" data-menu-open aria-label="Menu"><?php echo function_exists('rwb_icon')?rwb_icon('menu'):'☰'; ?></button><nav class="rwb-desktop-nav rwb-ref-nav" aria-label="Primary"><a href="<?php echo esc_url($shop_url); ?>">Shop</a><a href="#rwb-genesis">Learn</a><a href="<?php echo esc_url($sun_product?$sun_product->get_permalink():$shop_url); ?>">Sunscreen Decoder</a></nav></div><div class="rwb-brand"><?php if(has_custom_logo()){the_custom_logo();}else{?><a href="<?php echo esc_url(home_url('/')); ?>">RUWAH</a><?php } ?></div><div class="rwb-tools"><button class="rwb-icon" data-search-open aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.7"></circle><path d="m15.5 15.5 5 5"></path></svg></button><a class="rwb-ref-account-link" href="<?php echo esc_url($account_url); ?>">My Account</a><button class="rwb-ref-cart-link" data-cart-open aria-label="Cart">CART (<span class="rwb-cart-count"><?php echo esc_html((string)$count); ?></span>)</button></div></div></header>
-<aside class="rwb-mobile-menu" data-menu hidden><div class="rwb-panel-head"><b>RUWAH BEAUTY</b><button class="rwb-icon" data-menu-close aria-label="Close menu"><?php echo function_exists('rwb_icon')?rwb_icon('close'):'×'; ?></button></div><nav><a href="<?php echo esc_url($shop_url); ?>">Shop all</a><a href="#rwb-genesis">Learn</a><a href="<?php echo esc_url($sun_product?$sun_product->get_permalink():$shop_url); ?>">Sunscreen Decoder</a><?php foreach($products as $product):$copy=Ruwah_Fresh_Commerce_Design::display_copy($product);?><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($copy['name']); ?></a><?php endforeach;?><a href="<?php echo esc_url($account_url); ?>">My account</a></nav></aside><div class="rwb-layer" data-search hidden><button class="rwb-backdrop" data-search-close aria-label="Close search"></button><div class="rwb-search-panel"><div class="rwb-panel-head"><b>Search Ruwah</b><button class="rwb-icon" data-search-close aria-label="Close search"><?php echo function_exists('rwb_icon')?rwb_icon('close'):'×'; ?></button></div><form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>"><label class="screen-reader-text" for="rwb-home-search">Search products</label><input id="rwb-home-search" type="search" name="s" placeholder="Search products" required><input type="hidden" name="post_type" value="product"><button>Search</button></form></div></div><div class="rwb-layer" data-cart hidden><button class="rwb-backdrop" data-cart-close aria-label="Close cart"></button><aside class="rwb-cart-panel rwb-shop-cart-drawer"><?php if(function_exists('rwb_render_cart_drawer_content'))rwb_render_cart_drawer_content(); ?></aside></div>
-<main id="main" class="rwb-ref-home"><section class="rwb-ref-hero" aria-label="Featured formula"><div class="rwb-ref-hero-media" aria-hidden="true"><div class="rwb-ref-hero-bg"><?php echo wp_kses_post($hero_image_html); ?></div><div class="rwb-ref-hero-focus"><?php echo wp_kses_post($hero_image_html); ?></div></div><div class="rwb-ref-hero-wash"></div><div class="rwb-ref-hero-copy" data-reveal><p class="rwb-ref-kicker">NEW</p><h1><?php echo esc_html($hero_info['name']??'Ruwah Beauty'); ?></h1><h2><?php echo esc_html($hero_descriptor); ?></h2><?php if($hero_ingredient_line):?><p><?php echo esc_html($hero_ingredient_line); ?></p><?php endif;?><a class="rwb-ref-hero-btn" href="<?php echo esc_url($hero?$hero->get_permalink():$shop_url); ?>">Shop Now</a></div></section><section class="rwb-home-trust" aria-label="Shopping information"><div><strong>Cash on Delivery</strong><span>COD is available for current orders. Online payment is coming soon.</span></div><div><strong>Pakistan-wide delivery</strong><span>Availability, delivery charge and any estimate are confirmed for your address during checkout.</span></div><div><strong>Order support</strong><span>Use your order number on our <a href="<?php echo esc_url($contact_url); ?>">Contact page</a> for delivery or tracking help.</span></div><div><strong>Returns &amp; refunds</strong><span>Read eligibility and damaged-item guidance in our <a href="<?php echo esc_url($refund_url); ?>">Refund Policy</a>.</span></div></section><?php if($products):?><section class="rwb-ref-community" id="community-favorites"><div class="rwb-ref-wrap"><h2 data-reveal><?php echo esc_html($community_heading); ?></h2><div class="rwb-ref-card-grid"><?php foreach(array_slice($products,0,4) as $rank=>$product):$card_copy=Ruwah_Fresh_Commerce_Design::display_copy($product);ob_start();Ruwah_Fresh_Commerce_Design::render_card($product,(int)$rank);$card_html=(string)ob_get_clean();$action_label=$product->is_type('simple')&&$product->is_purchasable()&&$product->is_in_stock()?sprintf('Add %s to cart',(string)$card_copy['name']):sprintf('View %s',(string)$card_copy['name']);$card_html=preg_replace('/(<a\b[^>]*class="[^"]*rwb-commerce-add[^"]*")/i','$1 aria-label="'.esc_attr($action_label).'"',$card_html,1)?:$card_html;?><article class="rwb-commerce-card" data-reveal><?php echo wp_kses_post($card_html); ?></article><?php endforeach;?></div><a class="rwb-ref-text-link" href="<?php echo esc_url($shop_url); ?>">Shop All</a></div></section><?php endif;?>
-<section class="rwb-ref-proof" aria-label="Ruwah product notes"><div class="rwb-ref-proof-shell" data-proof-slider><button class="rwb-ref-proof-arrow prev" type="button" data-proof-prev aria-label="Previous note">←</button><div class="rwb-ref-proof-viewport"><div class="rwb-ref-proof-track" data-proof-track><?php if($reviews):foreach($reviews as $review):$product=function_exists('rwb_product')?rwb_product($review->comment_post_ID):wc_get_product($review->comment_post_ID);if(!$product)continue;$copy=Ruwah_Fresh_Commerce_Design::display_copy($product);$gallery=$product->get_gallery_image_ids();$image_id=(int)($gallery[0]??$product->get_image_id());$rating=(int)get_comment_meta($review->comment_ID,'rating',true);?><article class="rwb-ref-proof-slide"><div class="rwb-ref-proof-image"><?php echo wp_kses_post(wp_get_attachment_image($image_id,'large',false,['loading'=>'lazy','decoding'=>'async'])); ?></div><div class="rwb-ref-proof-copy"><?php if($rating>0):?><div class="rwb-ref-proof-stars" aria-label="<?php echo esc_attr($rating.' out of 5 stars'); ?>"><?php echo esc_html(str_repeat('★',min(5,$rating))); ?></div><?php endif;?><blockquote>“<?php echo esc_html(wp_trim_words(wp_strip_all_tags($review->comment_content),44,'…')); ?>”</blockquote><p>— <?php echo esc_html($review->comment_author); ?></p><a href="<?php echo esc_url($product->get_permalink()); ?>">Shop <?php echo esc_html($copy['name']); ?></a></div></article><?php endforeach;else:foreach(array_slice($products,0,4) as $product):$info=Ruwah_Fresh_Commerce_Design::display_copy($product);$gallery=$product->get_gallery_image_ids();$image_id=(int)($gallery[0]??$product->get_image_id());?><article class="rwb-ref-proof-slide"><div class="rwb-ref-proof-image"><?php echo wp_kses_post(wp_get_attachment_image($image_id,'large',false,['loading'=>'lazy','decoding'=>'async'])); ?></div><div class="rwb-ref-proof-copy"><p class="rwb-ref-kicker">PRODUCT NOTE</p><blockquote><?php echo esc_html($info['name']); ?></blockquote><p><?php echo esc_html($info['tagline']); ?> · <?php echo esc_html(implode(' · ',$info['benefits'])); ?></p><a href="<?php echo esc_url($product->get_permalink()); ?>">Shop Product</a></div></article><?php endforeach;endif;?></div></div><button class="rwb-ref-proof-arrow next" type="button" data-proof-next aria-label="Next note">→</button><div class="rwb-ref-proof-dots" data-proof-dots></div></div></section>
-<section class="rwb-ref-genesis" id="rwb-genesis"><div class="rwb-ref-wrap"><p class="rwb-ref-kicker">OUR GENESIS</p><div class="rwb-ref-genesis-grid"><article><span>I.</span><h3>ACCURATE PRODUCT DETAILS</h3><p>Clear product names, sizes, key ingredients and pack information help you know what you are choosing.</p></article><article><span>II.</span><h3>FOCUSED FORMULAS</h3><p>A concise collection built around cleansing, brightening, hydration and everyday sun care.</p></article><article><span>III.</span><h3>AUTHENTIC PRODUCT PHOTOGRAPHY</h3><p>Product-specific images help you evaluate the item and packaging before you order.</p></article><article><span>IV.</span><h3>CURRENT PRICE &amp; AVAILABILITY</h3><p>Current pricing, sale state and stock are shown before you add a product to your bag.</p></article><article><span>V.</span><h3>EVIDENCE-CONSCIOUS CLAIMS</h3><p>We keep cosmetic benefit language measured and avoid guaranteed treatment claims without verified support.</p></article></div></div></section><section class="rwb-ref-trust" id="rwb-standard"><div class="rwb-ref-wrap"><p class="rwb-ref-kicker">THE RUWAH STANDARD</p><div class="rwb-ref-trust-words" aria-label="Ruwah store standards"><span>CLEAR PRODUCT INFO</span><span>AUTHENTIC MEDIA</span><span>CURRENT AVAILABILITY</span></div><p class="rwb-ref-trust-quote">“Clear ingredients, practical guidance and honest product information should make skincare easier to choose.”</p></div></section><?php if($products):?><section class="rwb-ref-rituals" id="rituals"><div class="rwb-ref-wrap rwb-ref-rituals-head"><h2>Rituals, not clutter.</h2><a href="<?php echo esc_url($shop_url); ?>">SHOP RUWAH</a></div><div class="rwb-ref-ritual-grid"><?php foreach($products as $product):$copy=Ruwah_Fresh_Commerce_Design::display_copy($product);$gallery=$product->get_gallery_image_ids();$image_id=(int)($gallery[1]??$gallery[0]??$product->get_image_id());?><a href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="<?php echo esc_attr($copy['name']); ?>"><?php echo wp_kses_post(wp_get_attachment_image($image_id,'large',false,['loading'=>'lazy','decoding'=>'async'])); ?></a><?php endforeach;?></div></section><?php endif;?></main>
-<footer class="rwb-ref-footer"><section class="rwb-ref-footer-signup"><div class="rwb-ref-footer-signup-copy"><p class="rwb-ref-kicker">JOIN RUWAH NOTES</p><h2>Skincare guidance, product updates and occasional offers.</h2><p>Occasional emails only. Unsubscribe any time.</p></div><div><form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>"><input type="hidden" name="action" value="rwb_newsletter"><?php wp_nonce_field('rwb_newsletter','rwb_nonce'); ?><label class="screen-reader-text" for="rwb-footer-email">Email address</label><input id="rwb-footer-email" type="email" name="email" required autocomplete="email" placeholder="Email address"><button type="submit">Subscribe</button></form><?php if($privacy_url):?><small>By subscribing, you agree to receive Ruwah Notes. See our <a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a>.</small><?php endif;?><?php if('success'===$newsletter):?><p class="rwb-form-ok">Thank you — your subscription request was sent.</p><?php elseif('invalid'===$newsletter):?><p class="rwb-form-error">Please enter a valid email.</p><?php elseif('error'===$newsletter):?><p class="rwb-form-error">We could not send the signup request. Please try again.</p><?php endif;?></div></section><div class="rwb-ref-footer-grid"><div class="rwb-ref-footer-brand"><?php if(has_custom_logo()){the_custom_logo();}else{?><b>RUWAH BEAUTY</b><?php }?><p>Luxury care for everyday skin.</p><small>Pakistan-wide delivery · Cash on Delivery.</small></div><div><h3>Shop</h3><a href="<?php echo esc_url($shop_url); ?>">Shop all</a><?php foreach($products as $product):$copy=Ruwah_Fresh_Commerce_Design::display_copy($product);?><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($copy['name']); ?></a><?php endforeach;?></div><div><h3>Learn</h3><a href="#rwb-genesis">Our Genesis</a><a href="#rwb-standard">The Ruwah Standard</a><a href="#rituals">Rituals</a></div><div><h3>Account</h3><a href="<?php echo esc_url($account_url); ?>">My account</a><a href="<?php echo esc_url($cart_url); ?>">Shopping bag</a><a href="<?php echo esc_url(function_exists('wc_get_checkout_url')?wc_get_checkout_url():home_url('/checkout/')); ?>">Checkout</a></div><div><h3>Our Promise</h3><p>Clear product details.</p><p>Current price &amp; stock.</p><p>Measured cosmetic claims.</p></div></div><div class="rwb-ref-footer-bottom"><span>© <?php echo esc_html(wp_date('Y')); ?> Ruwah Beauty · Pakistan</span><div><?php if($privacy_url):?><a href="<?php echo esc_url($privacy_url); ?>">Privacy Policy</a><?php endif;?><a href="<?php echo esc_url($refund_url); ?>">Refund Policy</a><a href="<?php echo esc_url($contact_url); ?>">Contact</a></div></div></footer><?php wp_footer(); ?></body></html>
+<!doctype html>
+<html <?php language_attributes(); ?>>
+<head>
+<meta charset="<?php bloginfo('charset'); ?>">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Shop Ruwah Beauty skincare in Pakistan. Discover brightening serums, rice skincare, face wash and daily sun care with cash on delivery.">
+<?php wp_head(); ?>
+<script type="application/ld+json"><?php echo wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?></script>
+<?php if ($premium_css !== '') : ?><style id="rwb-home-premium-v1"><?php echo wp_strip_all_tags($premium_css); ?></style><?php endif; ?>
+</head>
+<body <?php body_class('rwb-home-premium'); ?>>
+<?php wp_body_open(); ?>
+<a class="screen-reader-text" href="#main">Skip to content</a>
+
+<div class="rhp-announcement" role="region" aria-label="Delivery and payment notice">
+    <a href="<?php echo esc_url($shipping_url); ?>"><span>Pakistan-wide delivery</span><span aria-hidden="true">·</span><span>Cash on delivery</span><span aria-hidden="true">·</span><span>Shipping details</span></a>
+</div>
+
+<header class="rhp-header" data-premium-header>
+    <div class="rhp-header-inner">
+        <button class="rhp-icon-button rhp-menu-toggle" type="button" data-premium-menu-open aria-label="Open navigation" aria-expanded="false" aria-controls="rhp-mobile-menu">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <nav class="rhp-desktop-nav" aria-label="Primary navigation">
+            <a href="<?php echo esc_url($shop_url); ?>">Shop</a>
+            <a href="#shop-by-concern">Shop by concern</a>
+            <a href="#routine-builder">Routine guide</a>
+            <a href="<?php echo esc_url($learn_url); ?>">Learn</a>
+            <a href="<?php echo esc_url($contact_url); ?>">Contact</a>
+        </nav>
+        <div class="rhp-logo">
+            <?php if (has_custom_logo()) { the_custom_logo(); } else { ?><a href="<?php echo esc_url($site_url); ?>" class="rhp-wordmark">Ruwah</a><?php } ?>
+        </div>
+        <div class="rhp-tools">
+            <button class="rhp-icon-button" type="button" data-search-open aria-label="Search products"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.4"/><path d="m15.4 15.4 4.8 4.8"/></svg></button>
+            <a class="rhp-icon-button rhp-account" href="<?php echo esc_url($account_url); ?>" aria-label="My account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.7 20c.7-4 2.8-6 6.3-6s5.6 2 6.3 6"/></svg></a>
+            <button class="rhp-icon-button rhp-cart" type="button" data-cart-open aria-label="Open cart, <?php echo esc_attr((string) $count); ?> items"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg><span class="rwb-cart-count rhp-cart-count"><?php echo esc_html((string) $count); ?></span></button>
+        </div>
+    </div>
+</header>
+
+<aside class="rhp-mobile-menu" id="rhp-mobile-menu" data-premium-menu role="dialog" aria-modal="true" aria-label="Navigation" hidden>
+    <div class="rhp-mobile-head"><span>Menu</span><button class="rhp-icon-button" type="button" data-premium-menu-close aria-label="Close navigation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 5 14 14M19 5 5 19"/></svg></button></div>
+    <nav aria-label="Mobile navigation">
+        <a href="<?php echo esc_url($shop_url); ?>">Shop <span>All products</span></a>
+        <a href="#shop-by-concern">Shop by concern <span>Choose by routine goal</span></a>
+        <a href="#routine-builder">Routine guide <span>Cleanse · Treat · Moisturize · Protect</span></a>
+        <a href="<?php echo esc_url($learn_url); ?>">Learn <span>Skincare guidance</span></a>
+        <a href="<?php echo esc_url($contact_url); ?>">Contact <span>Order and product support</span></a>
+        <a href="<?php echo esc_url($account_url); ?>">My account <span>Orders and account details</span></a>
+    </nav>
+    <div class="rhp-mobile-support"><a href="<?php echo esc_url($whatsapp_url); ?>" target="_blank" rel="noopener">WhatsApp support</a><small>Response hours are not currently published.</small></div>
+</aside>
+<div class="rhp-menu-backdrop" data-premium-menu-backdrop hidden></div>
+
+<div class="rwb-layer" data-search hidden><button class="rwb-backdrop" data-search-close aria-label="Close search"></button><div class="rwb-search-panel"><div class="rwb-panel-head"><b>Search Ruwah</b><button class="rwb-icon" data-search-close aria-label="Close search">×</button></div><form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>"><label class="screen-reader-text" for="rhp-search">Search products</label><input id="rhp-search" type="search" name="s" placeholder="Search products" required><input type="hidden" name="post_type" value="product"><button>Search</button></form></div></div>
+<div class="rwb-layer" data-cart hidden><button class="rwb-backdrop" data-cart-close aria-label="Close cart"></button><aside class="rwb-cart-panel rwb-shop-cart-drawer"><?php if (function_exists('rwb_render_cart_drawer_content')) rwb_render_cart_drawer_content(); ?></aside></div>
+
+<main id="main" class="rhp-main">
+    <section class="rhp-hero">
+        <div class="rhp-hero-media"><?php echo wp_kses_post($hero_image); ?></div>
+        <div class="rhp-hero-overlay" aria-hidden="true"></div>
+        <div class="rhp-hero-content">
+            <p class="rhp-eyebrow">Focused skincare · Pakistan</p>
+            <h1>Brighter-looking, hydrated skin — without the noise.</h1>
+            <p class="rhp-hero-lead"><?php echo esc_html($hero_info['name']); ?> combines Vitamin C, Niacinamide and Hyaluronic Acid in a brightening and hydration-focused serum.</p>
+            <div class="rhp-hero-actions">
+                <a class="rhp-button rhp-button-primary" href="<?php echo esc_url($hero ? $hero->get_permalink() : $shop_url); ?>">Shop Triple Action Serum</a>
+                <a class="rhp-button rhp-button-ghost" href="#routine-builder">Find your routine</a>
+            </div>
+            <p class="rhp-hero-trust">Cosmetic benefits are described in measured language; current price and stock come directly from WooCommerce.</p>
+        </div>
+    </section>
+
+    <section class="rhp-trust-strip" aria-label="Shopping reassurance">
+        <a href="<?php echo esc_url($checkout_url); ?>"><span class="rhp-trust-icon" aria-hidden="true">₨</span><strong>Cash on delivery</strong><small>Available for current checkout orders.</small></a>
+        <a href="<?php echo esc_url($shipping_url); ?>"><span class="rhp-trust-icon" aria-hidden="true">↗</span><strong>Pakistan-wide delivery</strong><small>Availability and charges are confirmed for your address.</small></a>
+        <a href="<?php echo esc_url($quality_url); ?>"><span class="rhp-trust-icon" aria-hidden="true">◎</span><strong>Measured skincare claims</strong><small>Cosmetic benefits without unsupported treatment promises.</small></a>
+        <a href="<?php echo esc_url($contact_url); ?>"><span class="rhp-trust-icon" aria-hidden="true">↘</span><strong>Order support</strong><small>Use your order number when contacting support.</small></a>
+    </section>
+
+    <section class="rhp-section rhp-concerns" id="shop-by-concern">
+        <div class="rhp-section-head"><div><p class="rhp-eyebrow">Shop by concern</p><h2>Start with what your routine needs.</h2></div><p>Four clear entry points into the current Ruwah range — without diagnostic or medical claims.</p></div>
+        <div class="rhp-concern-grid">
+            <?php foreach ($concerns as $index => $concern) : $p = $concern['product']; if (! $p) continue; $info = Ruwah_Fresh_Commerce_Design::display_copy($p); ?>
+                <a class="rhp-concern-card" href="<?php echo esc_url($p->get_permalink()); ?>">
+                    <span class="rhp-concern-number">0<?php echo esc_html((string) ($index + 1)); ?></span>
+                    <div><h3><?php echo esc_html($concern['title']); ?></h3><p><?php echo esc_html($concern['copy']); ?></p><span class="rhp-text-link">Explore <?php echo esc_html($info['name']); ?> →</span></div>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </section>
+
+    <?php if ($best) : ?>
+    <section class="rhp-section rhp-bestsellers" id="bestsellers">
+        <div class="rhp-section-head"><div><p class="rhp-eyebrow">Product discovery</p><h2>Ruwah essentials.</h2></div><p>Current product data, price, stock and genuine review counts — no placeholder ratings.</p></div>
+        <div class="rhp-product-grid">
+            <?php foreach ($best as $rank => $product) :
+                $info = Ruwah_Fresh_Commerce_Design::display_copy($product);
+                $regular = (float) $product->get_regular_price(); $price = (float) $product->get_price(); $saving = ($regular > $price && $price > 0) ? $regular - $price : 0;
+                $reviews = (int) $product->get_review_count(); $rating = (float) $product->get_average_rating();
+                $can_cart = $product->is_type('simple') && $product->is_purchasable() && $product->is_in_stock();
+                $image_url = wp_get_attachment_image_url((int) $product->get_image_id(), 'woocommerce_single') ?: '';
+                $benefit = ! empty($info['benefits'][0]) ? (string) $info['benefits'][0] : (string) $info['tagline'];
+                $stock_text = $product->is_in_stock() ? 'In stock' : 'Out of stock';
+            ?>
+            <article class="rhp-product-card">
+                <a class="rhp-product-image" href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="View <?php echo esc_attr($info['name']); ?>">
+                    <?php echo wp_kses_post($product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
+                    <?php if ($saving > 0) : ?><span class="rhp-product-badge">Save <?php echo wp_kses_post(wc_price($saving, ['decimals' => 0])); ?></span><?php elseif (0 === $rank) : ?><span class="rhp-product-badge">Popular pick</span><?php endif; ?>
+                </a>
+                <div class="rhp-product-copy">
+                    <div class="rhp-product-meta"><span><?php echo esc_html($stock_text); ?></span><?php if (! empty($info['size'])) : ?><span><?php echo esc_html($info['size']); ?></span><?php endif; ?></div>
+                    <h3><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($info['name']); ?></a></h3>
+                    <p><?php echo esc_html($benefit); ?></p>
+                    <?php if ($reviews > 0) : ?><div class="rhp-rating" aria-label="<?php echo esc_attr(number_format_i18n($rating, 1) . ' out of 5 from ' . $reviews . ' reviews'); ?>"><span aria-hidden="true">★ <?php echo esc_html(number_format_i18n($rating, 1)); ?></span><small><?php echo esc_html((string) $reviews); ?> reviews</small></div><?php endif; ?>
+                    <div class="rhp-price"><?php if ($saving > 0) : ?><del><?php echo wp_kses_post(wc_price($regular, ['decimals' => 0])); ?></del><?php endif; ?><strong><?php echo wp_kses_post(wc_price($price, ['decimals' => 0])); ?></strong><?php if ($saving > 0) : ?><small>You save <?php echo wp_kses_post(wc_price($saving, ['decimals' => 0])); ?></small><?php endif; ?></div>
+                    <div class="rhp-card-actions">
+                        <?php if ($can_cart) : ?><a class="rhp-add add_to_cart_button ajax_add_to_cart" rel="nofollow" data-product_id="<?php echo esc_attr((string) $product->get_id()); ?>" data-product_sku="<?php echo esc_attr($product->get_sku()); ?>" data-quantity="1" href="<?php echo esc_url($product->add_to_cart_url()); ?>">Add to cart</a><?php else : ?><a class="rhp-add" href="<?php echo esc_url($product->get_permalink()); ?>">View product</a><?php endif; ?>
+                        <button class="rhp-quick" type="button" data-quick-view data-qv-name="<?php echo esc_attr($info['name']); ?>" data-qv-image="<?php echo esc_url($image_url); ?>" data-qv-copy="<?php echo esc_attr($benefit); ?>" data-qv-price="<?php echo esc_attr(wp_strip_all_tags(wc_price($price, ['decimals' => 0]))); ?>" data-qv-stock="<?php echo esc_attr($stock_text); ?>" data-qv-url="<?php echo esc_url($product->get_permalink()); ?>" data-qv-add="<?php echo esc_url($can_cart ? $product->add_to_cart_url() : $product->get_permalink()); ?>" data-qv-can-cart="<?php echo $can_cart ? '1' : '0'; ?>">Quick view</button>
+                    </div>
+                </div>
+            </article>
+            <?php endforeach; ?>
+        </div>
+        <div class="rhp-centered"><a class="rhp-text-link" href="<?php echo esc_url($shop_url); ?>">Shop all skincare →</a></div>
+    </section>
+    <?php endif; ?>
+
+    <section class="rhp-section rhp-routine" id="routine-builder">
+        <div class="rhp-section-head"><div><p class="rhp-eyebrow">Routine builder</p><h2>Four steps. Use only what fits.</h2></div><p>Existing products mapped to a simple routine position; product directions remain on the product page and packaging.</p></div>
+        <div class="rhp-routine-grid">
+            <?php foreach ($routine as $row) : $p = $row['product']; if (! $p) continue; $info = Ruwah_Fresh_Commerce_Design::display_copy($p); ?>
+            <article><span class="rhp-routine-step">Step <?php echo esc_html($row['step']); ?></span><h3><?php echo esc_html($row['label']); ?></h3><a href="<?php echo esc_url($p->get_permalink()); ?>"><?php echo esc_html($info['name']); ?></a><p><?php echo esc_html((string) $info['tagline']); ?></p></article>
+            <?php endforeach; ?>
+        </div>
+        <a class="rhp-button rhp-button-dark" href="<?php echo esc_url($shop_url); ?>">Build your routine</a>
+    </section>
+
+    <?php if ($hero) : ?>
+    <section class="rhp-story">
+        <div class="rhp-story-media"><?php echo wp_kses_post($hero->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?></div>
+        <div class="rhp-story-copy">
+            <p class="rhp-eyebrow">Featured formula</p>
+            <h2><?php echo esc_html($hero_info['name']); ?></h2>
+            <p class="rhp-story-intro">For routines focused on brighter-looking, hydrated skin. Its verified product copy highlights Vitamin C, Niacinamide and Hyaluronic Acid.</p>
+            <dl class="rhp-story-facts">
+                <div><dt>Routine position</dt><dd>Treat</dd></div>
+                <div><dt>How to use</dt><dd><?php echo esc_html($usage); ?></dd></div>
+                <?php foreach ($verified_fields as $label => $value) : ?><div><dt><?php echo esc_html($label); ?></dt><dd><?php echo esc_html($value); ?></dd></div><?php endforeach; ?>
+                <div><dt>Delivery</dt><dd>No delivery-time range is currently published; availability and charges are confirmed for the checkout address.</dd></div>
+                <div><dt>Returns</dt><dd>Eligibility and damaged/incorrect item guidance are available in the published returns policy.</dd></div>
+            </dl>
+            <a class="rhp-button rhp-button-dark" href="<?php echo esc_url($hero->get_permalink()); ?>">View product</a>
+        </div>
+    </section>
+    <?php endif; ?>
+
+    <section class="rhp-section rhp-why">
+        <div class="rhp-section-head"><div><p class="rhp-eyebrow">Why Ruwah</p><h2>A focused range, not an endless shelf.</h2></div><p>Verifiable differences drawn from the current store — not manufacturing or clinical claims we cannot substantiate.</p></div>
+        <div class="rhp-why-grid">
+            <article><span>01</span><h3>Routine-focused collection</h3><p>The current range centers on cleansing, brightening, hydration and everyday sun care.</p></article>
+            <article><span>02</span><h3>Live commerce details</h3><p>Price, sale state and stock are pulled from WooCommerce at the moment you browse.</p></article>
+            <article><span>03</span><h3>Product-specific photography</h3><p>Existing product media is reused so shoppers can assess the actual item and packaging.</p></article>
+            <article><span>04</span><h3>Pakistan-first checkout</h3><p>Prices are shown in PKR and current checkout supports cash on delivery.</p></article>
+        </div>
+    </section>
+
+    <?php if ($review_count > 0) : ?>
+    <section class="rhp-section rhp-reviews" aria-labelledby="rhp-reviews-title">
+        <div class="rhp-section-head"><div><p class="rhp-eyebrow">Verified customer reviews</p><h2 id="rhp-reviews-title">What verified buyers said.</h2></div><p>Only reviews associated with verified WooCommerce owners are shown here.</p></div>
+        <?php if ($review_count >= 5) : ?><div class="rhp-review-summary"><strong><?php echo esc_html(number_format_i18n($review_avg, 1)); ?> / 5</strong><span><?php echo esc_html((string) $review_count); ?> verified reviews</span><div class="rhp-rating-bars"><?php foreach ($review_dist as $stars => $n) : $pct = $review_count ? round(($n / $review_count) * 100) : 0; ?><div><span><?php echo esc_html((string) $stars); ?>★</span><i><b style="width:<?php echo esc_attr((string) $pct); ?>%"></b></i><small><?php echo esc_html((string) $n); ?></small></div><?php endforeach; ?></div></div><?php endif; ?>
+        <div class="rhp-review-grid">
+            <?php foreach (array_slice($verified_reviews, 0, 6) as [$review, $review_product, $rating]) : $info = Ruwah_Fresh_Commerce_Design::display_copy($review_product); ?>
+            <article><div class="rhp-review-stars" aria-label="<?php echo esc_attr($rating . ' out of 5 stars'); ?>"><?php echo esc_html(str_repeat('★', $rating)); ?></div><blockquote>“<?php echo esc_html(wp_trim_words(wp_strip_all_tags($review->comment_content), 38, '…')); ?>”</blockquote><p><strong><?php echo esc_html($review->comment_author); ?></strong><span>Verified purchase · <?php echo esc_html($info['name']); ?></span><time datetime="<?php echo esc_attr(get_comment_date('c', $review)); ?>"><?php echo esc_html(get_comment_date(get_option('date_format'), $review)); ?></time></p></article>
+            <?php endforeach; ?>
+        </div>
+    </section>
+    <?php endif; ?>
+
+    <section class="rhp-section rhp-ingredients" id="ingredient-guide">
+        <div class="rhp-section-head"><div><p class="rhp-eyebrow">Ingredient education</p><h2>Know the role, not the hype.</h2></div><p>Simple cosmetic context for ingredients already named in current Ruwah product information.</p></div>
+        <div class="rhp-ingredient-grid">
+            <article><h3>Vitamin C</h3><p>Used in cosmetic formulas to support a brighter-looking, more radiant appearance.</p></article>
+            <article><h3>Niacinamide</h3><p>Commonly used to support an even-looking tone and the skin barrier’s comfortable appearance.</p></article>
+            <article><h3>Hyaluronic Acid</h3><p>A humectant used to help skin feel hydrated and look more comfortably plumped.</p></article>
+            <article><h3>Rice Extract</h3><p>Used in Ruwah’s rice-focused products as part of their brightening and conditioning positioning.</p></article>
+            <article><h3>Alpha Arbutin</h3><p>Included in the current rice cream product information for even-looking tone and radiance-focused care.</p></article>
+        </div>
+        <a class="rhp-text-link" href="<?php echo esc_url($learn_url); ?>">Formula guide →</a>
+    </section>
+
+    <section class="rhp-support">
+        <div><p class="rhp-eyebrow">Delivery & support</p><h2>Know what happens after you order.</h2></div>
+        <div class="rhp-support-grid">
+            <article><h3>Delivery estimate</h3><p>A delivery-time range is not currently published. Delivery availability and charge are confirmed for your address.</p><a href="<?php echo esc_url($shipping_url); ?>">Shipping details →</a></article>
+            <article><h3>Cash on delivery</h3><p>Place the order through checkout and use the current Cash on Delivery method.</p><a href="<?php echo esc_url($checkout_url); ?>">Go to checkout →</a></article>
+            <article><h3>Returns</h3><p>Return/refund eligibility depends on the published policy and the condition of the order.</p><a href="<?php echo esc_url($refund_url); ?>">Read returns policy →</a></article>
+            <article><h3>Tracking & WhatsApp</h3><p>Use your order number when requesting status help. Response hours are not currently published.</p><a href="<?php echo esc_url($whatsapp_url); ?>" target="_blank" rel="noopener">WhatsApp support →</a></article>
+        </div>
+    </section>
+</main>
+
+<dialog class="rhp-quick-view" data-quick-dialog aria-labelledby="rhp-qv-title">
+    <button class="rhp-qv-close" type="button" data-quick-close aria-label="Close quick view">×</button>
+    <div class="rhp-qv-media"><img data-qv-image alt=""></div>
+    <div class="rhp-qv-copy"><span data-qv-stock></span><h2 id="rhp-qv-title" data-qv-name></h2><p data-qv-copy></p><strong data-qv-price></strong><div><a class="rhp-button rhp-button-dark" data-qv-add href="#">Add to cart</a><a class="rhp-text-link" data-qv-link href="#">View full product →</a></div></div>
+</dialog>
+
+<footer class="rhp-footer">
+    <div class="rhp-footer-top">
+        <div class="rhp-footer-brand"><div class="rhp-footer-wordmark">Ruwah Beauty</div><p>Focused skincare for brighter-looking, hydrated and comfortable everyday skin.</p><div class="rhp-footer-social"><a href="https://www.facebook.com/share/1BNAdjWpYW/" target="_blank" rel="noopener" aria-label="Ruwah Beauty on Facebook">Fb</a><a href="https://www.instagram.com/rawah.beauty" target="_blank" rel="noopener" aria-label="Ruwah Beauty on Instagram">Ig</a><a href="https://vt.tiktok.com/ZSX6WqwS2/" target="_blank" rel="noopener" aria-label="Ruwah Beauty on TikTok">Tk</a></div></div>
+        <nav><h2>Shop</h2><a href="<?php echo esc_url($shop_url); ?>">Shop all</a><a href="#shop-by-concern">Shop by concern</a><a href="#routine-builder">Routine guide</a></nav>
+        <nav><h2>Learn</h2><a href="<?php echo esc_url($learn_url); ?>">Formula guide</a><a href="<?php echo esc_url($quality_url); ?>">Quality & safety</a><a href="<?php echo esc_url($contact_url); ?>">Contact</a></nav>
+        <nav><h2>Support</h2><a href="<?php echo esc_url($shipping_url); ?>">Shipping</a><a href="<?php echo esc_url($refund_url); ?>">Refunds</a><?php if ($privacy_url) : ?><a href="<?php echo esc_url($privacy_url); ?>">Privacy</a><?php endif; ?><a href="<?php echo esc_url($account_url); ?>">Account / track orders</a></nav>
+        <div class="rhp-footer-support"><h2>Pakistan support</h2><?php if ($branded_email) : ?><a href="mailto:<?php echo esc_attr($branded_email); ?>"><?php echo esc_html($branded_email); ?></a><?php endif; ?><a href="<?php echo esc_url($whatsapp_url); ?>" target="_blank" rel="noopener">WhatsApp +92 371 3923279</a><p>Response hours are not currently published.</p><p>Pakistan · Online skincare</p></div>
+    </div>
+    <div class="rhp-footer-bottom"><span>© <?php echo esc_html(wp_date('Y')); ?> Ruwah Beauty</span><span>PKR pricing · Cash on Delivery</span></div>
+</footer>
+<?php wp_footer(); ?>
+</body>
+</html>
