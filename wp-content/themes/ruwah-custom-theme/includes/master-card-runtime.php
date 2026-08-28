@@ -58,17 +58,15 @@ function rwb_master_card_runtime_surface(): bool {
     return false;
 }
 
-/* Keep the main Shop focused on the approved original range only.
- * Toner (56) and Repair Mask (58) remain published and directly accessible. */
+/* Shop-only catalogue: remove duplicate/non-core range from the main listing. */
 add_filter('woocommerce_product_object_query_args', static function (array $args): array {
-    if (is_admin() || ! function_exists('is_shop') || ! is_shop()) return $args;
-    $existing = isset($args['exclude']) ? array_map('intval', (array) $args['exclude']) : [];
-    $args['exclude'] = array_values(array_unique(array_merge($existing, [56, 58])));
+    if (! function_exists('is_shop') || ! is_shop()) return $args;
+    $exclude = array_map('intval', (array) ($args['exclude'] ?? []));
+    $args['exclude'] = array_values(array_unique(array_merge($exclude, [56, 58, 66])));
     return $args;
-}, 100);
+}, 50);
 
-/* Homepage already renders the exact Shop/footer markup through home-footer-dedup.php.
- * home-premium.css was hiding that footer, so only undo that hide rule. */
+/* Homepage already renders the exact Shop/footer markup through home-footer-dedup.php. */
 add_action('wp_enqueue_scripts', static function (): void {
     if (! is_front_page()) return;
     wp_add_inline_style('rwb-theme', 'body.rwb-home-premium .rwb-dieux-footer{display:block!important}');
@@ -76,12 +74,25 @@ add_action('wp_enqueue_scripts', static function (): void {
 
 add_action('wp_enqueue_scripts', static function (): void {
     if (! rwb_master_card_runtime_surface()) return;
-    wp_enqueue_style('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/home-premium.css'), ['rwb-theme'], '20260828.6');
+    wp_enqueue_style('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/home-premium.css'), ['rwb-theme'], '20260828.8');
     wp_enqueue_script('wc-add-to-cart');
-    wp_enqueue_script('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/product-card.js'), [], '20260828.6', true);
+    wp_enqueue_script('rwb-master-card-safe', plugins_url('ruwah-fresh-commerce-design/assets/product-card.js'), [], '20260828.8', true);
     wp_script_add_data('rwb-master-card-safe', 'strategy', 'defer');
-    wp_add_inline_style('rwb-master-card-safe', 'body{--rhp-ink:#171419;--rhp-muted:#625d65;--rhp-cream:#f7f3e9;--rhp-paper:#fbfaf6;--rhp-lilac:#876cad;--rhp-lilac-dark:#665082;--rhp-blue:#dce9e9;--rhp-line:rgba(23,20,25,.16);--rhp-radius:2px}.rhp-product-grid{display:grid;grid-template-columns:1fr;gap:14px}.rhp-loop-item{list-style:none!important}.rhp-loop-item>.rhp-product-card{height:100%}@media(min-width:600px){.rhp-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(min-width:1024px){.rhp-product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}}');
+    wp_add_inline_style('rwb-master-card-safe', 'body{--rhp-ink:#171419;--rhp-muted:#625d65;--rhp-cream:#f7f3e9;--rhp-paper:#fbfaf6;--rhp-lilac:#876cad;--rhp-lilac-dark:#665082;--rhp-blue:#dce9e9;--rhp-line:rgba(23,20,25,.16);--rhp-radius:2px}.rhp-product-grid{display:grid;grid-template-columns:1fr;gap:14px}.rhp-loop-item{list-style:none!important}.rhp-loop-item>.rhp-product-card{height:100%}.rhp-shop-feature-banner{position:relative;min-height:520px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid var(--rhp-line);background:#dfe8e9;color:#fff}.rhp-shop-feature-banner>a:first-child{position:absolute;inset:0}.rhp-shop-feature-banner img{width:100%!important;height:100%!important;object-fit:cover!important;margin:0!important}.rhp-shop-feature-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(17,14,18,.04) 35%,rgba(17,14,18,.76) 100%);pointer-events:none}.rhp-shop-feature-banner__copy{position:relative;z-index:2;padding:24px}.rhp-shop-feature-banner__copy small{display:block;margin-bottom:8px;font-size:9px;letter-spacing:.08em;text-transform:uppercase}.rhp-shop-feature-banner__copy h2{margin:0 0 14px!important;color:#fff!important;font-family:var(--serif,Georgia,serif)!important;font-size:36px!important;font-weight:400!important;line-height:1!important}.rhp-shop-feature-banner__copy a{display:inline-flex;min-height:44px;align-items:center;padding:0 16px;border:1px solid rgba(255,255,255,.8);color:#fff!important;font-size:10px;font-weight:700;letter-spacing:.05em;text-decoration:none;text-transform:uppercase}@media(min-width:600px){.rhp-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(min-width:1024px){.rhp-product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.rhp-shop-feature-banner{min-height:100%}}');
 }, 10005);
+
+/* Restore the left Shop feature banner using an existing product image only. */
+add_action('template_redirect', static function (): void {
+    if (! function_exists('is_shop') || ! is_shop() || ! function_exists('wc_get_product')) return;
+    ob_start(static function (string $html): string {
+        if (false !== strpos($html, 'rhp-shop-feature-banner')) return $html;
+        $featured = wc_get_product(54);
+        if (! $featured instanceof WC_Product || ! $featured->is_visible()) return $html;
+        $image = $featured->get_image('woocommerce_single', ['loading' => 'eager', 'decoding' => 'async']);
+        $banner = '<article class="rhp-shop-feature-banner"><a href="' . esc_url($featured->get_permalink()) . '" aria-label="View ' . esc_attr($featured->get_name()) . '">' . wp_kses_post($image) . '</a><div class="rhp-shop-feature-banner__copy"><small>Featured</small><h2>' . esc_html($featured->get_name()) . '</h2><a href="' . esc_url($featured->get_permalink()) . '">Shop product</a></div></article>';
+        return preg_replace('/(<div class="rhp-product-grid">)/', '$1' . $banner, $html, 1) ?: $html;
+    });
+}, 0);
 
 add_action('wp_footer', static function (): void {
     if (! rwb_master_card_runtime_surface()) return;
