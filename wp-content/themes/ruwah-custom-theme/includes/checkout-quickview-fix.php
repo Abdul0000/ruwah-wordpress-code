@@ -27,7 +27,7 @@ function rwb_remove_closure_at_priority(string $hook, int $priority, string $sou
     }
 }
 
-/* Remove only the older fixed +92 closures from home-footer-dedup.php. */
+/* Remove only the older phone closures from home-footer-dedup.php so one implementation owns the field. */
 add_action('wp_loaded', static function (): void {
     $legacy = __DIR__ . '/home-footer-dedup.php';
     rwb_remove_closure_at_priority('woocommerce_checkout_fields', 20000, $legacy);
@@ -43,22 +43,22 @@ function rwb_local_phone_checkout_active(): bool {
     return ! (function_exists('is_wc_endpoint_url') && is_wc_endpoint_url('order-received'));
 }
 
-/* Customer sees/types only the 10 local digits: 3XXXXXXXXX. */
+/* Customer sees fixed +92 and enters exactly 10 local mobile digits after it. */
 add_filter('woocommerce_checkout_fields', static function (array $fields): array {
     if (! rwb_local_phone_checkout_active() || ! isset($fields['billing']['billing_phone'])) {
         return $fields;
     }
     $phone =& $fields['billing']['billing_phone'];
     $phone['type'] = 'tel';
-    $phone['placeholder'] = '3XXXXXXXXX';
-    $phone['default'] = '';
-    $phone['autocomplete'] = 'tel-national';
+    $phone['placeholder'] = '+923XXXXXXXXX';
+    $phone['default'] = '+92';
+    $phone['autocomplete'] = 'tel';
     $phone['custom_attributes']['inputmode'] = 'numeric';
-    $phone['custom_attributes']['maxlength'] = '10';
-    $phone['custom_attributes']['minlength'] = '10';
-    $phone['custom_attributes']['pattern'] = '3[0-9]{9}';
-    $phone['custom_attributes']['title'] = 'Enter exactly 10 Pakistan mobile digits, starting with 3.';
-    unset($phone['custom_attributes']['data-rwb-fixed-prefix']);
+    $phone['custom_attributes']['maxlength'] = '13';
+    $phone['custom_attributes']['minlength'] = '13';
+    $phone['custom_attributes']['pattern'] = '\\+923[0-9]{9}';
+    $phone['custom_attributes']['title'] = 'Enter exactly 10 Pakistan mobile digits after the fixed +92 prefix.';
+    $phone['custom_attributes']['data-rwb-fixed-prefix'] = '+92';
     return $fields;
 }, 30000);
 
@@ -73,32 +73,34 @@ add_filter('woocommerce_checkout_get_value', static function ($value, string $in
     if (str_starts_with((string) $digits, '0')) {
         $digits = substr((string) $digits, 1);
     }
-    return substr((string) $digits, 0, 10);
+    return '+92' . substr((string) $digits, 0, 10);
 }, 30000, 2);
 
-/* Server gate: invalid local number blocks Place Order; valid local number clears legacy format errors. */
+/* Server gate: invalid number blocks Place Order. */
 add_action('woocommerce_after_checkout_validation', static function (array $data, WP_Error $errors): void {
     $country = strtoupper(trim((string) ($data['billing_country'] ?? 'PK')));
     if ('PK' !== $country) {
         return;
     }
-    $digits = preg_replace('/\D+/', '', trim((string) ($data['billing_phone'] ?? '')));
-    if (! preg_match('/^3\d{9}$/', (string) $digits)) {
-        $errors->add('rwb_pk_phone_local_10', 'Enter exactly 10 Pakistan mobile digits, starting with 3.');
+    $phone = preg_replace('/\s+/', '', trim((string) ($data['billing_phone'] ?? '')));
+    if (! preg_match('/^\+923\d{9}$/', (string) $phone)) {
+        $errors->add('rwb_pk_phone_visible_prefix', 'Enter exactly 10 Pakistan mobile digits after +92.');
         return;
     }
     $errors->remove('rwb_billing_phone_invalid');
     $errors->remove('rwb_pk_phone_fixed_prefix');
+    $errors->remove('rwb_pk_phone_local_10');
 }, 30000, 2);
 
-/* Enforce numeric-only 10 digits after every Woo checkout refresh. */
+/* Keep +92 fixed/visible and allow only 10 local digits after it. */
 add_action('wp_footer', static function (): void {
     if (! rwb_local_phone_checkout_active()) {
         return;
     }
     ?>
-    <script id="rwb-pk-local-phone-10">
+    <script id="rwb-pk-visible-prefix-phone">
     (()=>{'use strict';
+      const PREFIX='+92',MAX_LOCAL=10;
       const getPhone=()=>document.getElementById('billing_phone');
       const getCountry=()=>document.getElementById('billing_country');
       const isPK=()=>{const c=getCountry();return !c||String(c.value||'PK').toUpperCase()==='PK';};
@@ -106,21 +108,31 @@ add_action('wp_footer', static function (): void {
         let d=String(value||'').replace(/\D/g,'');
         if(d.startsWith('92'))d=d.slice(2);
         if(d.startsWith('0'))d=d.slice(1);
-        return d.slice(0,10);
+        return d.slice(0,MAX_LOCAL);
       };
       const normalize=()=>{
         const p=getPhone();if(!p||!isPK())return;
-        p.value=localDigits(p.value);
-        p.maxLength=10;p.minLength=10;
-        p.placeholder='3XXXXXXXXX';
-        p.autocomplete='tel-national';
+        p.value=PREFIX+localDigits(p.value);
+        p.maxLength=13;p.minLength=13;
+        p.placeholder='+923XXXXXXXXX';
+        p.autocomplete='tel';
         p.setAttribute('inputmode','numeric');
-        p.setAttribute('pattern','3[0-9]{9}');
-        p.setAttribute('title','Enter exactly 10 Pakistan mobile digits, starting with 3.');
-        p.removeAttribute('data-rwb-fixed-prefix');
+        p.setAttribute('pattern','\\+923[0-9]{9}');
+        p.setAttribute('title','Enter exactly 10 Pakistan mobile digits after the fixed +92 prefix.');
+        p.setAttribute('data-rwb-fixed-prefix',PREFIX);
+        try{if(p.selectionStart!==null&&p.selectionStart<PREFIX.length)p.setSelectionRange(PREFIX.length,PREFIX.length);}catch(e){}
       };
+      const protect=e=>{
+        const p=getPhone();if(!p||e.target!==p||!isPK())return;
+        const start=p.selectionStart==null?PREFIX.length:p.selectionStart;
+        const end=p.selectionEnd==null?start:p.selectionEnd;
+        if((e.key==='Backspace'&&start<=PREFIX.length&&end<=PREFIX.length)||(e.key==='Delete'&&start<PREFIX.length)){e.preventDefault();return;}
+        if(e.key==='Home'){e.preventDefault();try{p.setSelectionRange(PREFIX.length,PREFIX.length);}catch(err){}}
+      };
+      document.addEventListener('keydown',protect,true);
       document.addEventListener('input',e=>{if(e.target&&e.target.id==='billing_phone')normalize();},true);
       document.addEventListener('paste',e=>{if(!e.target||e.target.id!=='billing_phone'||!isPK())return;setTimeout(normalize,0);},true);
+      document.addEventListener('focusin',e=>{if(e.target&&e.target.id==='billing_phone')normalize();},true);
       document.addEventListener('change',e=>{if(e.target&&e.target.id==='billing_country')setTimeout(normalize,0);},true);
       if(window.jQuery){
         window.jQuery(document.body).on('updated_checkout country_to_state_changed checkout_error',()=>setTimeout(normalize,0));
