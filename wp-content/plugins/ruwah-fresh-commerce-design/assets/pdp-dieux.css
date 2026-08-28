@@ -158,10 +158,12 @@
 .single-product.rwb-reference-commerce-v6 .rwb-commerce-pdp-views .rwb-commerce-section-head h2{font-size:clamp(38px,11vw,50px)!important}
 }
 
-/* Mobile pre-init gallery guard: prevent a white/next-slide strip before Woo FlexSlider creates .flex-viewport. */
+/* Mobile initialization guard: FlexSlider creates .flex-viewport before slide widths settle, so keep a clean first-frame until .flexslider marks the gallery initialized. */
 @media(max-width:720px){
-.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery,.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery .woocommerce-product-gallery{width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important}
-.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery .woocommerce-product-gallery:not(:has(.flex-viewport)) .woocommerce-product-gallery__wrapper{display:block!important;width:100%!important;max-width:100%!important;overflow:hidden!important;transform:none!important}
-.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery .woocommerce-product-gallery:not(:has(.flex-viewport)) .woocommerce-product-gallery__image{display:none!important;width:100%!important;max-width:100%!important;float:none!important;margin:0!important}
-.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery .woocommerce-product-gallery:not(:has(.flex-viewport)) .woocommerce-product-gallery__image:first-child{display:grid!important}
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery{overflow:hidden!important;background:#DFE5E6!important;contain:paint}
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery .woocommerce-product-gallery{width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important;background:#DFE5E6!important}
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery .woocommerce-product-gallery:not(.flexslider) .flex-viewport{overflow:hidden!important;width:100%!important;max-width:100%!important;background:#DFE5E6!important}
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery .woocommerce-product-gallery:not(.flexslider) .woocommerce-product-gallery__wrapper{display:block!important;width:100%!important;max-width:100%!important;margin:0!important;overflow:hidden!important;transform:none!important;background:#DFE5E6!important}
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery .woocommerce-product-gallery:not(.flexslider) .woocommerce-product-gallery__image{display:none!important;width:100%!important;max-width:100%!important;float:none!important;margin:0!important;background:#DFE5E6!important}
+.single-product.rwb-reference-commerce-v6 .rwb-dieux-pdp-gallery .woocommerce-product-gallery:not(.flexslider) .woocommerce-product-gallery__image:first-child{display:grid!important}
 }
