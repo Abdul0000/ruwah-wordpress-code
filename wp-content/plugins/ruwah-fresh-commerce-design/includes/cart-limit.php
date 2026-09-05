@@ -143,10 +143,10 @@ add_action('wp_footer', static function (): void {
     <?php
 }, 99);
 
-/** Theme-matched green confirmation mark on the COD payment row. */
+/** Theme-matched green confirmation mark inside the COD description box. */
 add_action('wp_enqueue_scripts', static function (): void {
     if (! function_exists('is_checkout') || ! is_checkout()) return;
     if (function_exists('is_order_received_page') && is_order_received_page()) return;
-    $css = 'body.rwb-reference-checkout-v1 #payment li.payment_method_cod{position:relative!important;padding-right:52px!important}body.rwb-reference-checkout-v1 #payment li.payment_method_cod:after{content:"✓";position:absolute;right:14px;top:11px;width:27px;height:27px;display:grid;place-items:center;border-radius:50%;background:#18a957;color:#fff;font-size:15px;font-weight:800;line-height:1;box-shadow:0 5px 14px rgba(24,169,87,.22);pointer-events:none}';
+    $css = 'body.rwb-reference-checkout-v1 #payment li.payment_method_cod:after{content:none!important;display:none!important}body.rwb-reference-checkout-v1 #payment li.payment_method_cod .payment_box{position:relative!important;padding-right:72px!important}body.rwb-reference-checkout-v1 #payment li.payment_method_cod .payment_box:after{content:"✓";position:absolute;right:22px;top:50%;transform:translateY(-50%);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#18a957;color:#fff;font-family:Arial,sans-serif;font-size:18px;font-weight:900;line-height:1;box-shadow:0 5px 14px rgba(24,169,87,.20);pointer-events:none}';
     wp_add_inline_style('rwb-theme', $css);
 }, 10020);
