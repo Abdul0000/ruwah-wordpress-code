@@ -78,3 +78,22 @@ if (! function_exists('rwb_validate_cart_unit_limit')) {
     }
 }
 add_action('woocommerce_check_cart_items', 'rwb_validate_cart_unit_limit', 1);
+
+/**
+ * Keep checkout markup valid.
+ * The reference checkout used to inject a second <form> for coupons inside
+ * WooCommerce's main checkout <form>, which can prevent Place order from
+ * submitting in browsers. Restore WooCommerce's native coupon placement.
+ */
+add_action('wp', static function (): void {
+    if (! function_exists('is_checkout') || ! is_checkout()) return;
+    if (function_exists('is_order_received_page') && is_order_received_page()) return;
+
+    if (function_exists('rwb_reference_checkout_coupon')) {
+        remove_action('woocommerce_checkout_order_review', 'rwb_reference_checkout_coupon', 15);
+    }
+
+    if (function_exists('wc_coupons_enabled') && wc_coupons_enabled()) {
+        add_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
+    }
+}, 20);
