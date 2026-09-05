@@ -2,29 +2,43 @@
 defined('ABSPATH') || exit;
 
 /**
- * Keep the five approved Ruwah products on the new-image-only presentation.
+ * Keep the five approved Ruwah products on the intended presentation:
+ * current/new featured image as the main image, plus the verified original
+ * gallery images. The featured image itself is never duplicated in gallery.
  *
- * The current featured image is deliberately preserved. Only legacy
- * WooCommerce gallery IDs are removed. This is self-healing: if an older
- * image plugin re-attaches gallery images later, the next uncached page
- * request clears them again without touching any other product field.
+ * No image binary is edited and no other product field is changed.
  */
 function ruwah_enforce_new_only_product_galleries(): void {
     if (! function_exists('wc_get_product')) {
         return;
     }
 
-    foreach ([54, 60, 62, 64, 68] as $product_id) {
+    $gallery_map = [
+        54 => [263, 265, 266],
+        60 => [275, 277, 278],
+        62 => [267, 268, 269],
+        64 => [271, 273, 274],
+        68 => [279, 281, 282],
+    ];
+
+    foreach ($gallery_map as $product_id => $gallery_ids) {
         $product = wc_get_product($product_id);
         if (! $product instanceof WC_Product) {
             continue;
         }
 
-        if (empty($product->get_gallery_image_ids())) {
+        $featured_id = (int) $product->get_image_id();
+        $desired_gallery = array_values(array_filter(
+            array_map('intval', $gallery_ids),
+            static fn(int $attachment_id): bool => $attachment_id > 0 && $attachment_id !== $featured_id
+        ));
+
+        $current_gallery = array_map('intval', $product->get_gallery_image_ids());
+        if ($current_gallery === $desired_gallery) {
             continue;
         }
 
-        $product->set_gallery_image_ids([]);
+        $product->set_gallery_image_ids($desired_gallery);
         $product->save();
 
         if (function_exists('wc_delete_product_transients')) {
@@ -33,11 +47,7 @@ function ruwah_enforce_new_only_product_galleries(): void {
     }
 }
 
-/**
- * Compatibility entry point retained because footer.php already invokes this
- * helper. The former binary image cleanup is intentionally removed so the
- * newly approved image files remain byte-for-byte untouched.
- */
+/** Compatibility entry point retained for the existing footer call. */
 function ruwah_product_62_remove_baked_floor(): void {
     ruwah_enforce_new_only_product_galleries();
 }
