@@ -152,15 +152,34 @@ add_action('wp_enqueue_scripts', static function (): void {
 }, 10020);
 
 /**
- * Homepage-only visual override for Rice Repair Mask.
- * Use the product's first alternate gallery shot on the card without mutating
- * the product featured image or gallery data in WooCommerce.
+ * Homepage-only Rice Repair Mask visual override.
+ * Read raw gallery meta so no WooCommerce image filter can substitute it, then
+ * replace only this card's image in the rendered homepage DOM.
  */
-add_filter('woocommerce_product_get_image', static function ($image, $product, $size, $attr, $placeholder, $original_image) {
-    if (! function_exists('is_front_page') || ! is_front_page()) return $image;
-    if (! $product instanceof WC_Product || 58 !== (int) $product->get_id()) return $image;
-    $gallery_ids = array_values(array_filter(array_map('intval', (array) $product->get_gallery_image_ids())));
-    if (! $gallery_ids) return $image;
-    $alternate = wp_get_attachment_image($gallery_ids[0], $size, false, is_array($attr) ? $attr : []);
-    return $alternate ?: $image;
-}, 10060, 6);
+add_action('wp_footer', static function (): void {
+    if (! function_exists('is_front_page') || ! is_front_page()) return;
+    $raw = (string) get_post_meta(58, '_product_image_gallery', true);
+    $ids = array_values(array_filter(array_map('intval', explode(',', $raw))));
+    if (! $ids) return;
+    $url = wp_get_attachment_image_url($ids[0], 'full');
+    if (! $url) return;
+    ?>
+    <script id="rwb-rice-repair-home-image">
+    (()=>{'use strict';
+      const url=<?php echo wp_json_encode($url); ?>;
+      const swap=()=>{
+        document.querySelectorAll('.rhp-product-card').forEach(card=>{
+          const link=card.querySelector('h3 a[href*="/product/rice-repair-mask/"]');
+          if(!link)return;
+          const img=card.querySelector('.rhp-product-image img');
+          if(!img)return;
+          img.src=url;
+          img.removeAttribute('srcset');
+          img.removeAttribute('sizes');
+        });
+      };
+      if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',swap,{once:true});else swap();
+    })();
+    </script>
+    <?php
+}, 10080);
