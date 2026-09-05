@@ -42,7 +42,7 @@ if (! function_exists('rwb_render_master_product_card')) {
         <article class="rhp-product-card">
             <a class="rhp-product-image" href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="View <?php echo esc_attr($name); ?>">
                 <?php echo wp_kses_post($product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
-                <?php if ($saving > 0) : ?><span class="rhp-product-badge rhp-product-badge--offer">OFFER</span><?php elseif (0 === $rank) : ?><span class="rhp-product-badge">Popular pick</span><?php endif; ?>
+                <?php if ($saving > 0) : ?><span class="rhp-product-badge rhp-product-badge--offer">OFFER · <?php echo wp_kses_post(wc_price($saving, ['decimals' => 0])); ?> OFF</span><?php elseif (0 === $rank) : ?><span class="rhp-product-badge">Popular pick</span><?php endif; ?>
             </a>
             <div class="rhp-product-copy">
                 <div class="rhp-product-meta"><span><?php echo esc_html($stock_text); ?></span><?php if ($size) : ?><span><?php echo esc_html($size); ?></span><?php endif; ?></div>
