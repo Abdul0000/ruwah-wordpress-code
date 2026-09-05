@@ -41,10 +41,12 @@ if (! function_exists('rwb_render_master_product_card')) {
 
         $card_image = $product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async']);
         if (is_front_page() && 2 === $rank) {
+            $featured_id = (int) get_post_thumbnail_id((int) $product->get_id());
             $raw_gallery = trim((string) get_post_meta((int) $product->get_id(), '_product_image_gallery', true));
             if ('' !== $raw_gallery) {
-                foreach (array_filter(array_map('intval', explode(',', $raw_gallery))) as $gallery_id) {
-                    if ($gallery_id <= 0 || ! wp_attachment_is_image($gallery_id)) continue;
+                $gallery_ids = array_reverse(array_values(array_filter(array_map('intval', explode(',', $raw_gallery)))));
+                foreach ($gallery_ids as $gallery_id) {
+                    if ($gallery_id <= 0 || $gallery_id === $featured_id || ! wp_attachment_is_image($gallery_id)) continue;
                     $alternate = wp_get_attachment_image($gallery_id, 'woocommerce_single', false, ['loading' => 'lazy', 'decoding' => 'async']);
                     if ($alternate) { $card_image = $alternate; break; }
                 }
