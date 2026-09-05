@@ -150,3 +150,17 @@ add_action('wp_enqueue_scripts', static function (): void {
     $css = 'body.rwb-reference-checkout-v1 #payment li.payment_method_cod:after{content:none!important;display:none!important}body.rwb-reference-checkout-v1 #payment li.payment_method_cod .payment_box{position:relative!important;padding-right:72px!important}body.rwb-reference-checkout-v1 #payment li.payment_method_cod .payment_box:after{content:"✓";position:absolute;right:22px;top:50%;transform:translateY(-50%);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#18a957;color:#fff;font-family:Arial,sans-serif;font-size:18px;font-weight:900;line-height:1;box-shadow:0 5px 14px rgba(24,169,87,.20);pointer-events:none}';
     wp_add_inline_style('rwb-theme', $css);
 }, 10020);
+
+/**
+ * Homepage-only visual override for Rice Repair Mask.
+ * Use the product's first alternate gallery shot on the card without mutating
+ * the product featured image or gallery data in WooCommerce.
+ */
+add_filter('woocommerce_product_get_image', static function ($image, $product, $size, $attr, $placeholder, $original_image) {
+    if (! function_exists('is_front_page') || ! is_front_page()) return $image;
+    if (! $product instanceof WC_Product || 58 !== (int) $product->get_id()) return $image;
+    $gallery_ids = array_values(array_filter(array_map('intval', (array) $product->get_gallery_image_ids())));
+    if (! $gallery_ids) return $image;
+    $alternate = wp_get_attachment_image($gallery_ids[0], $size, false, is_array($attr) ? $attr : []);
+    return $alternate ?: $image;
+}, 10060, 6);
