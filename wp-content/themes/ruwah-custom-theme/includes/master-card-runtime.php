@@ -42,7 +42,7 @@ if (! function_exists('rwb_render_master_product_card')) {
         <article class="rhp-product-card">
             <a class="rhp-product-image" href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="View <?php echo esc_attr($name); ?>">
                 <?php echo wp_kses_post($product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
-                <?php if ($saving > 0) : ?><span class="rhp-product-badge">Save <?php echo wp_kses_post(wc_price($saving, ['decimals' => 0])); ?></span><?php elseif (0 === $rank) : ?><span class="rhp-product-badge">Popular pick</span><?php endif; ?>
+                <?php if ($saving > 0) : ?><span class="rhp-product-badge rhp-product-badge--offer">OFFER</span><?php elseif (0 === $rank) : ?><span class="rhp-product-badge">Popular pick</span><?php endif; ?>
             </a>
             <div class="rhp-product-copy">
                 <div class="rhp-product-meta"><span><?php echo esc_html($stock_text); ?></span><?php if ($size) : ?><span><?php echo esc_html($size); ?></span><?php endif; ?></div>
@@ -59,6 +59,14 @@ if (! function_exists('rwb_render_master_product_card')) {
         <?php
     }
 }
+
+/* Premium, theme-matched card badges for the actual master-card renderer. */
+add_action('wp_enqueue_scripts', static function (): void {
+    if (! is_front_page() && ! rwb_master_card_runtime_surface()) return;
+    $css = '.rhp-product-badge{position:absolute!important;left:14px!important;top:14px!important;z-index:4!important;display:inline-flex!important;align-items:center!important;gap:8px!important;min-height:34px!important;padding:0 13px!important;border:1px solid rgba(91,72,116,.20)!important;border-radius:999px!important;background:rgba(251,250,246,.92)!important;color:#211d24!important;box-shadow:0 8px 24px rgba(29,22,34,.10)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important;font-size:9px!important;font-weight:700!important;line-height:1!important;letter-spacing:.12em!important;text-transform:uppercase!important}.rhp-product-badge--offer:before{content:"";width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#876cad;box-shadow:0 0 0 3px rgba(135,108,173,.12)}@media(max-width:620px){.rhp-product-badge{left:10px!important;top:10px!important;min-height:30px!important;padding:0 11px!important;gap:7px!important;font-size:8px!important}.rhp-product-badge--offer:before{width:6px;height:6px;flex-basis:6px}}';
+    wp_add_inline_style('rwb-theme', $css);
+    if (wp_style_is('rwb-master-card-safe', 'enqueued')) wp_add_inline_style('rwb-master-card-safe', $css);
+}, 10100);
 
 function rwb_master_card_runtime_surface(): bool {
     if (! class_exists('WooCommerce') || is_front_page()) return false;
