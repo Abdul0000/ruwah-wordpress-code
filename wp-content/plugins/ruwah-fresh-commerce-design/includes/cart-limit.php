@@ -97,3 +97,56 @@ add_action('wp', static function (): void {
         add_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
     }
 }, 20);
+
+/**
+ * Checkout reliability: WooCommerce native validation remains authoritative.
+ * Remove only Ruwah's extra strict validation errors so valid customer details
+ * are not silently rejected by custom postcode/phone/address rules.
+ */
+add_action('woocommerce_after_checkout_validation', static function ($data, $errors): void {
+    if (! $errors instanceof WP_Error) return;
+    foreach ($errors->get_error_codes() as $code) {
+        if (str_starts_with((string) $code, 'rwb_')) {
+            $errors->remove($code);
+        }
+    }
+}, 10050, 2);
+
+/** Cash on Delivery is the only live method; keep it selected in the session. */
+add_filter('woocommerce_available_payment_gateways', static function ($gateways) {
+    if (isset($gateways['cod']) && function_exists('WC') && WC()->session) {
+        WC()->session->set('chosen_payment_method', 'cod');
+        return ['cod' => $gateways['cod']];
+    }
+    return $gateways;
+}, 10050);
+
+/** Keep COD visibly selected after WooCommerce AJAX checkout refreshes. */
+add_action('wp_footer', static function (): void {
+    if (! function_exists('is_checkout') || ! is_checkout()) return;
+    if (function_exists('is_order_received_page') && is_order_received_page()) return;
+    ?>
+    <script id="rwb-cod-autoselect">
+    (()=>{'use strict';
+      const ensure=()=>{
+        const radio=document.querySelector('input[name="payment_method"][value="cod"]');
+        if(!radio)return;
+        if(!radio.checked){
+          radio.checked=true;
+          radio.dispatchEvent(new Event('change',{bubbles:true}));
+        }
+      };
+      if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensure,{once:true});else ensure();
+      if(window.jQuery)jQuery(document.body).on('updated_checkout',ensure);
+    })();
+    </script>
+    <?php
+}, 99);
+
+/** Theme-matched green confirmation mark on the COD payment row. */
+add_action('wp_enqueue_scripts', static function (): void {
+    if (! function_exists('is_checkout') || ! is_checkout()) return;
+    if (function_exists('is_order_received_page') && is_order_received_page()) return;
+    $css = 'body.rwb-reference-checkout-v1 #payment li.payment_method_cod{position:relative!important;padding-right:52px!important}body.rwb-reference-checkout-v1 #payment li.payment_method_cod:after{content:"✓";position:absolute;right:14px;top:11px;width:27px;height:27px;display:grid;place-items:center;border-radius:50%;background:#18a957;color:#fff;font-size:15px;font-weight:800;line-height:1;box-shadow:0 5px 14px rgba(24,169,87,.22);pointer-events:none}';
+    wp_add_inline_style('rwb-theme', $css);
+}, 10020);
