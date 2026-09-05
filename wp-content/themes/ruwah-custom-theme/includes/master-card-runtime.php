@@ -38,10 +38,22 @@ if (! function_exists('rwb_render_master_product_card')) {
             $value = trim(wp_strip_all_tags((string) $product->get_attribute($attribute)));
             if ('' !== $value) { $size = $value; break; }
         }
+
+        $card_image = $product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async']);
+        if (is_front_page() && 2 === $rank) {
+            $raw_gallery = trim((string) get_post_meta((int) $product->get_id(), '_product_image_gallery', true));
+            if ('' !== $raw_gallery) {
+                foreach (array_filter(array_map('intval', explode(',', $raw_gallery))) as $gallery_id) {
+                    if ($gallery_id <= 0 || ! wp_attachment_is_image($gallery_id)) continue;
+                    $alternate = wp_get_attachment_image($gallery_id, 'woocommerce_single', false, ['loading' => 'lazy', 'decoding' => 'async']);
+                    if ($alternate) { $card_image = $alternate; break; }
+                }
+            }
+        }
         ?>
         <article class="rhp-product-card">
             <a class="rhp-product-image" href="<?php echo esc_url($product->get_permalink()); ?>" aria-label="View <?php echo esc_attr($name); ?>">
-                <?php echo wp_kses_post($product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
+                <?php echo wp_kses_post($card_image); ?>
                 <?php if ($saving > 0) : ?><span class="rhp-product-badge rhp-product-badge--offer">OFFER · <?php echo wp_kses_post(wc_price($saving, ['decimals' => 0])); ?> OFF</span><?php elseif (0 === $rank) : ?><span class="rhp-product-badge">Popular pick</span><?php endif; ?>
             </a>
             <div class="rhp-product-copy">
