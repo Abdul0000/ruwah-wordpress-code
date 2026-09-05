@@ -23,7 +23,7 @@ $current  = (float) $product->get_price();
         <?php endif; ?>
         <span class="rwb-cloud c1" aria-hidden="true"></span>
         <span class="rwb-cloud c2" aria-hidden="true"></span>
-        <?php echo wp_kses_post($product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
+        <?php echo wp_kses_post($product->get_image('full', ['loading' => 'lazy', 'decoding' => 'async'])); ?>
     </a>
 
     <div class="rwb-card-copy">
