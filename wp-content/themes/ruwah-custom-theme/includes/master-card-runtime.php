@@ -40,7 +40,7 @@ if (! function_exists('rwb_render_master_product_card')) {
         }
 
         $card_image = $product->get_image('woocommerce_single', ['loading' => 'lazy', 'decoding' => 'async']);
-        if (is_front_page() && 2 === $rank) {
+        if (is_front_page() && 58 === (int) $product->get_id()) {
             $featured_id = (int) get_post_thumbnail_id((int) $product->get_id());
             $raw_gallery = trim((string) get_post_meta((int) $product->get_id(), '_product_image_gallery', true));
             if ('' !== $raw_gallery) {
