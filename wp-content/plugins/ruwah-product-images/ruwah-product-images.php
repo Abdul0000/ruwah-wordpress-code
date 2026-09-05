@@ -43,7 +43,7 @@ final class Ruwah_Product_Images_V3 {
     public static function mappings() {
         return [
             54 => ['name' => 'Triple Action Serum', 'featured' => 2, 'gallery' => [1, 3, 4]],
-            62 => ['name' => 'Hydrating Moisturizer', 'featured' => 8, 'gallery' => [5, 6, 7]],
+            62 => ['name' => 'Hydrating Moisturizer', 'featured' => 8, 'gallery' => [6, 7]],
             64 => ['name' => 'Radiance Eye Serum', 'featured' => 10, 'gallery' => [9, 11, 12]],
             60 => ['name' => 'Rice Cleansing Cream', 'featured' => 14, 'gallery' => [13, 15, 16]],
             68 => ['name' => 'Mineral Shield Sunscreen SPF 50+', 'featured' => 18, 'gallery' => [17, 19, 20]],
