@@ -3,6 +3,33 @@ defined('ABSPATH') || exit;
 
 define('RUWAH_THEME_VERSION', '4.0.1');
 
+/**
+ * Authoritative exact PNGs for the five approved products.
+ * These filters affect every WooCommerce surface that reads the product image:
+ * cards, product pages, related products, search, cart and mini-cart.
+ */
+function ruwah_exact_product_png_map(): array {
+    return [
+        54 => 390,
+        60 => 388,
+        62 => 391,
+        64 => 389,
+        68 => 387,
+    ];
+}
+
+add_filter('woocommerce_product_get_image_id', function ($image_id, $product) {
+    if (! $product instanceof WC_Product) return $image_id;
+    $map = ruwah_exact_product_png_map();
+    $product_id = (int) $product->get_id();
+    return isset($map[$product_id]) ? (int) $map[$product_id] : $image_id;
+}, 9999, 2);
+
+add_filter('woocommerce_product_get_gallery_image_ids', function ($gallery_ids, $product) {
+    if (! $product instanceof WC_Product) return $gallery_ids;
+    return isset(ruwah_exact_product_png_map()[(int) $product->get_id()]) ? [] : $gallery_ids;
+}, 9999, 2);
+
 add_action('after_setup_theme', function () {
     load_theme_textdomain('ruwah', get_template_directory() . '/languages');
     add_theme_support('title-tag');
