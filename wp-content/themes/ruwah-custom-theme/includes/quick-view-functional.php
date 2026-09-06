@@ -9,6 +9,15 @@ defined('ABSPATH') || exit;
 add_action('wp_ajax_rwb_quick_view_product', 'rwb_quick_view_product_payload');
 add_action('wp_ajax_nopriv_rwb_quick_view_product', 'rwb_quick_view_product_payload');
 
+if (! function_exists('rwb_quick_view_price_text')) {
+    function rwb_quick_view_price_text(float $amount): string {
+        $html = function_exists('wc_price') ? wc_price($amount, ['decimals' => 0]) : (string) $amount;
+        $text = html_entity_decode(wp_strip_all_tags((string) $html), ENT_QUOTES | ENT_HTML5, get_bloginfo('charset') ?: 'UTF-8');
+        $text = str_replace("\xC2\xA0", ' ', $text);
+        return trim((string) preg_replace('/\s+/u', ' ', $text));
+    }
+}
+
 function rwb_quick_view_product_payload(): void {
     $product_id = isset($_GET['product_id']) ? absint(wp_unslash($_GET['product_id'])) : 0;
     $product = $product_id && function_exists('wc_get_product') ? wc_get_product($product_id) : false;
@@ -27,11 +36,17 @@ function rwb_quick_view_product_payload(): void {
         $copy = wp_trim_words(wp_strip_all_tags((string) $product->get_description()), 24, '…');
     }
 
+    $current_amount = (float) $product->get_price();
+    $regular_amount = (float) $product->get_regular_price();
+    $on_sale = $product->is_on_sale() && $regular_amount > $current_amount && $current_amount >= 0;
+
     wp_send_json_success([
         'id' => (int) $product->get_id(),
         'name' => (string) $product->get_name(),
         'image' => (string) $image_url,
-        'price' => wp_strip_all_tags((string) $product->get_price_html()),
+        'price' => rwb_quick_view_price_text($current_amount),
+        'regular_price' => $on_sale ? rwb_quick_view_price_text($regular_amount) : '',
+        'on_sale' => $on_sale,
         'stock' => $stock_text,
         'copy' => $copy,
         'url' => (string) $product->get_permalink(),
@@ -56,6 +71,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     wp_dequeue_script('rwb-master-card-safe');
     wp_deregister_script('rwb-master-card-safe');
     wp_enqueue_script('wc-add-to-cart');
+    wp_add_inline_style('rwb-theme', '.rhp-qv-copy [data-qv-price]{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}.rhp-qv-copy [data-qv-price] del{opacity:.55;font-weight:500}.rhp-qv-copy [data-qv-price] .rwb-qv-current{font-weight:700}');
 }, 20000);
 
 add_action('wp_footer', static function (): void {
@@ -64,13 +80,18 @@ add_action('wp_footer', static function (): void {
     }
     $ajax_url = admin_url('admin-ajax.php');
     ?>
-    <script id="rwb-quick-view-functional-v2">
+    <script id="rwb-quick-view-functional-v3">
     (()=>{'use strict';
-      if(window.__rwbQuickViewFunctionalV2)return;window.__rwbQuickViewFunctionalV2=true;
+      if(window.__rwbQuickViewFunctionalV3)return;window.__rwbQuickViewFunctionalV3=true;
       const AJAX=<?php echo wp_json_encode($ajax_url); ?>;
       let returnTo=null,loadToken=0,addInFlight=false,current=null;
       const dialog=()=>document.querySelector('[data-quick-dialog]');
       const setText=(dlg,sel,val)=>{const el=dlg.querySelector(sel);if(el)el.textContent=val||'';};
+      const renderPrice=(dlg,data)=>{
+        const el=dlg.querySelector('[data-qv-price]');if(!el)return;el.replaceChildren();
+        if(data?.on_sale&&data?.regular_price){const old=document.createElement('del');old.textContent=data.regular_price;const now=document.createElement('span');now.className='rwb-qv-current';now.textContent=data.price||'';el.append(old,now);return;}
+        const now=document.createElement('span');now.className='rwb-qv-current';now.textContent=data?.price||'';el.append(now);
+      };
       const ensureControls=dlg=>{
         let qty=dlg.querySelector('[data-qv-qty]');
         if(!qty){
@@ -97,7 +118,7 @@ add_action('wp_footer', static function (): void {
           const url=new URL(AJAX,window.location.origin);url.searchParams.set('action','rwb_quick_view_product');url.searchParams.set('product_id',String(productId));url.searchParams.set('_',String(Date.now()));
           const response=await fetch(url.toString(),{credentials:'same-origin',cache:'no-store',headers:{'X-Requested-With':'XMLHttpRequest'}});const payload=await response.json();
           if(token!==loadToken)return;if(!response.ok||!payload?.success)throw new Error(payload?.data?.message||'Unable to load this product.');
-          const data=payload.data;current=data;setText(dlg,'[data-qv-name]',data.name);setText(dlg,'[data-qv-copy]',data.copy);setText(dlg,'[data-qv-price]',data.price);setText(dlg,'[data-qv-stock]',data.stock);
+          const data=payload.data;current=data;setText(dlg,'[data-qv-name]',data.name);setText(dlg,'[data-qv-copy]',data.copy);renderPrice(dlg,data);setText(dlg,'[data-qv-stock]',data.stock);
           const img=dlg.querySelector('[data-qv-image]');if(img){img.src=data.image||'';img.alt=data.name||'';}const link=dlg.querySelector('[data-qv-link]');if(link)link.href=data.url||'#';
           if(qty){qty.min=String(data.min_qty||1);qty.value=String(data.min_qty||1);qty.step='1';if(data.max_qty>0)qty.max=String(data.max_qty);else qty.removeAttribute('max');qty.disabled=!data.can_cart;}
           if(add){add.textContent=data.can_cart?'Add to cart':'View product';if(data.can_cart){add.href='#';add.removeAttribute('aria-disabled');}else{add.href=data.url||'#';add.removeAttribute('aria-disabled');}}
@@ -106,7 +127,7 @@ add_action('wp_footer', static function (): void {
       };
       document.addEventListener('click',async e=>{
         const trigger=e.target.closest?.('[data-quick-view]');
-        if(trigger){const dlg=dialog();if(!dlg)return;e.preventDefault();returnTo=trigger;const fallbackName=trigger.dataset.qvName||'';setText(dlg,'[data-qv-name]',fallbackName);setText(dlg,'[data-qv-stock]',trigger.dataset.qvStock||'');setText(dlg,'[data-qv-price]',trigger.dataset.qvPrice||'');const img=dlg.querySelector('[data-qv-image]');if(img){img.src=trigger.dataset.qvImage||'';img.alt=fallbackName;}if(typeof dlg.showModal==='function'){if(!dlg.open)dlg.showModal();}else{dlg.setAttribute('open','');dlg.classList.add('is-open');}setTimeout(()=>dlg.querySelector('[data-quick-close]')?.focus(),0);fill(dlg,trigger);return;}
+        if(trigger){const dlg=dialog();if(!dlg)return;e.preventDefault();returnTo=trigger;const fallbackName=trigger.dataset.qvName||'';setText(dlg,'[data-qv-name]',fallbackName);setText(dlg,'[data-qv-stock]',trigger.dataset.qvStock||'');renderPrice(dlg,{price:''});const img=dlg.querySelector('[data-qv-image]');if(img){img.src=trigger.dataset.qvImage||'';img.alt=fallbackName;}if(typeof dlg.showModal==='function'){if(!dlg.open)dlg.showModal();}else{dlg.setAttribute('open','');dlg.classList.add('is-open');}setTimeout(()=>dlg.querySelector('[data-quick-close]')?.focus(),0);fill(dlg,trigger);return;}
         const close=e.target.closest?.('[data-quick-close]');if(close){e.preventDefault();closeDialog(dialog());return;}
         const add=e.target.closest?.('[data-qv-add]');if(add){
           const dlg=dialog();if(!dlg||!current||!current.can_cart)return;if(addInFlight){e.preventDefault();return;}e.preventDefault();
