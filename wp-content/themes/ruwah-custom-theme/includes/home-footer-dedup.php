@@ -47,6 +47,10 @@ add_action('wp_footer', static function (): void {
 
     $products = function_exists('rwb_products') ? array_slice((array) rwb_products(), 0, 5) : [];
     $shop_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('shop') : home_url('/shop/');
+    $learn_url = home_url('/beauty-guide/');
+    $quality_url = home_url('/quality-safety/');
+    $routine_url = home_url('/#routine-builder');
+    $ingredient_url = home_url('/#ingredient-guide');
     $account_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
     $privacy_url = get_privacy_policy_url();
     $contact_url = function_exists('ruwah_page_url') ? ruwah_page_url('contact') : home_url('/contact/');
@@ -91,10 +95,10 @@ add_action('wp_footer', static function (): void {
             </section>
 
             <section class="rwb-dieux-footer-col"><h2>Learn</h2>
-                <a href="<?php echo esc_url(home_url('/#rwb-genesis')); ?>">Our Genesis</a>
-                <a href="<?php echo esc_url(home_url('/#rwb-standard')); ?>">The Ruwah Standard</a>
-                <a href="<?php echo esc_url(home_url('/#rituals')); ?>">Rituals</a>
-                <a href="<?php echo esc_url($shop_url); ?>">Formula Guide</a>
+                <a href="<?php echo esc_url($learn_url); ?>">Beauty Guide</a>
+                <a href="<?php echo esc_url($quality_url); ?>">Quality &amp; Safety</a>
+                <a href="<?php echo esc_url($routine_url); ?>">Routine Guide</a>
+                <a href="<?php echo esc_url($ingredient_url); ?>">Ingredient Guide</a>
             </section>
 
             <section class="rwb-dieux-footer-col"><h2>Contact</h2>
