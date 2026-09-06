@@ -150,36 +150,3 @@ add_action('wp_enqueue_scripts', static function (): void {
     $css = 'body.rwb-reference-checkout-v1 #payment li.payment_method_cod:after{content:none!important;display:none!important}body.rwb-reference-checkout-v1 #payment li.payment_method_cod .payment_box{position:relative!important;padding-right:72px!important}body.rwb-reference-checkout-v1 #payment li.payment_method_cod .payment_box:after{content:"✓";position:absolute;right:22px;top:50%;transform:translateY(-50%);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#18a957;color:#fff;font-family:Arial,sans-serif;font-size:18px;font-weight:900;line-height:1;box-shadow:0 5px 14px rgba(24,169,87,.20);pointer-events:none}';
     wp_add_inline_style('rwb-theme', $css);
 }, 10020);
-
-/**
- * Homepage-only Rice Repair Mask visual override.
- * Read raw gallery meta so no WooCommerce image filter can substitute it, then
- * replace only this card's image in the rendered homepage DOM.
- */
-add_action('wp_footer', static function (): void {
-    if (! function_exists('is_front_page') || ! is_front_page()) return;
-    $raw = (string) get_post_meta(58, '_product_image_gallery', true);
-    $ids = array_values(array_filter(array_map('intval', explode(',', $raw))));
-    if (! $ids) return;
-    $url = wp_get_attachment_image_url($ids[0], 'full');
-    if (! $url) return;
-    ?>
-    <script id="rwb-rice-repair-home-image">
-    (()=>{'use strict';
-      const url=<?php echo wp_json_encode($url); ?>;
-      const swap=()=>{
-        document.querySelectorAll('.rhp-product-card').forEach(card=>{
-          const link=card.querySelector('h3 a[href*="/product/rice-repair-mask/"]');
-          if(!link)return;
-          const img=card.querySelector('.rhp-product-image img');
-          if(!img)return;
-          img.src=url;
-          img.removeAttribute('srcset');
-          img.removeAttribute('sizes');
-        });
-      };
-      if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',swap,{once:true});else swap();
-    })();
-    </script>
-    <?php
-}, 10080);

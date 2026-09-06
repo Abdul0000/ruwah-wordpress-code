@@ -35,7 +35,11 @@ if ($hero) {
 }
 $hero_image = $hero_image_id ? wp_get_attachment_image($hero_image_id, 'full', false, ['loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'async', 'sizes' => '100vw']) : ($hero ? $hero->get_image('full', ['loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'async']) : '');
 
-$best = $products;
+/* Homepage essentials must only use products backed by the latest approved PNG set. */
+$approved_home_ids = [54, 60, 62, 64, 68];
+$best = array_values(array_filter($products, static function ($product) use ($approved_home_ids) {
+    return $product instanceof WC_Product && in_array((int) $product->get_id(), $approved_home_ids, true);
+}));
 usort($best, static fn($a, $b) => (int) $b->get_total_sales() <=> (int) $a->get_total_sales());
 $best = array_slice($best, 0, 4);
 
