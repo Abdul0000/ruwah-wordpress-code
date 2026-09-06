@@ -12,7 +12,13 @@ if (class_exists('Ruwah_Fresh_Commerce_Design')) {
     remove_action('wp_footer', [Ruwah_Fresh_Commerce_Design::class, 'reference_footer'], 5);
 }
 
-$products = function_exists('rwb_products') ? array_slice((array) rwb_products(), 0, 5) : [];
+$products = [];
+if (function_exists('rwb_products')) {
+    $products = array_values(array_filter((array) rwb_products(-1), static function ($product): bool {
+        return $product instanceof WC_Product && ! in_array((int) $product->get_id(), [56, 58], true);
+    }));
+    $products = array_slice($products, 0, 5);
+}
 $shop_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('shop') : home_url('/shop/');
 $account_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
 $privacy_url = get_privacy_policy_url();
