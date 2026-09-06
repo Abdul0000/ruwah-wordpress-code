@@ -24,6 +24,24 @@ if (! function_exists('rwb_cart_limit_message')) {
     }
 }
 
+/**
+ * Homepage product source: the home template asks rwb_products() for five items,
+ * then limits its essentials grid to four. Ensure that five-item query is made
+ * only from the approved products that have the latest PNG image set.
+ */
+add_filter('woocommerce_product_object_query_args', static function (array $args): array {
+    if (! function_exists('is_front_page') || ! is_front_page()) return $args;
+
+    $limit = (int) ($args['limit'] ?? 0);
+    $orderby = (string) ($args['orderby'] ?? '');
+    $status = $args['status'] ?? '';
+    if (5 !== $limit || 'menu_order' !== $orderby || 'publish' !== $status) return $args;
+
+    $args['include'] = [54, 60, 62, 64, 68];
+    $args['limit'] = 5;
+    return $args;
+}, 1000);
+
 add_filter('woocommerce_add_to_cart_validation', function ($passed, $product_id, $quantity, $variation_id = 0, $variations = []) {
     if (! $passed || ! function_exists('WC') || ! WC()->cart) return $passed;
     $requested = max(0, (int) $quantity);
