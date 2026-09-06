@@ -84,7 +84,7 @@ add_action('wp_footer', static function (): void {
             </section>
 
             <section class="rwb-dieux-footer-col"><h2>Shop</h2>
-                <?php foreach ($products as $product) : if (! $product instanceof WC_Product) continue; ?>
+                <?php foreach ($products as $product) : if (! $product instanceof WC_Product || in_array((int) $product->get_id(), [56, 58], true)) continue; ?>
                     <a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($product->get_name()); ?></a>
                 <?php endforeach; ?>
                 <a href="<?php echo esc_url($shop_url); ?>">Shop All</a>
