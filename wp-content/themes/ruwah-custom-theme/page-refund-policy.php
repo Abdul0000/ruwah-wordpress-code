@@ -4,7 +4,7 @@
  */
 defined('ABSPATH') || exit;
 get_header();
-$policy_date = wp_date('j F Y');
+$policy_date = '6 September 2026';
 $contact_url = function_exists('ruwah_page_url') ? ruwah_page_url('contact') : home_url('/contact/');
 ?>
 <style id="rwb-refund-policy-inline">
@@ -65,7 +65,7 @@ $contact_url = function_exists('ruwah_page_url') ? ruwah_page_url('contact') : h
 
                 <section class="rwb-refund-section"><div class="rwb-refund-number">04</div><div><h2>How to start a return</h2><p>Contact Ruwah Beauty with your order number, the item involved and the reason for your request. If a return is approved, we will provide the applicable return address or collection instructions and explain any packaging requirements.</p><p>Return shipping responsibility can vary according to the reason for return. We will confirm the applicable arrangement before you send the item.</p></div></section>
 
-                <section class="rwb-refund-section" id="refund-refunds"><div class="rwb-refund-number">05</div><div><h2>Refunds</h2><p>Approved refunds are processed after the relevant return or claim has been reviewed. Where supported, the refund will normally be directed to the original payment method or another method agreed with you.</p><p>Once we have issued a refund, the time required for the amount to appear can depend on the payment provider, bank or card issuer and is outside our direct control.</p></div></section>
+                <section class="rwb-refund-section" id="refund-refunds"><div class="rwb-refund-number">05</div><div><h2>Refunds</h2><p>Approved refunds are processed after the relevant return or claim has been reviewed. Where supported, the refund will normally be directed to the original payment method or another method agreed with you.</p><p>For Cash on Delivery orders, there is no card payment to reverse. If a Cash on Delivery refund is approved, Ruwah support will confirm the refund method and any recipient details needed before processing.</p><p>Once we have issued a refund, the time required for the amount to appear can depend on the payment provider or receiving service and is outside our direct control.</p></div></section>
 
                 <section class="rwb-refund-section"><div class="rwb-refund-number">06</div><div><h2>Delivery and return charges</h2><p>Original delivery charges and return-shipping costs are considered according to the reason for the return. If the issue resulted from an incorrect, damaged or defective item, we will advise you of the appropriate resolution. For discretionary or change-of-mind requests, delivery-related charges may not be refundable.</p></div></section>
 
