@@ -192,3 +192,58 @@ add_action('wp_enqueue_scripts', static function (): void {
     $css = 'body.rwb-reference-checkout-v1 #payment li.payment_method_cod:after{content:none!important;display:none!important}body.rwb-reference-checkout-v1 #payment li.payment_method_cod .payment_box{position:relative!important;padding-right:72px!important}body.rwb-reference-checkout-v1 #payment li.payment_method_cod .payment_box:after{content:"✓";position:absolute;right:22px;top:50%;transform:translateY(-50%);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#18a957;color:#fff;font-family:Arial,sans-serif;font-size:18px;font-weight:900;line-height:1;box-shadow:0 5px 14px rgba(24,169,87,.20);pointer-events:none}';
     wp_add_inline_style('rwb-theme', $css);
 }, 10020);
+
+/**
+ * Customer-facing copy normalization only. This changes text and link targets,
+ * never card/image/product data or structural classes/layout.
+ */
+add_action('template_redirect', static function (): void {
+    $is_home = function_exists('is_front_page') && is_front_page();
+    $is_checkout_page = function_exists('is_checkout') && is_checkout()
+        && ! (function_exists('is_order_received_page') && is_order_received_page());
+    if (! $is_home && ! $is_checkout_page) return;
+
+    ob_start(static function (string $html) use ($is_home, $is_checkout_page): string {
+        if ($is_home) {
+            $copy = [
+                'Cosmetic benefits are described in measured language; current price and stock come directly from WooCommerce.' => 'Clear product benefits, current pricing and availability, with Cash on Delivery for checkout orders.',
+                'Four clear entry points into the current Ruwah range — without diagnostic or medical claims.' => 'Four simple ways to explore the current Ruwah range by routine goal.',
+                'Current product data, price, stock and genuine review counts — no placeholder ratings.' => 'Explore four Ruwah essentials with current prices, availability and customer review counts.',
+                'Existing products mapped to a simple routine position; product directions remain on the product page and packaging.' => 'A simple cleanse, treat, moisturize and protect sequence using products from the current Ruwah range.',
+                'Its verified product copy highlights Vitamin C, Niacinamide and Hyaluronic Acid.' => 'Its product information highlights Vitamin C, Niacinamide and Hyaluronic Acid.',
+                'Verifiable differences drawn from the current store — not manufacturing or clinical claims we cannot substantiate.' => 'Straightforward skincare information, clear shopping details and a focused routine-first collection.',
+                'Live commerce details' => 'Clear shopping details',
+                'Price, sale state and stock are pulled from WooCommerce at the moment you browse.' => 'Current pricing, sale savings and availability are shown while you shop.',
+                'Existing product media is reused so shoppers can assess the actual item and packaging.' => 'Product imagery helps you see the item and packaging before ordering.',
+                'Only reviews associated with verified WooCommerce owners are shown here.' => 'Reviews shown here come from customers linked to completed store purchases.',
+            ];
+            $html = str_replace(array_keys($copy), array_values($copy), $html);
+        }
+
+        if ($is_checkout_page) {
+            $old_payment_note = '<div class="rwb-online-coming-soon" role="note"><strong>Online Payment</strong><span>Coming Soon</span><small>For now, orders are confirmed with Cash on Delivery.</small></div>';
+            $new_payment_note = '<div class="rwb-online-coming-soon" role="note"><strong>Cash on Delivery</strong><span>Available</span><small>Pay with cash when your order is delivered.</small></div>';
+            $html = str_replace($old_payment_note, $new_payment_note, $html);
+
+            $html = preg_replace_callback(
+                '~<nav aria-label="Checkout policies">(.*?)</nav>~s',
+                static function (array $matches): string {
+                    $inner = $matches[1];
+                    $links = '';
+                    if (false === strpos($inner, '/shipping-delivery/')) {
+                        $links .= '<a href="' . esc_url(home_url('/shipping-delivery/')) . '">Shipping</a>';
+                    }
+                    if (false === strpos($inner, '/terms-conditions/')) {
+                        $links .= '<a href="' . esc_url(home_url('/terms-conditions/')) . '">Terms of service</a>';
+                    }
+                    if ('' === $links) return $matches[0];
+                    return '<nav aria-label="Checkout policies">' . $links . $inner . '</nav>';
+                },
+                $html,
+                1
+            ) ?: $html;
+        }
+
+        return $html;
+    });
+}, 2);
