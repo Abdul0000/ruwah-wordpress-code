@@ -42,6 +42,30 @@ add_filter('woocommerce_product_object_query_args', static function (array $args
     return $args;
 }, 1000);
 
+/**
+ * Footer-only catalogue cleanup. The global commerce footer queries five
+ * published products at wp_footer priority 5. Exclude the legacy Toner (56)
+ * and Rice Repair Mask (58) only while footer callbacks are rendering, then
+ * immediately remove the filter so shop/search/product queries stay unchanged.
+ */
+if (! function_exists('rwb_footer_product_query_cleanup')) {
+    function rwb_footer_product_query_cleanup(array $args): array {
+        $limit = (int) ($args['limit'] ?? 0);
+        $orderby = (string) ($args['orderby'] ?? '');
+        $status = $args['status'] ?? '';
+        if (5 !== $limit || 'menu_order' !== $orderby || 'publish' !== $status) return $args;
+        $exclude = array_map('intval', (array) ($args['exclude'] ?? []));
+        $args['exclude'] = array_values(array_unique(array_merge($exclude, [56, 58])));
+        return $args;
+    }
+}
+add_action('wp_footer', static function (): void {
+    add_filter('woocommerce_product_object_query_args', 'rwb_footer_product_query_cleanup', 2000);
+}, 4);
+add_action('wp_footer', static function (): void {
+    remove_filter('woocommerce_product_object_query_args', 'rwb_footer_product_query_cleanup', 2000);
+}, 7);
+
 add_filter('woocommerce_add_to_cart_validation', function ($passed, $product_id, $quantity, $variation_id = 0, $variations = []) {
     if (! $passed || ! function_exists('WC') || ! WC()->cart) return $passed;
     $requested = max(0, (int) $quantity);
